@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let websocket = null;
     let sessionId = generateSessionId();
     let analysisResults = [];
+    let buttonMode = 'analysis'; // 'analysis' or 'results'
 
     // Initialize
     updateSelectAllButton();
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateRunAnalysisButton();
         });
     });
+
 
     // WebSocket functions
     function connectWebSocket() {
@@ -64,13 +66,15 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('WebSocket error:', error);
         };
     }
+
+    let currentProgressItem;
     
     function handleWebSocketMessage(message) {
         console.log('Received message:', message);
         
         switch(message.type) {
             case 'analysis_start':
-                showAnalysisProgress(message.message, 'info');
+                currentProgressItem = showAnalysisProgress(message.message, 'info');
                 break;
                 
             case 'progress_update':
@@ -78,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
                 
             case 'analysis_complete':
-                showAnalysisProgress(message.message, 'success');
+                markProgressAsCompleted(message.message, currentProgressItem);
                 break;
                 
             case 'analysis_error':
@@ -99,14 +103,24 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleAnalysisComplete(message) {
         isAnalyzing = false;
         analysisResults = message.completed_analyses;
+        buttonMode = 'results';
+        
+        // Close WebSocket connection since analysis is complete
+        if (websocket) {
+            websocket.close();
+            websocket = null;
+            console.log('WebSocket closed after analysis completion');
+        }
         
         // Update UI
         btnText.style.display = 'flex';
         btnLoading.style.display = 'none';
         
-        // Change button to "View Results"
+        // Change button to "View Results" and remove the click event listener
         btnText.innerHTML = '<i class="fas fa-chart-bar"></i> View Results';
-        runAnalysisBtn.onclick = showResults;
+        runAnalysisBtn.removeEventListener('click', runAnalysis);
+        runAnalysisBtn.onclick = null; // Clear any existing onclick
+        runAnalysisBtn.addEventListener('click', showResults);
         runAnalysisBtn.disabled = false;
         runAnalysisBtn.classList.add('results-ready');
         
@@ -144,6 +158,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         progressContainer.appendChild(progressItem);
         progressContainer.scrollTop = progressContainer.scrollHeight;
+        return progressItem;
+    }
+
+    function markProgressAsCompleted(message, progressItem){
+        progressItem.innerHTML = `
+            <i class="fas fa-${getProgressIcon("success")}"></i>
+            <span>${message}</span>
+            <span class="timestamp">${new Date().toLocaleTimeString()}</span>
+        `;
     }
     
     function createProgressContainer() {
@@ -249,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function runAnalysis() {
-        if (isAnalyzing) return;
+        if (isAnalyzing || buttonMode === 'results') return;
         
         const location = locationInput.value.trim();
         const selectedAnalysis = Array.from(checkboxes)
@@ -331,18 +354,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showResults() {
+        console.log('Redirecting to results viewer with session ID:', sessionId);
         // Redirect to results viewer with session ID
         window.location.href = `/results-viewer?session=${sessionId}`;
     }
     
     function resetForm() {
         isAnalyzing = false;
+        buttonMode = 'analysis';
+        
+        // Close WebSocket if connected
+        if (websocket) {
+            websocket.close();
+            websocket = null;
+            console.log('WebSocket closed during form reset');
+        }
         
         // Reset button state
         btnText.innerHTML = '<i class="fas fa-play"></i> Run Analysis';
         btnText.style.display = 'flex';
         btnLoading.style.display = 'none';
-        runAnalysisBtn.onclick = runAnalysis;
+        
+        // Remove any existing event listeners and reset to original function
+        runAnalysisBtn.removeEventListener('click', showResults);
+        runAnalysisBtn.onclick = null;
+        runAnalysisBtn.addEventListener('click', runAnalysis);
         runAnalysisBtn.disabled = false;
         runAnalysisBtn.classList.remove('results-ready');
         
@@ -363,12 +399,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (progressBar) progressBar.remove();
         
         updateRunAnalysisButton();
-        
-        // Close WebSocket if connected
-        if (websocket) {
-            websocket.close();
-            websocket = null;
-        }
     }
     
     function showNotification(message, type = 'info') {
@@ -449,11 +479,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add keyboard shortcuts
     document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + Enter to run analysis
+        // Ctrl/Cmd + Enter to run analysis or show results
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             e.preventDefault();
             if (!runAnalysisBtn.disabled && !isAnalyzing) {
-                if (runAnalysisBtn.onclick === showResults) {
+                if (buttonMode === 'results') {
                     showResults();
                 } else {
                     runAnalysis();
