@@ -5,7 +5,7 @@ from pydantic import BaseModel
 import asyncio
 import threading
 import json
-import os
+import os, base64, tempfile
 import sys
 import importlib.util
 import time

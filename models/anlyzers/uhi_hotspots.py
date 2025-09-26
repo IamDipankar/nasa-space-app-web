@@ -2,7 +2,7 @@
 # Urban heat island (UHI) hotspots from NASA MODIS LST (daytime), 60-day mean.
 # Makes an easy-to-read Folium map with hotspot polygons + markers.
 
-import os
+import os, base64, tempfile, dotenv
 import math
 from datetime import date, timedelta
 
@@ -10,6 +10,8 @@ import ee
 import folium
 from folium.plugins import MiniMap, Fullscreen, MousePosition, MeasureControl
 from shapely.geometry import Point, MultiPoint
+
+dotenv.load_dotenv()
 
 # ------------- CONFIG -------------
 AOI_BBOX = [90.32, 23.70, 90.52, 23.86]  # Narayanganj (W,S,E,N)
@@ -46,12 +48,17 @@ OUT_HTML = f"web_outputs/narayanganj_uhi_hotspots.html"
 # ----------------------------------
 
 
-def ee_init():
-    try:
-        ee.Initialize()
-    except Exception:
-        ee.Authenticate()
-        ee.Initialize()
+def ee_init_headless():
+    sa = os.environ["EE_SERVICE_ACCOUNT"]       # ee-runner@<project>.iam.gserviceaccount.com
+    key_b64 = os.environ["EE_KEY_B64"]          # base64 of the JSON key
+
+    # Write key to a temp file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        f.write(base64.b64decode(key_b64).decode("utf-8"))
+        key_path = f.name
+
+    creds = ee.ServiceAccountCredentials(sa, key_path)
+    ee.Initialize(credentials=creds)
 
 
 def build_lst_day_mean(aoi, start_iso, end_iso):
@@ -222,7 +229,7 @@ def build_map(aoi_bbox, hotspots, clusters):
 
 def main():
     print("Initializing Earth Engine…")
-    ee_init()
+    ee_init_headless()
 
     aoi = ee.Geometry.Rectangle(AOI_BBOX)
     start_iso, end_iso = str(START), str(END)

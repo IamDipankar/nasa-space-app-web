@@ -9,9 +9,11 @@
 #
 # First run will prompt a browser for Earth Engine auth (ee.Authenticate()).
 
-import os
+import os, base64, tempfile, dotenv
 import math
 import warnings
+
+dotenv.load_dotenv()
 
 # ---- Load heavy libs with a friendly error if NumPy ABI is mismatched ----
 try:
@@ -91,13 +93,17 @@ OUT_HTML = os.path.join("web_outputs", "narayanganj_green_access_ndvi_osm.html")
 # ----------------------------
 # EARTH ENGINE HELPERS
 # ----------------------------
-def ee_init():
-    try:
-        ee.Initialize()
-    except Exception:
-        ee.Authenticate()   # opens browser once
-        ee.Initialize()
+def ee_init_headless():
+    sa = os.environ["EE_SERVICE_ACCOUNT"]       # ee-runner@<project>.iam.gserviceaccount.com
+    key_b64 = os.environ["EE_KEY_B64"]          # base64 of the JSON key
 
+    # Write key to a temp file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        f.write(base64.b64decode(key_b64).decode("utf-8"))
+        key_path = f.name
+
+    creds = ee.ServiceAccountCredentials(sa, key_path)
+    ee.Initialize(credentials=creds)
 
 def choose_s2_composite(aoi_geom):
     """Pick a recent, low-cloud Sentinel-2 composite (L2A preferred, fallback to L1C)."""
@@ -182,7 +188,7 @@ def make_iso_polygon(edges_subset, buffer_m=EDGE_BUFFER_M):
 
 def main():
     # Earth Engine init
-    ee_init()
+    ee_init_headless()
 
     # OSMnx settings
     ox.settings.log_console = True

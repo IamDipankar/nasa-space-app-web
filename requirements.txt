@@ -7,12 +7,11 @@ rtree==1.2.*
 fiona==1.9.* 
 geopandas==0.14.* 
 osmnx==1.9.4 
-earthengine-api
+earthengine-api>=0.1.398
 fastapi
 uvicorn[standard]
 websockets
 pydantic
 folium
-fastapi
-uvicorn[standard]
-pydantic
+google-auth>=2.30.0
+python-dotenv
