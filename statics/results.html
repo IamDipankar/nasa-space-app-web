@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Urban Environmental Analyzer</title>
+    <link rel="stylesheet" href="/statics/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="results-nav">
+        <div class="results-nav-container">
+            <div class="nav-title">
+                <i class="fas fa-chart-bar"></i>
+                Analysis Results
+            </div>
+            <div class="nav-actions">
+                <div class="analysis-selector">
+                    <select id="analysisSelector" class="analysis-dropdown" onchange="switchAnalysis()">
+                        <option value="">Loading available results...</option>
+                    </select>
+                </div>
+                <a href="/" class="nav-btn">
+                    <i class="fas fa-plus"></i>
+                    Run Another Analysis
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="results-container">
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading analysis results...</p>
+            </div>
+        </div>
+        <iframe id="resultsFrame" class="results-iframe" style="display: none;"></iframe>
+        <div id="noResults" style="display: none; text-align: center; padding: 4rem 1rem;">
+            <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">No Results Available</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                No analysis results were found for this session. Please run an analysis first.
+            </p>
+            <a href="/" class="nav-btn">
+                <i class="fas fa-play"></i>
+                Start New Analysis
+            </a>
+        </div>
+    </main>
+
+    <script>
+        let sessionId = null;
+        let availableResults = [];
+        let currentAnalysis = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeResults();
+        });
+
+        function initializeResults() {
+            // Get session ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            sessionId = urlParams.get('session');
+            
+            if (!sessionId) {
+                showNoResults('No session ID provided');
+                console.log('No session Id provider')
+                return;
+            }
+
+            loadAvailableResults();
+        }
+
+        async function loadAvailableResults() {
+            try {
+                console.log(`I know the session id ${sessionId}`)
+                const response = await fetch(`/available-results/${sessionId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== 'completed' || data.available_results.length === 0) {
+                    showNoResults('No completed analysis results found');
+                    return;
+                }
+
+                availableResults = data.available_results;
+                populateAnalysisSelector();
+                
+                // Auto-select first analysis
+                if (availableResults.length > 0) {
+                    currentAnalysis = availableResults[0].analysis_type;
+                    document.getElementById('analysisSelector').value = currentAnalysis;
+                    loadAnalysisResult(currentAnalysis);
+                }
+
+            } catch (error) {
+                console.error('Error loading available results:', error);
+                showNoResults('Error loading results: ' + error.message);
+            }
+        }
+
+        function populateAnalysisSelector() {
+            const selector = document.getElementById('analysisSelector');
+            selector.innerHTML = '';
+
+            availableResults.forEach(result => {
+                const option = document.createElement('option');
+                option.value = result.analysis_type;
+                option.textContent = result.analysis_name;
+                selector.appendChild(option);
+            });
+
+            // Enable selector
+            selector.disabled = false;
+        }
+
+        function switchAnalysis() {
+            const selector = document.getElementById('analysisSelector');
+            const selectedAnalysis = selector.value;
+            
+            if (selectedAnalysis && selectedAnalysis !== currentAnalysis) {
+                currentAnalysis = selectedAnalysis;
+                loadAnalysisResult(selectedAnalysis);
+            }
+        }
+
+        async function loadAnalysisResult(analysisType) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const resultsFrame = document.getElementById('resultsFrame');
+            const noResults = document.getElementById('noResults');
+
+            // Show loading
+            loadingOverlay.style.display = 'flex';
+            resultsFrame.style.display = 'none';
+            noResults.style.display = 'none';
+
+            try {
+                // Load the analysis result in iframe
+                const resultUrl = `/results/${analysisType}`;
+                
+                resultsFrame.onload = function() {
+                    loadingOverlay.style.display = 'none';
+                    resultsFrame.style.display = 'block';
+                };
+                
+                resultsFrame.onerror = function() {
+                    showNoResults('Error loading analysis result');
+                };
+
+                resultsFrame.src = resultUrl;
+
+            } catch (error) {
+                console.error('Error loading analysis result:', error);
+                showNoResults('Error loading analysis: ' + error.message);
+            }
+        }
+
+        function showNoResults(message) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const resultsFrame = document.getElementById('resultsFrame');
+            const noResults = document.getElementById('noResults');
+
+            loadingOverlay.style.display = 'none';
+            resultsFrame.style.display = 'none';
+            noResults.style.display = 'block';
+
+            // Update message if provided
+            if (message) {
+                const messageElement = noResults.querySelector('p');
+                messageElement.textContent = message;
+            }
+        }
+
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', function(event) {
+            if (event.state && event.state.analysis) {
+                const analysisSelector = document.getElementById('analysisSelector');
+                analysisSelector.value = event.state.analysis;
+                switchAnalysis();
+            }
+        });
+
+        // Update browser history when switching analyses
+        function updateHistory(analysisType) {
+            const url = new URL(window.location);
+            url.searchParams.set('analysis', analysisType);
+            history.pushState({analysis: analysisType}, '', url);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + H to go home
+            if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+                e.preventDefault();
+                window.location.href = '/';
+            }
+            
+            // Arrow keys to switch between analyses
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                const selector = document.getElementById('analysisSelector');
+                const currentIndex = Array.from(selector.options).findIndex(option => option.value === currentAnalysis);
+                
+                let newIndex;
+                if (e.key === 'ArrowLeft') {
+                    newIndex = currentIndex > 0 ? currentIndex - 1 : selector.options.length - 1;
+                } else {
+                    newIndex = currentIndex < selector.options.length - 1 ? currentIndex + 1 : 0;
+                }
+                
+                selector.selectedIndex = newIndex;
+                switchAnalysis();
+            }
+        });
+
+        // Mobile dropdown enhancement
+        if (window.innerWidth <= 768) {
+            const selector = document.getElementById('analysisSelector');
+            selector.addEventListener('change', function() {
+                // Add haptic feedback on mobile
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

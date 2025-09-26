@@ -11,10 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // State variables
     let isAnalyzing = false;
     let allSelected = false;
+    let websocket = null;
+    let sessionId = generateSessionId();
+    let analysisResults = [];
 
     // Initialize
     updateSelectAllButton();
     updateRunAnalysisButton();
+    
+    // Set default location to Narayanganj
+    locationInput.value = "Narayanganj";
 
     // Event listeners
     selectAllBtn.addEventListener('click', toggleSelectAll);
@@ -29,7 +35,161 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Functions
+    // WebSocket functions
+    function connectWebSocket() {
+        const protocol = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+        console.log("Connecting to WebSocket at protocol:", protocol);
+        const wsUrl = `${protocol}//${window.location.host}/ws/${sessionId}`;
+        
+        websocket = new WebSocket(wsUrl);
+        
+        websocket.onopen = function(event) {
+            console.log('WebSocket connected');
+        };
+        
+        websocket.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            handleWebSocketMessage(message);
+        };
+        
+        websocket.onclose = function(event) {
+            console.log('WebSocket disconnected');
+            if (isAnalyzing) {
+                // Attempt to reconnect if analysis is still running
+                setTimeout(connectWebSocket, 2000);
+            }
+        };
+        
+        websocket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
+    }
+    
+    function handleWebSocketMessage(message) {
+        console.log('Received message:', message);
+        
+        switch(message.type) {
+            case 'analysis_start':
+                showAnalysisProgress(message.message, 'info');
+                break;
+                
+            case 'progress_update':
+                updateProgressBar(message.current, message.total, message.message);
+                break;
+                
+            case 'analysis_complete':
+                showAnalysisProgress(message.message, 'success');
+                break;
+                
+            case 'analysis_error':
+                showAnalysisProgress(message.message, 'error');
+                break;
+                
+            case 'all_analyses_complete':
+                handleAnalysisComplete(message);
+                break;
+                
+            case 'error':
+                showNotification(message.message, 'error');
+                resetForm();
+                break;
+        }
+    }
+    
+    function handleAnalysisComplete(message) {
+        isAnalyzing = false;
+        analysisResults = message.completed_analyses;
+        
+        // Update UI
+        btnText.style.display = 'flex';
+        btnLoading.style.display = 'none';
+        
+        // Change button to "View Results"
+        btnText.innerHTML = '<i class="fas fa-chart-bar"></i> View Results';
+        runAnalysisBtn.onclick = showResults;
+        runAnalysisBtn.disabled = false;
+        runAnalysisBtn.classList.add('results-ready');
+        
+        // Update status message
+        statusMessage.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            Analysis complete! ${message.completed_analyses.length} results ready to view.
+        `;
+        statusMessage.classList.add('success');
+        statusMessage.style.display = 'flex';
+        
+        // Re-enable form elements
+        locationInput.disabled = false;
+        selectAllBtn.disabled = false;
+        checkboxes.forEach(cb => cb.disabled = false);
+        
+        showNotification(message.message, 'success');
+    }
+
+    // Utility functions
+    function generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    function showAnalysisProgress(message, type = 'info') {
+        const progressContainer = document.getElementById('progressContainer') || createProgressContainer();
+        
+        const progressItem = document.createElement('div');
+        progressItem.className = `progress-item progress-${type}`;
+        progressItem.innerHTML = `
+            <i class="fas fa-${getProgressIcon(type)}"></i>
+            <span>${message}</span>
+            <span class="timestamp">${new Date().toLocaleTimeString()}</span>
+        `;
+        
+        progressContainer.appendChild(progressItem);
+        progressContainer.scrollTop = progressContainer.scrollHeight;
+    }
+    
+    function createProgressContainer() {
+        const container = document.createElement('div');
+        container.id = 'progressContainer';
+        container.className = 'progress-container';
+        container.innerHTML = '<h4><i class="fas fa-list"></i> Analysis Progress</h4>';
+        
+        statusMessage.insertAdjacentElement('afterend', container);
+        return container;
+    }
+    
+    function updateProgressBar(current, total, message) {
+        let progressBar = document.getElementById('analysisProgressBar');
+        
+        if (!progressBar) {
+            progressBar = document.createElement('div');
+            progressBar.id = 'analysisProgressBar';
+            progressBar.className = 'analysis-progress-bar';
+            progressBar.innerHTML = `
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                <div class="progress-text"></div>
+            `;
+            statusMessage.insertAdjacentElement('afterend', progressBar);
+        }
+        
+        const percentage = (current / total) * 100;
+        const fill = progressBar.querySelector('.progress-bar-fill');
+        const text = progressBar.querySelector('.progress-text');
+        
+        fill.style.width = `${percentage}%`;
+        text.textContent = `${message} (${current}/${total})`;
+    }
+    
+    function getProgressIcon(type) {
+        switch(type) {
+            case 'success': return 'check';
+            case 'error': return 'times';
+            case 'info': return 'spinner fa-spin';
+            default: return 'info-circle';
+        }
+    }
+
+    // Modified functions
     function toggleSelectAll() {
         if (isAnalyzing) return;
         
@@ -68,10 +228,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateRunAnalysisButton() {
+        if (isAnalyzing) return;
+        
         const hasLocation = locationInput.value.trim().length > 0;
         const hasSelectedAnalysis = Array.from(checkboxes).some(cb => cb.checked);
         
-        const canRun = hasLocation && hasSelectedAnalysis && !isAnalyzing;
+        const canRun = hasLocation && hasSelectedAnalysis;
         
         runAnalysisBtn.disabled = !canRun;
         
@@ -99,79 +261,114 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Start analysis
-        isAnalyzing = true;
+        // Note: Currently only supports Narayanganj
+        if (location.toLowerCase() !== 'narayanganj') {
+            showNotification('Currently, only Narayanganj is supported as a location', 'warning');
+            locationInput.value = 'Narayanganj';
+        }
         
-        // Update button state
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'flex';
-        runAnalysisBtn.disabled = true;
-        
-        // Show status message
-        statusMessage.style.display = 'flex';
-        
-        // Disable form elements
-        locationInput.disabled = true;
-        selectAllBtn.disabled = true;
-        checkboxes.forEach(cb => cb.disabled = true);
-        
-        // Add visual feedback to selected analysis options
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                const label = checkbox.nextElementSibling;
-                label.style.opacity = '0.7';
-                label.style.transform = 'scale(0.98)';
-            }
-        });
-        
-        console.log('Starting analysis for:', {
-            location: location,
-            analyses: selectedAnalysis
-        });
-        
-        // Here you would typically make an AJAX request to your backend
-        // For now, we'll simulate the analysis process
-        simulateAnalysis(location, selectedAnalysis);
+        startAnalysis(selectedAnalysis);
     }
     
-    function simulateAnalysis(location, analyses) {
-        // This is a simulation - replace with actual API call
-        setTimeout(() => {
-            // Reset form state
+    async function startAnalysis(selectedAnalysis) {
+        try {
+            isAnalyzing = true;
+            
+            // Connect to WebSocket
+            connectWebSocket();
+            
+            // Update UI
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'flex';
+            runAnalysisBtn.disabled = true;
+            runAnalysisBtn.classList.remove('results-ready');
+            
+            // Show status message
+            statusMessage.innerHTML = `
+                <i class="fas fa-clock"></i>
+                The analysis may take a while. Hold tight...
+            `;
+            statusMessage.classList.remove('success');
+            statusMessage.style.display = 'flex';
+            
+            // Disable form elements
+            locationInput.disabled = true;
+            selectAllBtn.disabled = true;
+            checkboxes.forEach(cb => cb.disabled = true);
+            
+            // Clear any previous progress
+            const existingProgress = document.getElementById('progressContainer');
+            if (existingProgress) existingProgress.remove();
+            
+            const existingProgressBar = document.getElementById('analysisProgressBar');
+            if (existingProgressBar) existingProgressBar.remove();
+            
+            // Send request to backend
+            const response = await fetch('/run-analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    location: locationInput.value.trim(),
+                    analyses: selectedAnalysis,
+                    session_id: sessionId
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('Analysis started:', result);
+            
+        } catch (error) {
+            console.error('Error starting analysis:', error);
+            showNotification('Error starting analysis: ' + error.message, 'error');
             resetForm();
-            
-            // Show completion message
-            showNotification(`Analysis completed for ${location}!`, 'success');
-            
-            // You could redirect to results page or show results here
-            // window.location.href = '/results';
-        }, 3000); // Simulate 3 seconds of analysis
+        }
+    }
+    
+    function showResults() {
+        // Redirect to results viewer with session ID
+        window.location.href = `/results-viewer?session=${sessionId}`;
     }
     
     function resetForm() {
         isAnalyzing = false;
         
         // Reset button state
+        btnText.innerHTML = '<i class="fas fa-play"></i> Run Analysis';
         btnText.style.display = 'flex';
         btnLoading.style.display = 'none';
+        runAnalysisBtn.onclick = runAnalysis;
         runAnalysisBtn.disabled = false;
+        runAnalysisBtn.classList.remove('results-ready');
         
         // Hide status message
         statusMessage.style.display = 'none';
+        statusMessage.classList.remove('success');
         
         // Re-enable form elements
         locationInput.disabled = false;
         selectAllBtn.disabled = false;
         checkboxes.forEach(cb => cb.disabled = false);
         
-        // Reset visual feedback
-        checkboxes.forEach(checkbox => {
-            const label = checkbox.nextElementSibling;
-            label.style.opacity = '1';
-            label.style.transform = 'scale(1)';
-        });
+        // Clean up progress elements
+        const progressContainer = document.getElementById('progressContainer');
+        if (progressContainer) progressContainer.remove();
+        
+        const progressBar = document.getElementById('analysisProgressBar');
+        if (progressBar) progressBar.remove();
         
         updateRunAnalysisButton();
+        
+        // Close WebSocket if connected
+        if (websocket) {
+            websocket.close();
+            websocket = null;
+        }
     }
     
     function showNotification(message, type = 'info') {
@@ -255,8 +452,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ctrl/Cmd + Enter to run analysis
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             e.preventDefault();
-            if (!runAnalysisBtn.disabled) {
-                runAnalysis();
+            if (!runAnalysisBtn.disabled && !isAnalyzing) {
+                if (runAnalysisBtn.onclick === showResults) {
+                    showResults();
+                } else {
+                    runAnalysis();
+                }
             }
         }
         
@@ -268,41 +469,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
-    // Add loading animation to form while analyzing
-    function addLoadingOverlay() {
-        const overlay = document.createElement('div');
-        overlay.id = 'loadingOverlay';
-        overlay.innerHTML = `
-            <div class="loading-spinner">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Processing your analysis...</p>
-            </div>
-        `;
-        
-        Object.assign(overlay.style, {
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            right: '0',
-            bottom: '0',
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: '9999',
-            backdropFilter: 'blur(5px)'
-        });
-        
-        const spinner = overlay.querySelector('.loading-spinner');
-        Object.assign(spinner.style, {
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '1rem',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-xl)'
-        });
-        
-        document.body.appendChild(overlay);
-    }
 });

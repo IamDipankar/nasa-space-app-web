@@ -8,6 +8,11 @@ fiona==1.9.*
 geopandas==0.14.* 
 osmnx==1.9.4 
 earthengine-api
+fastapi
+uvicorn[standard]
+websockets
+pydantic
 folium
 fastapi
-uvicorn
+uvicorn[standard]
+pydantic
