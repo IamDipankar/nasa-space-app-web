@@ -87,7 +87,7 @@ DATE_TRIES = [
 # Output paths
 USER = os.getenv("USER") or os.getenv("USERNAME") or "yourusername"
 DOWNLOADS = os.path.expanduser(f"~/Downloads")
-OUT_HTML = os.path.join("web_outputs", "narayanganj_green_access_ndvi_osm.html")
+OUT_HTML = os.path.join("web_outputs", "green_access.html")
 
 
 # ----------------------------
@@ -186,7 +186,7 @@ def make_iso_polygon(edges_subset, buffer_m=EDGE_BUFFER_M):
     return gpd.GeoSeries([merged], crs=edges_subset.crs)
 
 
-def main():
+def analyze_green_access_ndvi():
     # Earth Engine init
     ee_init_headless()
 
@@ -398,6 +398,8 @@ def main():
 
     print("Done.")
 
-
+def main():
+    return analyze_green_access_ndvi()
+ 
 if __name__ == "__main__":
     main()

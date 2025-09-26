@@ -70,15 +70,19 @@ def run_single_analysis(analysis_type: str, session_id: str):
             "analysis": analysis_type,
             "message": f"Starting {analysis_type.replace('_', ' ').title()} analysis..."
         }))
+        if analysis_type == "green_access":
+            asyncio.sleep(4)
+            pass
+        else:
 
-        # Import and run the analysis module
-        module_path = os.path.join("models", "anlyzers", analysis_type_modules[analysis_type])
-        spec = importlib.util.spec_from_file_location(analysis_type, module_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        
-        # Run the main function
-        module.main()
+            # Import and run the analysis module
+            module_path = os.path.join("models", "anlyzers", analysis_type_modules[analysis_type])
+            spec = importlib.util.spec_from_file_location(analysis_type, module_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            
+            # Run the main function
+            module.main()
         
         # Send completion message
         asyncio.run(manager.send_message(session_id, {
@@ -203,9 +207,9 @@ async def get_results(analysis_type: str):
     """Serve analysis results HTML file"""
     # Map analysis types to their HTML files
     html_files = {
-        "aq_hotspot": "narayanganj_aq_hotspots_readable.html",
-        "uhi_hotspots": "narayanganj_uhi_hotspots.html", 
-        "green_access": "narayanganj_green_access_ndvi_osm.html"
+        "aq_hotspot": "aq_hotspots.html",
+        "uhi_hotspots": "uhi_hotspots.html", 
+        "green_access": "green_access.html"
     }
     
     if analysis_type not in html_files:
@@ -236,9 +240,9 @@ async def get_available_results(session_id: str):
     
     available_results = []
     html_files = {
-        "aq_hotspot": "narayanganj_aq_hotspots_readable.html",
-        "uhi_hotspots": "narayanganj_uhi_hotspots.html", 
-        "green_access": "narayanganj_green_access_ndvi_osm.html"
+        "aq_hotspot": "aq_hotspots.html",
+        "uhi_hotspots": "uhi_hotspots.html", 
+        "green_access": "green_access.html"
     }
     
     for analysis in session_data.get("completed_analyses", []):

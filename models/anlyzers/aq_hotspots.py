@@ -48,7 +48,7 @@ COLORS = {
 }
 
 USER = os.getenv("USER") or os.getenv("USERNAME") or "user"
-OUT_HTML = f"web_outputs/narayanganj_aq_hotspots_readable.html"
+OUT_HTML = f"web_outputs/aq_hotspots.html"
 # --------------------------------------------
 
 
@@ -246,7 +246,7 @@ def build_map(aoi_bbox, hotspots, clusters):
     return m
 
 
-def main():
+def analyze_aq_hotspots(session_id = None):
     print("Initializing Earth Engine…")
     ee_init_headless()
 
@@ -290,6 +290,9 @@ def main():
     os.makedirs(os.path.dirname(OUT_HTML), exist_ok=True)
     m.save(OUT_HTML)
     print(f"✅ Saved: {OUT_HTML}")
+
+def main():
+    return analyze_aq_hotspots()
 
 if __name__ == "__main__":
     main()
