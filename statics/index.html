@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Heat, Air Quality and Green Access Analyzer</title>
+    <link rel="stylesheet" href="/statics/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">
+                <i class="fas fa-globe-americas"></i>
+            </div>
+            <h1 class="title">Urban Heat, Air Quality and Green Access Analyzer</h1>
+            <p class="subtitle">Comprehensive environmental analysis for urban areas</p>
+        </header>
+
+        <main class="main-content">
+            <div class="analysis-form">
+                <div class="form-group">
+                    <label for="location" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Location
+                    </label>
+                    <input 
+                        type="text" 
+                        id="location" 
+                        name="location" 
+                        class="form-input" 
+                        placeholder="Enter city or location name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-chart-line"></i>
+                        Analysis Options
+                    </label>
+                    <div class="checkbox-container">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="aq_hotspot" name="analysis[]" value="aq_hotspot" class="checkbox-input">
+                            <label for="aq_hotspot" class="checkbox-label">
+                                <i class="fas fa-smog"></i>
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Air Quality Hotspots</span>
+                                    <span class="checkbox-desc">Analyze air pollution patterns</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="uhi_hotspots" name="analysis[]" value="uhi_hotspots" class="checkbox-input">
+                            <label for="uhi_hotspots" class="checkbox-label">
+                                <i class="fas fa-thermometer-half"></i>
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Urban Heat Islands</span>
+                                    <span class="checkbox-desc">Identify heat hotspot areas</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="green_access" name="analysis[]" value="green_access" class="checkbox-input">
+                            <label for="green_access" class="checkbox-label">
+                                <i class="fas fa-leaf"></i>
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Green Access</span>
+                                    <span class="checkbox-desc">Assess green space accessibility</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="button" id="selectAllBtn" class="select-all-btn">
+                        <i class="fas fa-check-double"></i>
+                        Select All
+                    </button>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="runAnalysisBtn" class="run-analysis-btn">
+                        <span class="btn-text">
+                            <i class="fas fa-play"></i>
+                            Run Analysis
+                        </span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Analyzing...
+                        </span>
+                    </button>
+                </div>
+
+                <div id="statusMessage" class="status-message" style="display: none;">
+                    <i class="fas fa-clock"></i>
+                    The analysis may take a while. Hold tight...
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Urban Environmental Analysis Tool</p>
+        </footer>
+    </div>
+
+    <script src="/statics/script.js"></script>
+</body>
+</html>
