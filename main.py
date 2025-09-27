@@ -62,7 +62,7 @@ analysis_type_modules = {
     "green_access": "green_access_ndvi.py"
 }
 
-def run_single_analysis(analysis_type: str, session_id: str, ee_geometry, aoi_bbox):
+def run_single_analysis(analysis_type: str, session_id: str, ee_geometry, aoi_bbox, gdf):
     """Run a single analysis in a separate thread"""
     global analysis_type_modules
     try:
@@ -72,17 +72,16 @@ def run_single_analysis(analysis_type: str, session_id: str, ee_geometry, aoi_bb
             "analysis": analysis_type,
             "message": f"Starting {analysis_type.replace('_', ' ').title()} analysis..."
         }))
+        
+        # Import and run the analysis module
+        module_path = os.path.join("models", "anlyzers", analysis_type_modules[analysis_type])
+        spec = importlib.util.spec_from_file_location(analysis_type, module_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
         if analysis_type == "green_access":
-            asyncio.sleep(4)
-            pass
+            module.run(session_id, gdf)
+        # Run the main function
         else:
-            # Import and run the analysis module
-            module_path = os.path.join("models", "anlyzers", analysis_type_modules[analysis_type])
-            spec = importlib.util.spec_from_file_location(analysis_type, module_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            
-            # Run the main function
             module.run(session_id, ee_geometry, aoi_bbox)
         
         # Send completion message
@@ -107,6 +106,7 @@ def run_analyses_background(analyses: List[str], session_id: str, district: str,
     """Run multiple analyses in sequence"""
     # Extracting location
     ee_geometry, aoi_bbox = router.get_polygon_and_bbox(district, upazila)
+    gdf = router.get_gdf(district, upazila)
     try:
         completed_analyses = []
         total_analyses = len(analyses)
@@ -120,7 +120,7 @@ def run_analyses_background(analyses: List[str], session_id: str, district: str,
                 "message": f"Running {analysis.replace('_', ' ').title()} ({i + 1}/{total_analyses})"
             }))
             
-            success = run_single_analysis(analysis, session_id, ee_geometry, aoi_bbox)
+            success = run_single_analysis(analysis, session_id, ee_geometry, aoi_bbox, gdf)
             if success:
                 completed_analyses.append(analysis)
             
@@ -201,8 +201,8 @@ async def get_analysis_status(session_id: str):
     
     return analysis_status[session_id]
 
-@app.get("/results/{analysis_type}")
-async def get_results(analysis_type: str):
+@app.get("/results/{session_id}/{analysis_type}")
+async def get_results(session_id: str, analysis_type: str):
     """Serve analysis results HTML file"""
     # Map analysis types to their HTML files
     html_files = {
@@ -215,7 +215,7 @@ async def get_results(analysis_type: str):
         raise HTTPException(status_code=404, detail="Analysis type not found")
     
     html_file = html_files[analysis_type]
-    file_path = os.path.join("web_outputs", html_file)
+    file_path = os.path.join("web_outputs", session_id, html_file)
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Results file not found. Analysis may not be completed yet.")
@@ -252,7 +252,7 @@ async def get_available_results(session_id: str):
                     "analysis_type": analysis,
                     "analysis_name": analysis.replace('_', ' ').title(),
                     "file_name": html_files[analysis],
-                    "url": f"/results/{analysis}"
+                    "url": f"/results/{session_id}/{analysis}"
                 })
     
     return {"available_results": available_results, "status": "completed"}

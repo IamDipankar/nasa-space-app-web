@@ -186,7 +186,7 @@ def make_iso_polygon(edges_subset, buffer_m=EDGE_BUFFER_M):
     return gpd.GeoSeries([merged], crs=edges_subset.crs)
 
 
-def run(polygon = None, aoi_bbox = None, session_id = None):
+def run(session_id = None, gdf = None):
     # Earth Engine init
     ee_init_headless()
 
@@ -196,8 +196,8 @@ def run(polygon = None, aoi_bbox = None, session_id = None):
     ox.settings.timeout = 180
 
     print("Geocoding AOI…")
-    if polygon:
-        aoi = polygon
+    if gdf is not None:
+        aoi = gdf
     else:
         aoi = ox.geocode_to_gdf(PLACE)
     if aoi.empty:
@@ -236,10 +236,7 @@ def run(polygon = None, aoi_bbox = None, session_id = None):
     print("Vectorizing NDVI green polygons from GEE (this is server-side fast)…")
     # Build a simple rectangle AOI for GEE from the OSM aoi bounds
     minx, miny, maxx, maxy = aoi.to_crs(epsg=4326).total_bounds
-    if aoi_bbox:
-        gee_aoi = aoi_bbox
-    else:
-        gee_aoi = ee.Geometry.Rectangle([minx, miny, maxx, maxy])
+    gee_aoi = ee.Geometry.Rectangle([minx, miny, maxx, maxy])
 
     ndvi_greens = gee_green_polygons(gee_aoi, ndvi_min=NDVI_GREEN_MIN, scale=30, max_features=600)
 
@@ -391,16 +388,16 @@ def run(polygon = None, aoi_bbox = None, session_id = None):
     folium.LayerControl(collapsed=False).add_to(m)
 
     # Save map
-    # out_cwd = "narayanganj_green_access_ndvi_osm.html"
-    # m.save(out_cwd)
-    # print(f"✅ Saved map in current folder: {out_cwd}")
+    out_dir = os.path.join("web_outputs", session_id, "green_access.html")
+    m.save(out_dir)
+    print(f"✅ Saved map in current folder: {out_dir}")
 
-    try:
-        os.makedirs(DOWNLOADS, exist_ok=True)
-        m.save(OUT_HTML)
-        print(f"✅ Also saved to: {OUT_HTML}")
-    except Exception as e:
-        print("Could not save to ~/Downloads:", e)
+    # try:
+    #     os.makedirs(DOWNLOADS, exist_ok=True)
+    #     m.save(OUT_HTML)
+    #     print(f"✅ Also saved to: {OUT_HTML}")
+    # except Exception as e:
+    #     print("Could not save to ~/Downloads:", e)
 
     print("Done.")
 

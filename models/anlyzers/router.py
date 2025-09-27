@@ -38,6 +38,19 @@ def get_upazilas_by_district(district_name: str):
     filtered_upz = upz[upz['DISTRICT_N'] == district_name]
     return sorted(filtered_upz['UPAZILA_NA'].unique().tolist())
 
+def get_gdf(district_name: str, upazila_name: str = None):
+    """Get GeoDataFrame for a specific district or upazila"""
+    if upazila_name:
+        filtered_upz = upz[(upz['UPAZILA_NA'] == upazila_name) & (upz['DISTRICT_N'] == district_name)]
+        if filtered_upz.empty:
+            raise ValueError(f"Could not find upazila '{upazila_name}' in district '{district_name}'")
+        return filtered_upz
+    else:
+        filtered_dist = dist[dist['DISTRICT_N'] == district_name]
+        if filtered_dist.empty:
+            raise ValueError(f"Could not find district '{district_name}'")
+        return filtered_dist.iloc[0, :]
+
 def get_polygon_and_bbox(district_name: str, upazila_name: str = None):
     functions = {
         "aq_hotspots": aq_hotspots.run,
