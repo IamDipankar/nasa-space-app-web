@@ -49,7 +49,7 @@ def get_gdf(district_name: str, upazila_name: str = None):
         filtered_dist = dist[dist['DISTRICT_N'] == district_name]
         if filtered_dist.empty:
             raise ValueError(f"Could not find district '{district_name}'")
-        return filtered_dist.iloc[0, :]
+        return filtered_dist
 
 def get_polygon_and_bbox(district_name: str, upazila_name: str = None):
     functions = {

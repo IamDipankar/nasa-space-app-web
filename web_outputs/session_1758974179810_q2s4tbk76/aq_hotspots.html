@@ -1,0 +1,4158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_2437823f839599890eb6d85bad067316 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
+</head>
+<body>
+    
+    
+    <div style="position: fixed; bottom: 18px; left: 18px; z-index:9999; background: white;
+                padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+      <b>Air-Quality Hotspots (60-day avg)</b><br>
+      <span style="display:inline-block;width:12px;height:12px;background:#d32f2f;border:1px solid #d32f2f;"></span>
+      Severe (≥ 2σ above AOI mean)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#fb8c00;border:1px solid #fb8c00;"></span>
+      High (1–2σ)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#ffd54f;border:1px solid #ffd54f;"></span>
+      Elevated (0.5–1σ)<br>
+      <i>Shaded polygons show cluster areas.</i>
+    </div>
+    
+    
+            <div class="folium-map" id="map_2437823f839599890eb6d85bad067316" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_2437823f839599890eb6d85bad067316 = L.map(
+                "map_2437823f839599890eb6d85bad067316",
+                {
+                    center: [23.715880573000078, 90.58538652700008],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_2437823f839599890eb6d85bad067316);
+
+            
+
+        
+    
+            var tile_layer_c6bbf6417f8bef05d4a82cc9ac6fb9aa = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_c6bbf6417f8bef05d4a82cc9ac6fb9aa.addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        function geo_json_e03ad6d51e616763028123e17d8dbf03_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#fb8c00", "fillColor": "#fb8c00", "fillOpacity": 0.18, "weight": 2};
+            }
+        }
+
+        function geo_json_e03ad6d51e616763028123e17d8dbf03_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_e03ad6d51e616763028123e17d8dbf03 = L.geoJson(null, {
+                onEachFeature: geo_json_e03ad6d51e616763028123e17d8dbf03_onEachFeature,
+            
+                style: geo_json_e03ad6d51e616763028123e17d8dbf03_styler,
+            ...{
+}
+        });
+
+        function geo_json_e03ad6d51e616763028123e17d8dbf03_add (data) {
+            geo_json_e03ad6d51e616763028123e17d8dbf03
+                .addData(data);
+        }
+            geo_json_e03ad6d51e616763028123e17d8dbf03_add({"features": [{"geometry": {"coordinates": [[[90.55467221566836, 23.594250937399234], [90.54568906282718, 23.612217243081624], [90.57263852135075, 23.62120039592282], [90.58162167419195, 23.62120039592282], [90.58162167419195, 23.603234090240427], [90.56365536850956, 23.594250937399234], [90.55467221566836, 23.594250937399234]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_e03ad6d51e616763028123e17d8dbf03.bindTooltip(
+                `<div>
+                     Cluster 0 — HIGH (n=12)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_e03ad6d51e616763028123e17d8dbf03.addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        function geo_json_e80e9192112fc2692d4fa1c570b3053a_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#fb8c00", "fillColor": "#fb8c00", "fillOpacity": 0.18, "weight": 2};
+            }
+        }
+
+        function geo_json_e80e9192112fc2692d4fa1c570b3053a_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_e80e9192112fc2692d4fa1c570b3053a = L.geoJson(null, {
+                onEachFeature: geo_json_e80e9192112fc2692d4fa1c570b3053a_onEachFeature,
+            
+                style: geo_json_e80e9192112fc2692d4fa1c570b3053a_styler,
+            ...{
+}
+        });
+
+        function geo_json_e80e9192112fc2692d4fa1c570b3053a_add (data) {
+            geo_json_e80e9192112fc2692d4fa1c570b3053a
+                .addData(data);
+        }
+            geo_json_e80e9192112fc2692d4fa1c570b3053a_add({"features": [{"geometry": {"coordinates": [[[90.47382384009761, 23.612217243081624], [90.46484068725641, 23.630183548764013], [90.46484068725641, 23.657133007287598], [90.49179014578, 23.657133007287598], [90.5007732986212, 23.62120039592282], [90.49179014578, 23.612217243081624], [90.47382384009761, 23.612217243081624]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_e80e9192112fc2692d4fa1c570b3053a.bindTooltip(
+                `<div>
+                     Cluster 1 — HIGH (n=18)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_e80e9192112fc2692d4fa1c570b3053a.addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        function geo_json_551e57bf67af25c0e1a8aec84a71b58a_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#fb8c00", "fillColor": "#fb8c00", "fillOpacity": 0.18, "weight": 2};
+            }
+        }
+
+        function geo_json_551e57bf67af25c0e1a8aec84a71b58a_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_551e57bf67af25c0e1a8aec84a71b58a = L.geoJson(null, {
+                onEachFeature: geo_json_551e57bf67af25c0e1a8aec84a71b58a_onEachFeature,
+            
+                style: geo_json_551e57bf67af25c0e1a8aec84a71b58a_styler,
+            ...{
+}
+        });
+
+        function geo_json_551e57bf67af25c0e1a8aec84a71b58a_add (data) {
+            geo_json_551e57bf67af25c0e1a8aec84a71b58a
+                .addData(data);
+        }
+            geo_json_551e57bf67af25c0e1a8aec84a71b58a_add({"features": [{"geometry": {"coordinates": [[[90.5097564514624, 23.684082465811187], [90.5097564514624, 23.702048771493576], [90.52772275714479, 23.702048771493576], [90.52772275714479, 23.69306561865238], [90.5097564514624, 23.684082465811187]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_551e57bf67af25c0e1a8aec84a71b58a.bindTooltip(
+                `<div>
+                     Cluster 2 — HIGH (n=6)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_551e57bf67af25c0e1a8aec84a71b58a.addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        function geo_json_7f474a549a2edcca2bc5134bea07cba0_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#fb8c00", "fillColor": "#fb8c00", "fillOpacity": 0.18, "weight": 2};
+            }
+        }
+
+        function geo_json_7f474a549a2edcca2bc5134bea07cba0_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_7f474a549a2edcca2bc5134bea07cba0 = L.geoJson(null, {
+                onEachFeature: geo_json_7f474a549a2edcca2bc5134bea07cba0_onEachFeature,
+            
+                style: geo_json_7f474a549a2edcca2bc5134bea07cba0_styler,
+            ...{
+}
+        });
+
+        function geo_json_7f474a549a2edcca2bc5134bea07cba0_add (data) {
+            geo_json_7f474a549a2edcca2bc5134bea07cba0
+                .addData(data);
+        }
+            geo_json_7f474a549a2edcca2bc5134bea07cba0_add({"features": [{"geometry": {"coordinates": [[[90.5007732986212, 23.720015077175965], [90.49179014578, 23.74696453569955], [90.4828069929388, 23.782897147064332], [90.49179014578, 23.80086345274672], [90.5007732986212, 23.809846605587918], [90.52772275714479, 23.809846605587918], [90.52772275714479, 23.72899823001716], [90.51873960430359, 23.720015077175965], [90.5007732986212, 23.720015077175965]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_7f474a549a2edcca2bc5134bea07cba0.bindTooltip(
+                `<div>
+                     Cluster 3 — HIGH (n=39)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_7f474a549a2edcca2bc5134bea07cba0.addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        function geo_json_f90d42c499759b4a73879a50ba055cde_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#fb8c00", "fillColor": "#fb8c00", "fillOpacity": 0.18, "weight": 2};
+            }
+        }
+
+        function geo_json_f90d42c499759b4a73879a50ba055cde_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_f90d42c499759b4a73879a50ba055cde = L.geoJson(null, {
+                onEachFeature: geo_json_f90d42c499759b4a73879a50ba055cde_onEachFeature,
+            
+                style: geo_json_f90d42c499759b4a73879a50ba055cde_styler,
+            ...{
+}
+        });
+
+        function geo_json_f90d42c499759b4a73879a50ba055cde_add (data) {
+            geo_json_f90d42c499759b4a73879a50ba055cde
+                .addData(data);
+        }
+            geo_json_f90d42c499759b4a73879a50ba055cde_add({"features": [{"geometry": {"coordinates": [[[90.5007732986212, 23.836796064111503], [90.49179014578, 23.8457792169527], [90.5007732986212, 23.854762369793896], [90.51873960430359, 23.8457792169527], [90.5097564514624, 23.836796064111503], [90.5007732986212, 23.836796064111503]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_f90d42c499759b4a73879a50ba055cde.bindTooltip(
+                `<div>
+                     Cluster 4 — HIGH (n=7)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_f90d42c499759b4a73879a50ba055cde.addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+            var circle_marker_fd957d5915fabc2d716faa0d898e29fc = L.circleMarker(
+                [23.594250937399234, 90.55467221566836],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_19bef9bd2845f309ed00db7e9333e1dd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_11a3d1ece48b10503a9ae889e6803209 = $(`<div id="html_11a3d1ece48b10503a9ae889e6803209" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.30 (top 89%)<br>NO₂ z: 0.54 | PM₂.₅ z: 1.36 | CO z: -0.32<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_19bef9bd2845f309ed00db7e9333e1dd.setContent(html_11a3d1ece48b10503a9ae889e6803209);
+            
+        
+
+        circle_marker_fd957d5915fabc2d716faa0d898e29fc.bindPopup(popup_19bef9bd2845f309ed00db7e9333e1dd)
+        ;
+
+        
+    
+    
+            circle_marker_fd957d5915fabc2d716faa0d898e29fc.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_58669e471f24a1b80b063f4acbb2e99c = L.circleMarker(
+                [23.594250937399234, 90.56365536850956],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_338e1686a9b995a1b9927f743aa130ad = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a63e70e09ed4f185df3efe875474150f = $(`<div id="html_a63e70e09ed4f185df3efe875474150f" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.80 (top 96%)<br>NO₂ z: 0.68 | PM₂.₅ z: 1.54 | CO z: 0.36<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_338e1686a9b995a1b9927f743aa130ad.setContent(html_a63e70e09ed4f185df3efe875474150f);
+            
+        
+
+        circle_marker_58669e471f24a1b80b063f4acbb2e99c.bindPopup(popup_338e1686a9b995a1b9927f743aa130ad)
+        ;
+
+        
+    
+    
+            circle_marker_58669e471f24a1b80b063f4acbb2e99c.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7fe39c96cb5ac5201b80a4bfe5dd0d5a = L.circleMarker(
+                [23.603234090240427, 90.55467221566836],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_350ff46fa603bebb7015d8462b7645e0 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e4548aee0b511161b17bbd30133ba3be = $(`<div id="html_e4548aee0b511161b17bbd30133ba3be" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.04 (top 85%)<br>NO₂ z: 0.92 | PM₂.₅ z: 0.33 | CO z: 0.26<br>Mixed drivers</div>`)[0];
+                popup_350ff46fa603bebb7015d8462b7645e0.setContent(html_e4548aee0b511161b17bbd30133ba3be);
+            
+        
+
+        circle_marker_7fe39c96cb5ac5201b80a4bfe5dd0d5a.bindPopup(popup_350ff46fa603bebb7015d8462b7645e0)
+        ;
+
+        
+    
+    
+            circle_marker_7fe39c96cb5ac5201b80a4bfe5dd0d5a.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_936d88e609a15ccf2abbec2ad350dfb1 = L.circleMarker(
+                [23.603234090240427, 90.56365536850956],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_2001db6c61d2fa25e891c61fb92187cc = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_43de49111004e2adc442d8181f9da770 = $(`<div id="html_43de49111004e2adc442d8181f9da770" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.56 (top 94%)<br>NO₂ z: 0.95 | PM₂.₅ z: 0.96 | CO z: 0.36<br>Mixed drivers</div>`)[0];
+                popup_2001db6c61d2fa25e891c61fb92187cc.setContent(html_43de49111004e2adc442d8181f9da770);
+            
+        
+
+        circle_marker_936d88e609a15ccf2abbec2ad350dfb1.bindPopup(popup_2001db6c61d2fa25e891c61fb92187cc)
+        ;
+
+        
+    
+    
+            circle_marker_936d88e609a15ccf2abbec2ad350dfb1.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_98af377f50874412ccb2ec715ee9100e = L.circleMarker(
+                [23.603234090240427, 90.57263852135075],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_7b9cbb8747534d4937ed6efe5486a6f7 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_89b1d6dbaeeb16f4e476584860fa552a = $(`<div id="html_89b1d6dbaeeb16f4e476584860fa552a" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.06 (top 86%)<br>NO₂ z: 0.52 | PM₂.₅ z: 0.42 | CO z: 0.94<br>Mixed drivers</div>`)[0];
+                popup_7b9cbb8747534d4937ed6efe5486a6f7.setContent(html_89b1d6dbaeeb16f4e476584860fa552a);
+            
+        
+
+        circle_marker_98af377f50874412ccb2ec715ee9100e.bindPopup(popup_7b9cbb8747534d4937ed6efe5486a6f7)
+        ;
+
+        
+    
+    
+            circle_marker_98af377f50874412ccb2ec715ee9100e.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_177667649a9277f92c6b6e7de6fdd8d7 = L.circleMarker(
+                [23.603234090240427, 90.58162167419195],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_daa7fbade039919ddcbec22eb5e68930 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_40c9c434af00a0b76332142ab0e05ed2 = $(`<div id="html_40c9c434af00a0b76332142ab0e05ed2" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.85 (top 97%)<br>NO₂ z: 0.34 | PM₂.₅ z: 1.86 | CO z: 0.53<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_daa7fbade039919ddcbec22eb5e68930.setContent(html_40c9c434af00a0b76332142ab0e05ed2);
+            
+        
+
+        circle_marker_177667649a9277f92c6b6e7de6fdd8d7.bindPopup(popup_daa7fbade039919ddcbec22eb5e68930)
+        ;
+
+        
+    
+    
+            circle_marker_177667649a9277f92c6b6e7de6fdd8d7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_286c531ad64ccfeeba3f91f7910be873 = L.circleMarker(
+                [23.612217243081624, 90.44687438157402],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_f95dc5887dbc2690fbe101ad31d0c6dd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_dd1ce54aff784c7e20ebc88130ec6998 = $(`<div id="html_dd1ce54aff784c7e20ebc88130ec6998" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.01 (top 85%)<br>NO₂ z: -0.16 | PM₂.₅ z: 1.59 | CO z: -0.18<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_f95dc5887dbc2690fbe101ad31d0c6dd.setContent(html_dd1ce54aff784c7e20ebc88130ec6998);
+            
+        
+
+        circle_marker_286c531ad64ccfeeba3f91f7910be873.bindPopup(popup_f95dc5887dbc2690fbe101ad31d0c6dd)
+        ;
+
+        
+    
+    
+            circle_marker_286c531ad64ccfeeba3f91f7910be873.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2df088eeb1e769f6bd67f8824861011d = L.circleMarker(
+                [23.612217243081624, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_e476c46a9b5df96fb9bbd42a055f316d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4e1f296ae661524f6e4924e73be0d18c = $(`<div id="html_4e1f296ae661524f6e4924e73be0d18c" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.01 (top 97%)<br>NO₂ z: 0.73 | PM₂.₅ z: 1.85 | CO z: 0.20<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_e476c46a9b5df96fb9bbd42a055f316d.setContent(html_4e1f296ae661524f6e4924e73be0d18c);
+            
+        
+
+        circle_marker_2df088eeb1e769f6bd67f8824861011d.bindPopup(popup_e476c46a9b5df96fb9bbd42a055f316d)
+        ;
+
+        
+    
+    
+            circle_marker_2df088eeb1e769f6bd67f8824861011d.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b702921ba8b47f4430f2f8a7f3f029f7 = L.circleMarker(
+                [23.612217243081624, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_33a86a64a7e6d192dae9c0ce9e9ef09e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4fef5d52764dc3ed467b44cb0f9546da = $(`<div id="html_4fef5d52764dc3ed467b44cb0f9546da" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.32 (top 90%)<br>NO₂ z: 1.23 | PM₂.₅ z: 0.27 | CO z: 0.53<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_33a86a64a7e6d192dae9c0ce9e9ef09e.setContent(html_4fef5d52764dc3ed467b44cb0f9546da);
+            
+        
+
+        circle_marker_b702921ba8b47f4430f2f8a7f3f029f7.bindPopup(popup_33a86a64a7e6d192dae9c0ce9e9ef09e)
+        ;
+
+        
+    
+    
+            circle_marker_b702921ba8b47f4430f2f8a7f3f029f7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fe378bffde67c3b6b3714f3024b6f9a2 = L.circleMarker(
+                [23.612217243081624, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_b6119b1d77dd6ba2535db636f02c177f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_058861aa4448dfdfe7092657d42b3d30 = $(`<div id="html_058861aa4448dfdfe7092657d42b3d30" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.65 (top 94%)<br>NO₂ z: 1.10 | PM₂.₅ z: 1.00 | CO z: 0.20<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_b6119b1d77dd6ba2535db636f02c177f.setContent(html_058861aa4448dfdfe7092657d42b3d30);
+            
+        
+
+        circle_marker_fe378bffde67c3b6b3714f3024b6f9a2.bindPopup(popup_b6119b1d77dd6ba2535db636f02c177f)
+        ;
+
+        
+    
+    
+            circle_marker_fe378bffde67c3b6b3714f3024b6f9a2.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3abd2c6f1f20df8f26f8f88aeac94f5f = L.circleMarker(
+                [23.612217243081624, 90.54568906282718],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_55be24fb054da8cac4c854b91b9a54aa = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_50a90915b59ca4d3e9067f01d71cd208 = $(`<div id="html_50a90915b59ca4d3e9067f01d71cd208" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.21 (top 88%)<br>NO₂ z: 0.96 | PM₂.₅ z: 0.60 | CO z: 0.10<br>Mixed drivers</div>`)[0];
+                popup_55be24fb054da8cac4c854b91b9a54aa.setContent(html_50a90915b59ca4d3e9067f01d71cd208);
+            
+        
+
+        circle_marker_3abd2c6f1f20df8f26f8f88aeac94f5f.bindPopup(popup_55be24fb054da8cac4c854b91b9a54aa)
+        ;
+
+        
+    
+    
+            circle_marker_3abd2c6f1f20df8f26f8f88aeac94f5f.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_92324698cd050e124b150c63d912d645 = L.circleMarker(
+                [23.612217243081624, 90.55467221566836],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_b7cbe4747387dc2f65ce962aa042ac14 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_085bedb59f795e1c6eef0133e90834e5 = $(`<div id="html_085bedb59f795e1c6eef0133e90834e5" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.48 (top 93%)<br>NO₂ z: 1.29 | PM₂.₅ z: 0.60 | CO z: 0.17<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_b7cbe4747387dc2f65ce962aa042ac14.setContent(html_085bedb59f795e1c6eef0133e90834e5);
+            
+        
+
+        circle_marker_92324698cd050e124b150c63d912d645.bindPopup(popup_b7cbe4747387dc2f65ce962aa042ac14)
+        ;
+
+        
+    
+    
+            circle_marker_92324698cd050e124b150c63d912d645.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_62aaf65a6cb4b3176f0a7ca41e775c15 = L.circleMarker(
+                [23.612217243081624, 90.56365536850956],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_1265b8f6b0ff3e26137986e9e66f2ca5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_db40d28fa0ed214278d48f429362ba48 = $(`<div id="html_db40d28fa0ed214278d48f429362ba48" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.40 (top 91%)<br>NO₂ z: 1.36 | PM₂.₅ z: 0.20 | CO z: 0.61<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_1265b8f6b0ff3e26137986e9e66f2ca5.setContent(html_db40d28fa0ed214278d48f429362ba48);
+            
+        
+
+        circle_marker_62aaf65a6cb4b3176f0a7ca41e775c15.bindPopup(popup_1265b8f6b0ff3e26137986e9e66f2ca5)
+        ;
+
+        
+    
+    
+            circle_marker_62aaf65a6cb4b3176f0a7ca41e775c15.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3161b04299d009f6a24bf4c23fe12574 = L.circleMarker(
+                [23.612217243081624, 90.57263852135075],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_b00802a8783091fef222bdba0290c740 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8337b6fa79cc110d367d473c3674fc87 = $(`<div id="html_8337b6fa79cc110d367d473c3674fc87" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.14 (top 98%)<br>NO₂ z: 1.03 | PM₂.₅ z: 1.23 | CO z: 1.18<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion<br>High CO → combustion/transport</div>`)[0];
+                popup_b00802a8783091fef222bdba0290c740.setContent(html_8337b6fa79cc110d367d473c3674fc87);
+            
+        
+
+        circle_marker_3161b04299d009f6a24bf4c23fe12574.bindPopup(popup_b00802a8783091fef222bdba0290c740)
+        ;
+
+        
+    
+    
+            circle_marker_3161b04299d009f6a24bf4c23fe12574.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3352a8ff1700809f282a1216d5db7d49 = L.circleMarker(
+                [23.612217243081624, 90.60857113271554],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_c26e88b3b3168974462d07ad8765b56c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_85bea0d8180d8dac14b4fb8d09561316 = $(`<div id="html_85bea0d8180d8dac14b4fb8d09561316" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.03 (top 85%)<br>NO₂ z: 0.00 | PM₂.₅ z: 1.31 | CO z: 0.12<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_c26e88b3b3168974462d07ad8765b56c.setContent(html_85bea0d8180d8dac14b4fb8d09561316);
+            
+        
+
+        circle_marker_3352a8ff1700809f282a1216d5db7d49.bindPopup(popup_c26e88b3b3168974462d07ad8765b56c)
+        ;
+
+        
+    
+    
+            circle_marker_3352a8ff1700809f282a1216d5db7d49.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b9f0ec66445ad5a943e56f19d42fa252 = L.circleMarker(
+                [23.62120039592282, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_31deee258de88a7eef525635cd0b56f3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_20ee7c84eca35110a2ac5f604165d4e8 = $(`<div id="html_20ee7c84eca35110a2ac5f604165d4e8" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.14 (top 87%)<br>NO₂ z: 0.74 | PM₂.₅ z: 1.06 | CO z: -0.54<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_31deee258de88a7eef525635cd0b56f3.setContent(html_20ee7c84eca35110a2ac5f604165d4e8);
+            
+        
+
+        circle_marker_b9f0ec66445ad5a943e56f19d42fa252.bindPopup(popup_31deee258de88a7eef525635cd0b56f3)
+        ;
+
+        
+    
+    
+            circle_marker_b9f0ec66445ad5a943e56f19d42fa252.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6b80a751e786906b1ec3dfb0fe646170 = L.circleMarker(
+                [23.62120039592282, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_e8342525d836035f6ed86cc43129527c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_7ff0e2370888697752d625922d3756a8 = $(`<div id="html_7ff0e2370888697752d625922d3756a8" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.11 (top 98%)<br>NO₂ z: 1.09 | PM₂.₅ z: 1.18 | CO z: 1.11<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion<br>High CO → combustion/transport</div>`)[0];
+                popup_e8342525d836035f6ed86cc43129527c.setContent(html_7ff0e2370888697752d625922d3756a8);
+            
+        
+
+        circle_marker_6b80a751e786906b1ec3dfb0fe646170.bindPopup(popup_e8342525d836035f6ed86cc43129527c)
+        ;
+
+        
+    
+    
+            circle_marker_6b80a751e786906b1ec3dfb0fe646170.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fe38d7402ae0693eb2f00dec06db25eb = L.circleMarker(
+                [23.62120039592282, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_0ced66e0365bbb1b6f3b7a87c3c62c36 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_5b2d3b0d68a62cc44e482fb934cb7138 = $(`<div id="html_5b2d3b0d68a62cc44e482fb934cb7138" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.78 (top 96%)<br>NO₂ z: 0.99 | PM₂.₅ z: 1.07 | CO z: 0.64<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_0ced66e0365bbb1b6f3b7a87c3c62c36.setContent(html_5b2d3b0d68a62cc44e482fb934cb7138);
+            
+        
+
+        circle_marker_fe38d7402ae0693eb2f00dec06db25eb.bindPopup(popup_0ced66e0365bbb1b6f3b7a87c3c62c36)
+        ;
+
+        
+    
+    
+            circle_marker_fe38d7402ae0693eb2f00dec06db25eb.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4f2647e9f99cb64b961c93567fd54af5 = L.circleMarker(
+                [23.62120039592282, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_ada223c38aa2e95fc76c6a0664646c53 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_504ea0a2d0481d4c67b1983ddca73e27 = $(`<div id="html_504ea0a2d0481d4c67b1983ddca73e27" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.37 (top 90%)<br>NO₂ z: 0.86 | PM₂.₅ z: 0.88 | CO z: 0.16<br>Mixed drivers</div>`)[0];
+                popup_ada223c38aa2e95fc76c6a0664646c53.setContent(html_504ea0a2d0481d4c67b1983ddca73e27);
+            
+        
+
+        circle_marker_4f2647e9f99cb64b961c93567fd54af5.bindPopup(popup_ada223c38aa2e95fc76c6a0664646c53)
+        ;
+
+        
+    
+    
+            circle_marker_4f2647e9f99cb64b961c93567fd54af5.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ae2b026076adb1ed1424c4e91d076a5b = L.circleMarker(
+                [23.62120039592282, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_3dad36d10d118b4e293ee05d5087522e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ed6d7cf64d978bda8e0b75e47f9ef8d9 = $(`<div id="html_ed6d7cf64d978bda8e0b75e47f9ef8d9" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.05 (top 86%)<br>NO₂ z: 0.86 | PM₂.₅ z: 0.45 | CO z: 0.16<br>Mixed drivers</div>`)[0];
+                popup_3dad36d10d118b4e293ee05d5087522e.setContent(html_ed6d7cf64d978bda8e0b75e47f9ef8d9);
+            
+        
+
+        circle_marker_ae2b026076adb1ed1424c4e91d076a5b.bindPopup(popup_3dad36d10d118b4e293ee05d5087522e)
+        ;
+
+        
+    
+    
+            circle_marker_ae2b026076adb1ed1424c4e91d076a5b.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4127b8952b4d2a6b3edafa8f0c367ce4 = L.circleMarker(
+                [23.62120039592282, 90.57263852135075],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_4fb739e3971e7586328eb1a940598ceb = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_66ed96e70762bc5db21bfea100f9fe71 = $(`<div id="html_66ed96e70762bc5db21bfea100f9fe71" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.50 (top 93%)<br>NO₂ z: 1.65 | PM₂.₅ z: 0.13 | CO z: 0.45<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_4fb739e3971e7586328eb1a940598ceb.setContent(html_66ed96e70762bc5db21bfea100f9fe71);
+            
+        
+
+        circle_marker_4127b8952b4d2a6b3edafa8f0c367ce4.bindPopup(popup_4fb739e3971e7586328eb1a940598ceb)
+        ;
+
+        
+    
+    
+            circle_marker_4127b8952b4d2a6b3edafa8f0c367ce4.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7168388e9ba4872bec3e4756310b4810 = L.circleMarker(
+                [23.62120039592282, 90.58162167419195],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_48ec2278cff626901e7319c13ff1f738 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a5f24752ce89870521614b3ae40743cd = $(`<div id="html_a5f24752ce89870521614b3ae40743cd" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.68 (top 95%)<br>NO₂ z: 1.36 | PM₂.₅ z: 0.86 | CO z: 0.05<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_48ec2278cff626901e7319c13ff1f738.setContent(html_a5f24752ce89870521614b3ae40743cd);
+            
+        
+
+        circle_marker_7168388e9ba4872bec3e4756310b4810.bindPopup(popup_48ec2278cff626901e7319c13ff1f738)
+        ;
+
+        
+    
+    
+            circle_marker_7168388e9ba4872bec3e4756310b4810.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8040b46ad82253cd59a8bcf6a6e74e4a = L.circleMarker(
+                [23.62120039592282, 90.59060482703315],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_8ea59aa61c9be97031da95b0750a0191 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d16563a53f2b7235a08434f0b43a7d55 = $(`<div id="html_d16563a53f2b7235a08434f0b43a7d55" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.22 (top 98%)<br>NO₂ z: 1.03 | PM₂.₅ z: 1.64 | CO z: 0.59<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_8ea59aa61c9be97031da95b0750a0191.setContent(html_d16563a53f2b7235a08434f0b43a7d55);
+            
+        
+
+        circle_marker_8040b46ad82253cd59a8bcf6a6e74e4a.bindPopup(popup_8ea59aa61c9be97031da95b0750a0191)
+        ;
+
+        
+    
+    
+            circle_marker_8040b46ad82253cd59a8bcf6a6e74e4a.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cfa91e3d83153db358d2ff6a000c4d4a = L.circleMarker(
+                [23.62120039592282, 90.59958797987434],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_ee218dc8e3534249652d9a0e8aeb83cd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a7791b8997bb9b9acdb3cf9eabe6869d = $(`<div id="html_a7791b8997bb9b9acdb3cf9eabe6869d" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.52 (top 93%)<br>NO₂ z: 1.03 | PM₂.₅ z: 0.71 | CO z: 0.59<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_ee218dc8e3534249652d9a0e8aeb83cd.setContent(html_a7791b8997bb9b9acdb3cf9eabe6869d);
+            
+        
+
+        circle_marker_cfa91e3d83153db358d2ff6a000c4d4a.bindPopup(popup_ee218dc8e3534249652d9a0e8aeb83cd)
+        ;
+
+        
+    
+    
+            circle_marker_cfa91e3d83153db358d2ff6a000c4d4a.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_36754125d1fb93a18362205aa501318f = L.circleMarker(
+                [23.62120039592282, 90.60857113271554],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_d13ecc296fa778b812337e4873157761 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e505d219e878b33b5c687a954693b4c6 = $(`<div id="html_e505d219e878b33b5c687a954693b4c6" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.08 (top 86%)<br>NO₂ z: 0.48 | PM₂.₅ z: 0.70 | CO z: 0.51<br>Mixed drivers</div>`)[0];
+                popup_d13ecc296fa778b812337e4873157761.setContent(html_e505d219e878b33b5c687a954693b4c6);
+            
+        
+
+        circle_marker_36754125d1fb93a18362205aa501318f.bindPopup(popup_d13ecc296fa778b812337e4873157761)
+        ;
+
+        
+    
+    
+            circle_marker_36754125d1fb93a18362205aa501318f.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ac0d7aee31f8a73a534fd8b1e57779bc = L.circleMarker(
+                [23.62120039592282, 90.61755428555674],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_ae4d6674dd1ffe2918db52da5eb89df7 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ba54efdd47086dbd1215d1aea07a75e6 = $(`<div id="html_ba54efdd47086dbd1215d1aea07a75e6" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.40 (top 91%)<br>NO₂ z: 0.17 | PM₂.₅ z: 1.78 | CO z: -0.15<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_ae4d6674dd1ffe2918db52da5eb89df7.setContent(html_ba54efdd47086dbd1215d1aea07a75e6);
+            
+        
+
+        circle_marker_ac0d7aee31f8a73a534fd8b1e57779bc.bindPopup(popup_ae4d6674dd1ffe2918db52da5eb89df7)
+        ;
+
+        
+    
+    
+            circle_marker_ac0d7aee31f8a73a534fd8b1e57779bc.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b8f88ddfc07e76713aad1c1783ecc14b = L.circleMarker(
+                [23.62120039592282, 90.62653743839793],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_51e9f2381b6a73a14c5efa5a931469fa = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_45d4c9bf8cc85e44424a8f4b913512e2 = $(`<div id="html_45d4c9bf8cc85e44424a8f4b913512e2" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 2.00 (top 97%)<br>NO₂ z: -0.40 | PM₂.₅ z: 3.10 | CO z: -0.07<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_51e9f2381b6a73a14c5efa5a931469fa.setContent(html_45d4c9bf8cc85e44424a8f4b913512e2);
+            
+        
+
+        circle_marker_b8f88ddfc07e76713aad1c1783ecc14b.bindPopup(popup_51e9f2381b6a73a14c5efa5a931469fa)
+        ;
+
+        
+    
+    
+            circle_marker_b8f88ddfc07e76713aad1c1783ecc14b.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_40fdddc6aeb8b883c68670feaec1d084 = L.circleMarker(
+                [23.630183548764013, 90.46484068725641],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_3bda8ce6a81e3a981bd7a7fa97db7afd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c41b0059fa76d8e1a25e5d7aa7af1391 = $(`<div id="html_c41b0059fa76d8e1a25e5d7aa7af1391" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.42 (top 92%)<br>NO₂ z: 1.14 | PM₂.₅ z: 0.82 | CO z: -0.14<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_3bda8ce6a81e3a981bd7a7fa97db7afd.setContent(html_c41b0059fa76d8e1a25e5d7aa7af1391);
+            
+        
+
+        circle_marker_40fdddc6aeb8b883c68670feaec1d084.bindPopup(popup_3bda8ce6a81e3a981bd7a7fa97db7afd)
+        ;
+
+        
+    
+    
+            circle_marker_40fdddc6aeb8b883c68670feaec1d084.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2695ea6cca855dae27d7d7e31d2d2491 = L.circleMarker(
+                [23.630183548764013, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_97bdd9576591e7f8677b250736bd5f29 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_603c0574a3e33588c6e75d0a6df86f46 = $(`<div id="html_603c0574a3e33588c6e75d0a6df86f46" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.15 (top 87%)<br>NO₂ z: 1.31 | PM₂.₅ z: 0.25 | CO z: -0.06<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_97bdd9576591e7f8677b250736bd5f29.setContent(html_603c0574a3e33588c6e75d0a6df86f46);
+            
+        
+
+        circle_marker_2695ea6cca855dae27d7d7e31d2d2491.bindPopup(popup_97bdd9576591e7f8677b250736bd5f29)
+        ;
+
+        
+    
+    
+            circle_marker_2695ea6cca855dae27d7d7e31d2d2491.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3e1dc8fba1583f05bf324bf454876f43 = L.circleMarker(
+                [23.630183548764013, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_d125b189f06443286fb102c18ffa2d00 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e8ee296b88c62cc09bed0a7aadbd704f = $(`<div id="html_e8ee296b88c62cc09bed0a7aadbd704f" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.37 (top 91%)<br>NO₂ z: 1.81 | PM₂.₅ z: -0.22 | CO z: 0.48<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_d125b189f06443286fb102c18ffa2d00.setContent(html_e8ee296b88c62cc09bed0a7aadbd704f);
+            
+        
+
+        circle_marker_3e1dc8fba1583f05bf324bf454876f43.bindPopup(popup_d125b189f06443286fb102c18ffa2d00)
+        ;
+
+        
+    
+    
+            circle_marker_3e1dc8fba1583f05bf324bf454876f43.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bf198a24c99021418fa820cba5cd217f = L.circleMarker(
+                [23.63916670160521, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_45c6905720be21f4cfef77eb9be95065 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1cca17ea6208ce43fe65d2cfc68d8cda = $(`<div id="html_1cca17ea6208ce43fe65d2cfc68d8cda" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.32 (top 90%)<br>NO₂ z: 1.31 | PM₂.₅ z: 0.49 | CO z: -0.06<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_45c6905720be21f4cfef77eb9be95065.setContent(html_1cca17ea6208ce43fe65d2cfc68d8cda);
+            
+        
+
+        circle_marker_bf198a24c99021418fa820cba5cd217f.bindPopup(popup_45c6905720be21f4cfef77eb9be95065)
+        ;
+
+        
+    
+    
+            circle_marker_bf198a24c99021418fa820cba5cd217f.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_db56cef689399a0eb581b928c9680bcc = L.circleMarker(
+                [23.63916670160521, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_7b0c9272c5a4722b4e07344f13b003ed = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_70b191ad13a8069b58e369f479a3524b = $(`<div id="html_70b191ad13a8069b58e369f479a3524b" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.40 (top 92%)<br>NO₂ z: 1.81 | PM₂.₅ z: -0.18 | CO z: 0.48<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_7b0c9272c5a4722b4e07344f13b003ed.setContent(html_70b191ad13a8069b58e369f479a3524b);
+            
+        
+
+        circle_marker_db56cef689399a0eb581b928c9680bcc.bindPopup(popup_7b0c9272c5a4722b4e07344f13b003ed)
+        ;
+
+        
+    
+    
+            circle_marker_db56cef689399a0eb581b928c9680bcc.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_62cb5492f701c9cd994ec8c8027b7c01 = L.circleMarker(
+                [23.648149854446405, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_ae6b4aa79ca73961a772113bff43a1d9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_759926ae92f2f48d245e62ee0321fef8 = $(`<div id="html_759926ae92f2f48d245e62ee0321fef8" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.72 (top 99%)<br>NO₂ z: 1.50 | PM₂.₅ z: 2.28 | CO z: -0.31<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_ae6b4aa79ca73961a772113bff43a1d9.setContent(html_759926ae92f2f48d245e62ee0321fef8);
+            
+        
+
+        circle_marker_62cb5492f701c9cd994ec8c8027b7c01.bindPopup(popup_ae6b4aa79ca73961a772113bff43a1d9)
+        ;
+
+        
+    
+    
+            circle_marker_62cb5492f701c9cd994ec8c8027b7c01.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fdabaed08a2ca561c60f699af98ddf17 = L.circleMarker(
+                [23.648149854446405, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_7e50214552a90fed1fd506a1494e5172 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_830cce0ae2d8ae68c83683380ca0692e = $(`<div id="html_830cce0ae2d8ae68c83683380ca0692e" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.73 (top 99%)<br>NO₂ z: 2.08 | PM₂.₅ z: 1.56 | CO z: 0.01<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_7e50214552a90fed1fd506a1494e5172.setContent(html_830cce0ae2d8ae68c83683380ca0692e);
+            
+        
+
+        circle_marker_fdabaed08a2ca561c60f699af98ddf17.bindPopup(popup_7e50214552a90fed1fd506a1494e5172)
+        ;
+
+        
+    
+    
+            circle_marker_fdabaed08a2ca561c60f699af98ddf17.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d84d1e3d44da2aa6fc3530c93b57a265 = L.circleMarker(
+                [23.648149854446405, 90.57263852135075],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_79a8fd13158d0f281fa892dc2f6ce250 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_18bdcc617a4b6509bdb4f475428b51ac = $(`<div id="html_18bdcc617a4b6509bdb4f475428b51ac" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.72 (top 95%)<br>NO₂ z: 1.07 | PM₂.₅ z: 0.78 | CO z: 0.92<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_79a8fd13158d0f281fa892dc2f6ce250.setContent(html_18bdcc617a4b6509bdb4f475428b51ac);
+            
+        
+
+        circle_marker_d84d1e3d44da2aa6fc3530c93b57a265.bindPopup(popup_79a8fd13158d0f281fa892dc2f6ce250)
+        ;
+
+        
+    
+    
+            circle_marker_d84d1e3d44da2aa6fc3530c93b57a265.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_215d7dd00bacebf9e24442a9314f09c5 = L.circleMarker(
+                [23.657133007287598, 90.46484068725641],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_2098441c45c0dffa10b692b4e5d76cf6 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ade0123b8d8fdb82b40cb21a462566ca = $(`<div id="html_ade0123b8d8fdb82b40cb21a462566ca" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 3.26 (top 100%)<br>NO₂ z: 1.26 | PM₂.₅ z: 3.38 | CO z: -0.57<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_2098441c45c0dffa10b692b4e5d76cf6.setContent(html_ade0123b8d8fdb82b40cb21a462566ca);
+            
+        
+
+        circle_marker_215d7dd00bacebf9e24442a9314f09c5.bindPopup(popup_2098441c45c0dffa10b692b4e5d76cf6)
+        ;
+
+        
+    
+    
+            circle_marker_215d7dd00bacebf9e24442a9314f09c5.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_12ad904c638ac5699b11314f682257e7 = L.circleMarker(
+                [23.657133007287598, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_10b5dd8f08d9e5bcf223b42ab05f0a9e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_627fa422da85ee3ba499ce4ea7c14f92 = $(`<div id="html_627fa422da85ee3ba499ce4ea7c14f92" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.16 (top 98%)<br>NO₂ z: 1.59 | PM₂.₅ z: 1.48 | CO z: -0.37<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_10b5dd8f08d9e5bcf223b42ab05f0a9e.setContent(html_627fa422da85ee3ba499ce4ea7c14f92);
+            
+        
+
+        circle_marker_12ad904c638ac5699b11314f682257e7.bindPopup(popup_10b5dd8f08d9e5bcf223b42ab05f0a9e)
+        ;
+
+        
+    
+    
+            circle_marker_12ad904c638ac5699b11314f682257e7.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_51c22037a15f3002af0b7b0189c26d4c = L.circleMarker(
+                [23.657133007287598, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_e92dae832f9fda81d4bd1a0563690246 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d0f9e613baaa450f33b35d61e636ec58 = $(`<div id="html_d0f9e613baaa450f33b35d61e636ec58" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.86 (top 99%)<br>NO₂ z: 1.92 | PM₂.₅ z: 2.05 | CO z: -0.28<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_e92dae832f9fda81d4bd1a0563690246.setContent(html_d0f9e613baaa450f33b35d61e636ec58);
+            
+        
+
+        circle_marker_51c22037a15f3002af0b7b0189c26d4c.bindPopup(popup_e92dae832f9fda81d4bd1a0563690246)
+        ;
+
+        
+    
+    
+            circle_marker_51c22037a15f3002af0b7b0189c26d4c.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ac5406febfc6a6292fcb0fed1b31c32a = L.circleMarker(
+                [23.657133007287598, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_555a616f4503dd87f5b3f739bc91cb1a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8b24eac16ad3e50fb9c393a5177087a1 = $(`<div id="html_8b24eac16ad3e50fb9c393a5177087a1" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.04 (top 98%)<br>NO₂ z: 1.64 | PM₂.₅ z: 1.48 | CO z: -0.77<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_555a616f4503dd87f5b3f739bc91cb1a.setContent(html_8b24eac16ad3e50fb9c393a5177087a1);
+            
+        
+
+        circle_marker_ac5406febfc6a6292fcb0fed1b31c32a.bindPopup(popup_555a616f4503dd87f5b3f739bc91cb1a)
+        ;
+
+        
+    
+    
+            circle_marker_ac5406febfc6a6292fcb0fed1b31c32a.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1953f827ae0a1f2f5e818f85e94e8a74 = L.circleMarker(
+                [23.657133007287598, 90.63552059123913],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_70804534adb6e2d05966af0dbb23a075 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_bb67cc95f7a66a7fcd35c6494a972db9 = $(`<div id="html_bb67cc95f7a66a7fcd35c6494a972db9" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.38 (top 91%)<br>NO₂ z: -0.70 | PM₂.₅ z: 2.54 | CO z: -0.00<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_70804534adb6e2d05966af0dbb23a075.setContent(html_bb67cc95f7a66a7fcd35c6494a972db9);
+            
+        
+
+        circle_marker_1953f827ae0a1f2f5e818f85e94e8a74.bindPopup(popup_70804534adb6e2d05966af0dbb23a075)
+        ;
+
+        
+    
+    
+            circle_marker_1953f827ae0a1f2f5e818f85e94e8a74.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_49b83dc1d12ca278e4a865c17779ead9 = L.circleMarker(
+                [23.666116160128794, 90.45585753441522],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_b69c1eaca8b428ce4a358d947c932b4a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_7e80262cde050ac6bde689dea069e0b0 = $(`<div id="html_7e80262cde050ac6bde689dea069e0b0" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.43 (top 92%)<br>NO₂ z: 1.12 | PM₂.₅ z: 1.04 | CO z: -0.52<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_b69c1eaca8b428ce4a358d947c932b4a.setContent(html_7e80262cde050ac6bde689dea069e0b0);
+            
+        
+
+        circle_marker_49b83dc1d12ca278e4a865c17779ead9.bindPopup(popup_b69c1eaca8b428ce4a358d947c932b4a)
+        ;
+
+        
+    
+    
+            circle_marker_49b83dc1d12ca278e4a865c17779ead9.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0046d2fff8e1696057efed5411373be3 = L.circleMarker(
+                [23.666116160128794, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_68a81920152d1581aae4b4d0c38744aa = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_06582c6a87ce389a38be5cbbfcd3d92b = $(`<div id="html_06582c6a87ce389a38be5cbbfcd3d92b" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.88 (top 97%)<br>NO₂ z: 1.47 | PM₂.₅ z: 1.34 | CO z: -0.59<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_68a81920152d1581aae4b4d0c38744aa.setContent(html_06582c6a87ce389a38be5cbbfcd3d92b);
+            
+        
+
+        circle_marker_0046d2fff8e1696057efed5411373be3.bindPopup(popup_68a81920152d1581aae4b4d0c38744aa)
+        ;
+
+        
+    
+    
+            circle_marker_0046d2fff8e1696057efed5411373be3.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_50d5a20b7d69718ebac4f6a1be914389 = L.circleMarker(
+                [23.666116160128794, 90.54568906282718],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_d6e1d5b95f1661b909bc33a2bfd54a25 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c79d899b91b8ec1533be84bafd79d1f9 = $(`<div id="html_c79d899b91b8ec1533be84bafd79d1f9" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.73 (top 95%)<br>NO₂ z: 0.69 | PM₂.₅ z: 1.38 | CO z: 0.49<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_d6e1d5b95f1661b909bc33a2bfd54a25.setContent(html_c79d899b91b8ec1533be84bafd79d1f9);
+            
+        
+
+        circle_marker_50d5a20b7d69718ebac4f6a1be914389.bindPopup(popup_d6e1d5b95f1661b909bc33a2bfd54a25)
+        ;
+
+        
+    
+    
+            circle_marker_50d5a20b7d69718ebac4f6a1be914389.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_21439573f81a16812b83001f7e4886c7 = L.circleMarker(
+                [23.67509931296999, 90.46484068725641],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_83bc7df0158717863c7c80268757730d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c71a627ffd635b6535bd96fcb95a1177 = $(`<div id="html_c71a627ffd635b6535bd96fcb95a1177" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.02 (top 85%)<br>NO₂ z: 1.26 | PM₂.₅ z: 0.45 | CO z: -0.70<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_83bc7df0158717863c7c80268757730d.setContent(html_c71a627ffd635b6535bd96fcb95a1177);
+            
+        
+
+        circle_marker_21439573f81a16812b83001f7e4886c7.bindPopup(popup_83bc7df0158717863c7c80268757730d)
+        ;
+
+        
+    
+    
+            circle_marker_21439573f81a16812b83001f7e4886c7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_77f3968b9e13325e37e0d0413593084b = L.circleMarker(
+                [23.67509931296999, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_0e8458a3125401df9a7c5e98f0650ade = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_eb30414c919e6d4ca57a719a9987e5fb = $(`<div id="html_eb30414c919e6d4ca57a719a9987e5fb" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.16 (top 88%)<br>NO₂ z: 1.31 | PM₂.₅ z: -0.02 | CO z: 0.52<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_0e8458a3125401df9a7c5e98f0650ade.setContent(html_eb30414c919e6d4ca57a719a9987e5fb);
+            
+        
+
+        circle_marker_77f3968b9e13325e37e0d0413593084b.bindPopup(popup_0e8458a3125401df9a7c5e98f0650ade)
+        ;
+
+        
+    
+    
+            circle_marker_77f3968b9e13325e37e0d0413593084b.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4de28e868a308642bdf2e3551725fa4a = L.circleMarker(
+                [23.67509931296999, 90.69840266112749],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_8629fcdea2da5d3320314f564eb31ddb = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_7339654b5daeb97dc1ad6084542d8285 = $(`<div id="html_7339654b5daeb97dc1ad6084542d8285" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.85 (top 96%)<br>NO₂ z: -1.18 | PM₂.₅ z: 3.78 | CO z: -0.25<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_8629fcdea2da5d3320314f564eb31ddb.setContent(html_7339654b5daeb97dc1ad6084542d8285);
+            
+        
+
+        circle_marker_4de28e868a308642bdf2e3551725fa4a.bindPopup(popup_8629fcdea2da5d3320314f564eb31ddb)
+        ;
+
+        
+    
+    
+            circle_marker_4de28e868a308642bdf2e3551725fa4a.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_49e00fc9383423e3992a90472ee02019 = L.circleMarker(
+                [23.684082465811187, 90.46484068725641],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_23da288cc0ed2f72f4d556b49f82668f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3bf8247eb8e4876bcada38edcebc35ca = $(`<div id="html_3bf8247eb8e4876bcada38edcebc35ca" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.48 (top 93%)<br>NO₂ z: 1.73 | PM₂.₅ z: 0.67 | CO z: -0.84<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_23da288cc0ed2f72f4d556b49f82668f.setContent(html_3bf8247eb8e4876bcada38edcebc35ca);
+            
+        
+
+        circle_marker_49e00fc9383423e3992a90472ee02019.bindPopup(popup_23da288cc0ed2f72f4d556b49f82668f)
+        ;
+
+        
+    
+    
+            circle_marker_49e00fc9383423e3992a90472ee02019.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6965ef4789a27ecca69941c71a6c4b43 = L.circleMarker(
+                [23.684082465811187, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_b85fa334df192c5c98d616f086fb824c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_bc49a85a7cdfd07fbad8e2218ec49a59 = $(`<div id="html_bc49a85a7cdfd07fbad8e2218ec49a59" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.02 (top 85%)<br>NO₂ z: 1.65 | PM₂.₅ z: -0.12 | CO z: -0.33<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_b85fa334df192c5c98d616f086fb824c.setContent(html_bc49a85a7cdfd07fbad8e2218ec49a59);
+            
+        
+
+        circle_marker_6965ef4789a27ecca69941c71a6c4b43.bindPopup(popup_b85fa334df192c5c98d616f086fb824c)
+        ;
+
+        
+    
+    
+            circle_marker_6965ef4789a27ecca69941c71a6c4b43.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d223331d0ed9d63f240f355a1c007a25 = L.circleMarker(
+                [23.684082465811187, 90.64450374408032],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_85540d6c12a603226d1ea03823d9d5cc = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_53dff1e1dacdaee58d0287604001e443 = $(`<div id="html_53dff1e1dacdaee58d0287604001e443" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.03 (top 98%)<br>NO₂ z: -0.31 | PM₂.₅ z: 3.06 | CO z: -0.07<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_85540d6c12a603226d1ea03823d9d5cc.setContent(html_53dff1e1dacdaee58d0287604001e443);
+            
+        
+
+        circle_marker_d223331d0ed9d63f240f355a1c007a25.bindPopup(popup_85540d6c12a603226d1ea03823d9d5cc)
+        ;
+
+        
+    
+    
+            circle_marker_d223331d0ed9d63f240f355a1c007a25.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ec3ac10031f341d298524e6509fe7fa7 = L.circleMarker(
+                [23.684082465811187, 90.65348689692152],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_95ad46624d02f180a2bba6735ed32a80 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a5d8ecdcb9470364dafb9d8e602fb23a = $(`<div id="html_a5d8ecdcb9470364dafb9d8e602fb23a" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.21 (top 88%)<br>NO₂ z: -0.85 | PM₂.₅ z: 2.57 | CO z: -0.20<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_95ad46624d02f180a2bba6735ed32a80.setContent(html_a5d8ecdcb9470364dafb9d8e602fb23a);
+            
+        
+
+        circle_marker_ec3ac10031f341d298524e6509fe7fa7.bindPopup(popup_95ad46624d02f180a2bba6735ed32a80)
+        ;
+
+        
+    
+    
+            circle_marker_ec3ac10031f341d298524e6509fe7fa7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9778b3aa413fe21a03ba1416b7ad59e6 = L.circleMarker(
+                [23.684082465811187, 90.66247004976272],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_1fdd978e02610a36342902716ee9dbfd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_09c29b2fdbb4d3b327cc7d042d86f721 = $(`<div id="html_09c29b2fdbb4d3b327cc7d042d86f721" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.20 (top 88%)<br>NO₂ z: -0.97 | PM₂.₅ z: 2.57 | CO z: 0.02<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_1fdd978e02610a36342902716ee9dbfd.setContent(html_09c29b2fdbb4d3b327cc7d042d86f721);
+            
+        
+
+        circle_marker_9778b3aa413fe21a03ba1416b7ad59e6.bindPopup(popup_1fdd978e02610a36342902716ee9dbfd)
+        ;
+
+        
+    
+    
+            circle_marker_9778b3aa413fe21a03ba1416b7ad59e6.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c7569371e0b4251d105a1bdc4164de67 = L.circleMarker(
+                [23.69306561865238, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_4b7d21c33401117e9786664f634cc083 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_80f04ebf156974f62e0b8654011be14a = $(`<div id="html_80f04ebf156974f62e0b8654011be14a" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.13 (top 98%)<br>NO₂ z: 1.71 | PM₂.₅ z: 1.10 | CO z: 0.08<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_4b7d21c33401117e9786664f634cc083.setContent(html_80f04ebf156974f62e0b8654011be14a);
+            
+        
+
+        circle_marker_c7569371e0b4251d105a1bdc4164de67.bindPopup(popup_4b7d21c33401117e9786664f634cc083)
+        ;
+
+        
+    
+    
+            circle_marker_c7569371e0b4251d105a1bdc4164de67.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e4283a4b284ebd7433127b1dbcfa2b8b = L.circleMarker(
+                [23.69306561865238, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_a13fdb62ea35d9cdf36599fdb9d98a11 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a498c5be33c2a6327a959e3ca185eae2 = $(`<div id="html_a498c5be33c2a6327a959e3ca185eae2" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.33 (top 90%)<br>NO₂ z: 1.31 | PM₂.₅ z: 0.81 | CO z: -0.69<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_a13fdb62ea35d9cdf36599fdb9d98a11.setContent(html_a498c5be33c2a6327a959e3ca185eae2);
+            
+        
+
+        circle_marker_e4283a4b284ebd7433127b1dbcfa2b8b.bindPopup(popup_a13fdb62ea35d9cdf36599fdb9d98a11)
+        ;
+
+        
+    
+    
+            circle_marker_e4283a4b284ebd7433127b1dbcfa2b8b.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a2312e929771eb8c150cf30d97359876 = L.circleMarker(
+                [23.69306561865238, 90.55467221566836],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_139ecff571165041d06a34774d72faeb = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a5f83f7d2cce98c7a6ba51b4db02f82f = $(`<div id="html_a5f83f7d2cce98c7a6ba51b4db02f82f" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.93 (top 97%)<br>NO₂ z: 0.44 | PM₂.₅ z: 1.76 | CO z: 0.75<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_139ecff571165041d06a34774d72faeb.setContent(html_a5f83f7d2cce98c7a6ba51b4db02f82f);
+            
+        
+
+        circle_marker_a2312e929771eb8c150cf30d97359876.bindPopup(popup_139ecff571165041d06a34774d72faeb)
+        ;
+
+        
+    
+    
+            circle_marker_a2312e929771eb8c150cf30d97359876.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7319dd796d0780b9661ad9e708c6ce75 = L.circleMarker(
+                [23.69306561865238, 90.65348689692152],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_89ef99e69894b2b891989088833c7611 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fba272b9b9878e4aa119ef7356e165d4 = $(`<div id="html_fba272b9b9878e4aa119ef7356e165d4" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.32 (top 90%)<br>NO₂ z: -0.92 | PM₂.₅ z: 2.88 | CO z: -0.39<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_89ef99e69894b2b891989088833c7611.setContent(html_fba272b9b9878e4aa119ef7356e165d4);
+            
+        
+
+        circle_marker_7319dd796d0780b9661ad9e708c6ce75.bindPopup(popup_89ef99e69894b2b891989088833c7611)
+        ;
+
+        
+    
+    
+            circle_marker_7319dd796d0780b9661ad9e708c6ce75.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fc78e780a49a3805187d98607119e681 = L.circleMarker(
+                [23.69306561865238, 90.66247004976272],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_76f7446795d8cb5e28a31e1e105b3628 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6d5d358d5099d60cbf20255f3d024505 = $(`<div id="html_6d5d358d5099d60cbf20255f3d024505" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.04 (top 86%)<br>NO₂ z: -0.98 | PM₂.₅ z: 2.43 | CO z: -0.10<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_76f7446795d8cb5e28a31e1e105b3628.setContent(html_6d5d358d5099d60cbf20255f3d024505);
+            
+        
+
+        circle_marker_fc78e780a49a3805187d98607119e681.bindPopup(popup_76f7446795d8cb5e28a31e1e105b3628)
+        ;
+
+        
+    
+    
+            circle_marker_fc78e780a49a3805187d98607119e681.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9d37796d24e77d39587fc16fe3fa2ed9 = L.circleMarker(
+                [23.702048771493576, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_4fbb756bcb579b4abb7bb8afb07fe491 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d75ac4214cd29eb1835e486b51448277 = $(`<div id="html_d75ac4214cd29eb1835e486b51448277" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.62 (top 99%)<br>NO₂ z: 1.76 | PM₂.₅ z: 1.10 | CO z: 1.29<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion<br>High CO → combustion/transport</div>`)[0];
+                popup_4fbb756bcb579b4abb7bb8afb07fe491.setContent(html_d75ac4214cd29eb1835e486b51448277);
+            
+        
+
+        circle_marker_9d37796d24e77d39587fc16fe3fa2ed9.bindPopup(popup_4fbb756bcb579b4abb7bb8afb07fe491)
+        ;
+
+        
+    
+    
+            circle_marker_9d37796d24e77d39587fc16fe3fa2ed9.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0b0186d6d1a8db62f6867c74775d92f0 = L.circleMarker(
+                [23.702048771493576, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_3d606ead10239131a9545fc9946db834 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_dc9d2c2c13cccdb73970730c5144f489 = $(`<div id="html_dc9d2c2c13cccdb73970730c5144f489" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.64 (top 99%)<br>NO₂ z: 1.81 | PM₂.₅ z: 1.10 | CO z: 1.24<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion<br>High CO → combustion/transport</div>`)[0];
+                popup_3d606ead10239131a9545fc9946db834.setContent(html_dc9d2c2c13cccdb73970730c5144f489);
+            
+        
+
+        circle_marker_0b0186d6d1a8db62f6867c74775d92f0.bindPopup(popup_3d606ead10239131a9545fc9946db834)
+        ;
+
+        
+    
+    
+            circle_marker_0b0186d6d1a8db62f6867c74775d92f0.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_38abd7bfc15d6f8f137823a5d90ea908 = L.circleMarker(
+                [23.702048771493576, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_3821b940fa863f806b9b6a96789a80cc = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f9e758115d2b471647f5f643ae5bfcf6 = $(`<div id="html_f9e758115d2b471647f5f643ae5bfcf6" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.09 (top 87%)<br>NO₂ z: 1.62 | PM₂.₅ z: -0.86 | CO z: 1.39<br>High NO₂ → traffic/industry<br>High CO → combustion/transport</div>`)[0];
+                popup_3821b940fa863f806b9b6a96789a80cc.setContent(html_f9e758115d2b471647f5f643ae5bfcf6);
+            
+        
+
+        circle_marker_38abd7bfc15d6f8f137823a5d90ea908.bindPopup(popup_3821b940fa863f806b9b6a96789a80cc)
+        ;
+
+        
+    
+    
+            circle_marker_38abd7bfc15d6f8f137823a5d90ea908.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4868f29eba826c3eddbfd6cfcb49aef0 = L.circleMarker(
+                [23.702048771493576, 90.68941950828629],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_666a67ff8af44f3a4142ab206bd8781b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_200da26ac396cf5c6f90516bcd75bc0c = $(`<div id="html_200da26ac396cf5c6f90516bcd75bc0c" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.52 (top 93%)<br>NO₂ z: -1.18 | PM₂.₅ z: 3.53 | CO z: -0.63<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_666a67ff8af44f3a4142ab206bd8781b.setContent(html_200da26ac396cf5c6f90516bcd75bc0c);
+            
+        
+
+        circle_marker_4868f29eba826c3eddbfd6cfcb49aef0.bindPopup(popup_666a67ff8af44f3a4142ab206bd8781b)
+        ;
+
+        
+    
+    
+            circle_marker_4868f29eba826c3eddbfd6cfcb49aef0.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_be399945622bee8a5f3651d894538654 = L.circleMarker(
+                [23.720015077175965, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_c5360615b6aa18f5404759ed6c4c1bf7 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8e0749e47bf60f4b6384acab58b981b4 = $(`<div id="html_8e0749e47bf60f4b6384acab58b981b4" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.28 (top 89%)<br>NO₂ z: 1.73 | PM₂.₅ z: -0.28 | CO z: 0.52<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_c5360615b6aa18f5404759ed6c4c1bf7.setContent(html_8e0749e47bf60f4b6384acab58b981b4);
+            
+        
+
+        circle_marker_be399945622bee8a5f3651d894538654.bindPopup(popup_c5360615b6aa18f5404759ed6c4c1bf7)
+        ;
+
+        
+    
+    
+            circle_marker_be399945622bee8a5f3651d894538654.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cff0ce20ae84c851d24965f246a30201 = L.circleMarker(
+                [23.720015077175965, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_9327c5667d794a1a16540f0f48935434 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4e9d81c77bb5065e18337bab24ef69f4 = $(`<div id="html_4e9d81c77bb5065e18337bab24ef69f4" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.17 (top 88%)<br>NO₂ z: 1.63 | PM₂.₅ z: -0.44 | CO z: 0.75<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_9327c5667d794a1a16540f0f48935434.setContent(html_4e9d81c77bb5065e18337bab24ef69f4);
+            
+        
+
+        circle_marker_cff0ce20ae84c851d24965f246a30201.bindPopup(popup_9327c5667d794a1a16540f0f48935434)
+        ;
+
+        
+    
+    
+            circle_marker_cff0ce20ae84c851d24965f246a30201.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4522fc47d47f58f465cea83c0ff22b6a = L.circleMarker(
+                [23.72899823001716, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_d18c1544e11ab70fe65fb87cbdc4679a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d3d76b0e2bdbfbb91391020ec29ff77e = $(`<div id="html_d3d76b0e2bdbfbb91391020ec29ff77e" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.03 (top 85%)<br>NO₂ z: 1.73 | PM₂.₅ z: -0.61 | CO z: 0.52<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_d18c1544e11ab70fe65fb87cbdc4679a.setContent(html_d3d76b0e2bdbfbb91391020ec29ff77e);
+            
+        
+
+        circle_marker_4522fc47d47f58f465cea83c0ff22b6a.bindPopup(popup_d18c1544e11ab70fe65fb87cbdc4679a)
+        ;
+
+        
+    
+    
+            circle_marker_4522fc47d47f58f465cea83c0ff22b6a.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ce4ce12b7e86cc38b295781e524d6505 = L.circleMarker(
+                [23.72899823001716, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_63fc5e4be31ecf7ceef1b47363c2b36b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_50fc1d6bd22b2b2b5c2747f8fac1ff36 = $(`<div id="html_50fc1d6bd22b2b2b5c2747f8fac1ff36" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.68 (top 95%)<br>NO₂ z: 1.73 | PM₂.₅ z: 0.25 | CO z: 0.52<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_63fc5e4be31ecf7ceef1b47363c2b36b.setContent(html_50fc1d6bd22b2b2b5c2747f8fac1ff36);
+            
+        
+
+        circle_marker_ce4ce12b7e86cc38b295781e524d6505.bindPopup(popup_63fc5e4be31ecf7ceef1b47363c2b36b)
+        ;
+
+        
+    
+    
+            circle_marker_ce4ce12b7e86cc38b295781e524d6505.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_720505ade53b36f1bd0fea6797e15e45 = L.circleMarker(
+                [23.72899823001716, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_cd912b7392ec2561c68386d7af34619f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e919362d13fdabb3e18e4426e3f9dcdd = $(`<div id="html_e919362d13fdabb3e18e4426e3f9dcdd" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.37 (top 90%)<br>NO₂ z: 1.63 | PM₂.₅ z: -0.17 | CO z: 0.75<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_cd912b7392ec2561c68386d7af34619f.setContent(html_e919362d13fdabb3e18e4426e3f9dcdd);
+            
+        
+
+        circle_marker_720505ade53b36f1bd0fea6797e15e45.bindPopup(popup_cd912b7392ec2561c68386d7af34619f)
+        ;
+
+        
+    
+    
+            circle_marker_720505ade53b36f1bd0fea6797e15e45.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c545f2053a3d4f5aed025e3812c7dc32 = L.circleMarker(
+                [23.72899823001716, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_5debb54b5e65415ed33158538a7b50f8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_41e097737210541162d60892cf8426b6 = $(`<div id="html_41e097737210541162d60892cf8426b6" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.12 (top 87%)<br>NO₂ z: 1.55 | PM₂.₅ z: -0.47 | CO z: 0.81<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_5debb54b5e65415ed33158538a7b50f8.setContent(html_41e097737210541162d60892cf8426b6);
+            
+        
+
+        circle_marker_c545f2053a3d4f5aed025e3812c7dc32.bindPopup(popup_5debb54b5e65415ed33158538a7b50f8)
+        ;
+
+        
+    
+    
+            circle_marker_c545f2053a3d4f5aed025e3812c7dc32.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d55fc7bb6eb25a5bd5ae9123ecb3b494 = L.circleMarker(
+                [23.737981382858358, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_388bf530a3901ba67d6db6b998356a68 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_796d535a663e665f3a5f652b2ea5f025 = $(`<div id="html_796d535a663e665f3a5f652b2ea5f025" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.81 (top 96%)<br>NO₂ z: 1.93 | PM₂.₅ z: 0.12 | CO z: 0.72<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_388bf530a3901ba67d6db6b998356a68.setContent(html_796d535a663e665f3a5f652b2ea5f025);
+            
+        
+
+        circle_marker_d55fc7bb6eb25a5bd5ae9123ecb3b494.bindPopup(popup_388bf530a3901ba67d6db6b998356a68)
+        ;
+
+        
+    
+    
+            circle_marker_d55fc7bb6eb25a5bd5ae9123ecb3b494.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3f2f681567bc0d4230cf959b3d42d0e1 = L.circleMarker(
+                [23.737981382858358, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_7c78f12a6603e856dd863bb427bf8d5f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fc475a11bd953dccc3069e4cd91ed1ad = $(`<div id="html_fc475a11bd953dccc3069e4cd91ed1ad" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.74 (top 96%)<br>NO₂ z: 1.93 | PM₂.₅ z: 0.03 | CO z: 0.72<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_7c78f12a6603e856dd863bb427bf8d5f.setContent(html_fc475a11bd953dccc3069e4cd91ed1ad);
+            
+        
+
+        circle_marker_3f2f681567bc0d4230cf959b3d42d0e1.bindPopup(popup_7c78f12a6603e856dd863bb427bf8d5f)
+        ;
+
+        
+    
+    
+            circle_marker_3f2f681567bc0d4230cf959b3d42d0e1.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7ce2b12c877efac457565d4ade6b407c = L.circleMarker(
+                [23.737981382858358, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_02ee49986f7aae609ba00171a780c613 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0778d19c0dd6eebc7140c85b815371c9 = $(`<div id="html_0778d19c0dd6eebc7140c85b815371c9" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.25 (top 89%)<br>NO₂ z: 1.64 | PM₂.₅ z: -0.13 | CO z: 0.31<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_02ee49986f7aae609ba00171a780c613.setContent(html_0778d19c0dd6eebc7140c85b815371c9);
+            
+        
+
+        circle_marker_7ce2b12c877efac457565d4ade6b407c.bindPopup(popup_02ee49986f7aae609ba00171a780c613)
+        ;
+
+        
+    
+    
+            circle_marker_7ce2b12c877efac457565d4ade6b407c.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_60fde2da274ce1c7a59a666e7b5f0ade = L.circleMarker(
+                [23.74696453569955, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_5500ea0905bc1a8b09b42e649fec2ff3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f9a96871131b6573b28039ee2c1b6c9e = $(`<div id="html_f9a96871131b6573b28039ee2c1b6c9e" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.31 (top 90%)<br>NO₂ z: 1.74 | PM₂.₅ z: -0.25 | CO z: 0.52<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_5500ea0905bc1a8b09b42e649fec2ff3.setContent(html_f9a96871131b6573b28039ee2c1b6c9e);
+            
+        
+
+        circle_marker_60fde2da274ce1c7a59a666e7b5f0ade.bindPopup(popup_5500ea0905bc1a8b09b42e649fec2ff3)
+        ;
+
+        
+    
+    
+            circle_marker_60fde2da274ce1c7a59a666e7b5f0ade.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3a324b642e6e19bb78044002e197e706 = L.circleMarker(
+                [23.74696453569955, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_6369bea301596d4dff5861c5bced9ec4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c0549dce7fc81e912cfd03941fd32a18 = $(`<div id="html_c0549dce7fc81e912cfd03941fd32a18" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.48 (top 93%)<br>NO₂ z: 1.87 | PM₂.₅ z: -0.29 | CO z: 0.77<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_6369bea301596d4dff5861c5bced9ec4.setContent(html_c0549dce7fc81e912cfd03941fd32a18);
+            
+        
+
+        circle_marker_3a324b642e6e19bb78044002e197e706.bindPopup(popup_6369bea301596d4dff5861c5bced9ec4)
+        ;
+
+        
+    
+    
+            circle_marker_3a324b642e6e19bb78044002e197e706.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e6c2442a8aa3111e88f1b9d89e5bcac2 = L.circleMarker(
+                [23.74696453569955, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_e0c36c55c3fce902329fd75667a8d1bd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3aab2960d9ececf87a5e3856fb6f25ce = $(`<div id="html_3aab2960d9ececf87a5e3856fb6f25ce" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.17 (top 98%)<br>NO₂ z: 1.87 | PM₂.₅ z: 0.64 | CO z: 0.77<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_e0c36c55c3fce902329fd75667a8d1bd.setContent(html_3aab2960d9ececf87a5e3856fb6f25ce);
+            
+        
+
+        circle_marker_e6c2442a8aa3111e88f1b9d89e5bcac2.bindPopup(popup_e0c36c55c3fce902329fd75667a8d1bd)
+        ;
+
+        
+    
+    
+            circle_marker_e6c2442a8aa3111e88f1b9d89e5bcac2.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8992c7fc194dfab320be03a2507707da = L.circleMarker(
+                [23.74696453569955, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_da6cd8a462a20c49ae52e00d535e47ab = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_104033bfab5fae439c78554a2f729cba = $(`<div id="html_104033bfab5fae439c78554a2f729cba" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.38 (top 99%)<br>NO₂ z: 1.84 | PM₂.₅ z: 0.95 | CO z: 0.79<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_da6cd8a462a20c49ae52e00d535e47ab.setContent(html_104033bfab5fae439c78554a2f729cba);
+            
+        
+
+        circle_marker_8992c7fc194dfab320be03a2507707da.bindPopup(popup_da6cd8a462a20c49ae52e00d535e47ab)
+        ;
+
+        
+    
+    
+            circle_marker_8992c7fc194dfab320be03a2507707da.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_06c6cf43a4742225edc952b91d02e0d3 = L.circleMarker(
+                [23.755947688540747, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_2ac9a79531836077ad4cba15c59d08c1 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_701838460c9842bba0a1394555fda782 = $(`<div id="html_701838460c9842bba0a1394555fda782" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.33 (top 90%)<br>NO₂ z: 1.36 | PM₂.₅ z: 0.35 | CO z: 0.13<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_2ac9a79531836077ad4cba15c59d08c1.setContent(html_701838460c9842bba0a1394555fda782);
+            
+        
+
+        circle_marker_06c6cf43a4742225edc952b91d02e0d3.bindPopup(popup_2ac9a79531836077ad4cba15c59d08c1)
+        ;
+
+        
+    
+    
+            circle_marker_06c6cf43a4742225edc952b91d02e0d3.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_afaa91fa201a09684f7bc3a1edd2e542 = L.circleMarker(
+                [23.755947688540747, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_bdfa7ef5dc55cb0b95b6d413c47c11cc = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c0c4f4792312d079c8d10b84b04c4e46 = $(`<div id="html_c0c4f4792312d079c8d10b84b04c4e46" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.50 (top 93%)<br>NO₂ z: 1.71 | PM₂.₅ z: 0.25 | CO z: 0.07<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_bdfa7ef5dc55cb0b95b6d413c47c11cc.setContent(html_c0c4f4792312d079c8d10b84b04c4e46);
+            
+        
+
+        circle_marker_afaa91fa201a09684f7bc3a1edd2e542.bindPopup(popup_bdfa7ef5dc55cb0b95b6d413c47c11cc)
+        ;
+
+        
+    
+    
+            circle_marker_afaa91fa201a09684f7bc3a1edd2e542.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1bc8a24de144615bb2c1da0bb98dbe0e = L.circleMarker(
+                [23.755947688540747, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_c841060f5379732b42ea00d0a1beb374 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c6c023ff163237d8ba8af790143503c1 = $(`<div id="html_c6c023ff163237d8ba8af790143503c1" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.43 (top 92%)<br>NO₂ z: 1.71 | PM₂.₅ z: 0.16 | CO z: 0.07<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_c841060f5379732b42ea00d0a1beb374.setContent(html_c6c023ff163237d8ba8af790143503c1);
+            
+        
+
+        circle_marker_1bc8a24de144615bb2c1da0bb98dbe0e.bindPopup(popup_c841060f5379732b42ea00d0a1beb374)
+        ;
+
+        
+    
+    
+            circle_marker_1bc8a24de144615bb2c1da0bb98dbe0e.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_eb7bad6b3048219cc42fb9010a246557 = L.circleMarker(
+                [23.755947688540747, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_e5bf8197cae08015ed4f031d4fd95480 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f6d5c0160b71aecb76c4cbb1bd00911d = $(`<div id="html_f6d5c0160b71aecb76c4cbb1bd00911d" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.91 (top 97%)<br>NO₂ z: 1.83 | PM₂.₅ z: 0.76 | CO z: -0.09<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_e5bf8197cae08015ed4f031d4fd95480.setContent(html_f6d5c0160b71aecb76c4cbb1bd00911d);
+            
+        
+
+        circle_marker_eb7bad6b3048219cc42fb9010a246557.bindPopup(popup_e5bf8197cae08015ed4f031d4fd95480)
+        ;
+
+        
+    
+    
+            circle_marker_eb7bad6b3048219cc42fb9010a246557.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a350ea970744c4e72df11872fc030ed8 = L.circleMarker(
+                [23.755947688540747, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_9c281a1c4963a2b3bf56e2b0472acac3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3b42d115ba5cd06d3cfb9bd3a3ac6236 = $(`<div id="html_3b42d115ba5cd06d3cfb9bd3a3ac6236" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.04 (top 85%)<br>NO₂ z: 1.49 | PM₂.₅ z: 0.28 | CO z: -0.77<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_9c281a1c4963a2b3bf56e2b0472acac3.setContent(html_3b42d115ba5cd06d3cfb9bd3a3ac6236);
+            
+        
+
+        circle_marker_a350ea970744c4e72df11872fc030ed8.bindPopup(popup_9c281a1c4963a2b3bf56e2b0472acac3)
+        ;
+
+        
+    
+    
+            circle_marker_a350ea970744c4e72df11872fc030ed8.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_99d9d50af675ba8449304ebe0ea2417f = L.circleMarker(
+                [23.764930841381943, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_7508fce7f8f067094d13ee49ed386637 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b17eb684c7faea1e6e38033870e7e973 = $(`<div id="html_b17eb684c7faea1e6e38033870e7e973" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.83 (top 96%)<br>NO₂ z: 1.42 | PM₂.₅ z: 1.15 | CO z: -0.24<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_7508fce7f8f067094d13ee49ed386637.setContent(html_b17eb684c7faea1e6e38033870e7e973);
+            
+        
+
+        circle_marker_99d9d50af675ba8449304ebe0ea2417f.bindPopup(popup_7508fce7f8f067094d13ee49ed386637)
+        ;
+
+        
+    
+    
+            circle_marker_99d9d50af675ba8449304ebe0ea2417f.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_728cab8391099323feb3c1c7af4f8214 = L.circleMarker(
+                [23.764930841381943, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_92eb439fe0331ffcd7f2a0b8351fa9e8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ce0e5d07fe89edf122bf1407871c61c1 = $(`<div id="html_ce0e5d07fe89edf122bf1407871c61c1" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.39 (top 91%)<br>NO₂ z: 1.29 | PM₂.₅ z: 0.86 | CO z: -0.59<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_92eb439fe0331ffcd7f2a0b8351fa9e8.setContent(html_ce0e5d07fe89edf122bf1407871c61c1);
+            
+        
+
+        circle_marker_728cab8391099323feb3c1c7af4f8214.bindPopup(popup_92eb439fe0331ffcd7f2a0b8351fa9e8)
+        ;
+
+        
+    
+    
+            circle_marker_728cab8391099323feb3c1c7af4f8214.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6bd48955000062e29da5d76a3d4b3ed5 = L.circleMarker(
+                [23.764930841381943, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_57b4c853c13be3dc694954bfde09fd3c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_be2905415faa06d71cc2f4b41c5a5477 = $(`<div id="html_be2905415faa06d71cc2f4b41c5a5477" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.07 (top 86%)<br>NO₂ z: 1.29 | PM₂.₅ z: 0.43 | CO z: -0.59<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_57b4c853c13be3dc694954bfde09fd3c.setContent(html_be2905415faa06d71cc2f4b41c5a5477);
+            
+        
+
+        circle_marker_6bd48955000062e29da5d76a3d4b3ed5.bindPopup(popup_57b4c853c13be3dc694954bfde09fd3c)
+        ;
+
+        
+    
+    
+            circle_marker_6bd48955000062e29da5d76a3d4b3ed5.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7177d86e01ae029a6908d2d18be0d4fa = L.circleMarker(
+                [23.764930841381943, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_9c2a9eb42903a736cdc58674f76ad88a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4400c8d072f1a63a9c36d124347d7e4e = $(`<div id="html_4400c8d072f1a63a9c36d124347d7e4e" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.53 (top 94%)<br>NO₂ z: 2.00 | PM₂.₅ z: 0.39 | CO z: -0.69<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_9c2a9eb42903a736cdc58674f76ad88a.setContent(html_4400c8d072f1a63a9c36d124347d7e4e);
+            
+        
+
+        circle_marker_7177d86e01ae029a6908d2d18be0d4fa.bindPopup(popup_9c2a9eb42903a736cdc58674f76ad88a)
+        ;
+
+        
+    
+    
+            circle_marker_7177d86e01ae029a6908d2d18be0d4fa.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_66f18f1d8e12ef9bf9967cf59c05ea1f = L.circleMarker(
+                [23.773913994223136, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_c593025e3784e985d4a17e3c2a31234d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_7da27c2316f32d6d3793af13c32596e8 = $(`<div id="html_7da27c2316f32d6d3793af13c32596e8" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>AQ index z = 2.70 (top 99%)<br>NO₂ z: 1.12 | PM₂.₅ z: 2.42 | CO z: 0.13<br>High NO₂ → traffic/industry<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_c593025e3784e985d4a17e3c2a31234d.setContent(html_7da27c2316f32d6d3793af13c32596e8);
+            
+        
+
+        circle_marker_66f18f1d8e12ef9bf9967cf59c05ea1f.bindPopup(popup_c593025e3784e985d4a17e3c2a31234d)
+        ;
+
+        
+    
+    
+            circle_marker_66f18f1d8e12ef9bf9967cf59c05ea1f.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6e08f3940f2d965cbdbeb76f0c1eb682 = L.circleMarker(
+                [23.773913994223136, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_bb0eea0414766883326e63ba39017f8d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ba05eaefcfd48b107128fb43ef8dd892 = $(`<div id="html_ba05eaefcfd48b107128fb43ef8dd892" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.10 (top 87%)<br>NO₂ z: 1.16 | PM₂.₅ z: 0.31 | CO z: 0.00<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_bb0eea0414766883326e63ba39017f8d.setContent(html_ba05eaefcfd48b107128fb43ef8dd892);
+            
+        
+
+        circle_marker_6e08f3940f2d965cbdbeb76f0c1eb682.bindPopup(popup_bb0eea0414766883326e63ba39017f8d)
+        ;
+
+        
+    
+    
+            circle_marker_6e08f3940f2d965cbdbeb76f0c1eb682.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4850c7afd33c601479b27e11371fdad6 = L.circleMarker(
+                [23.782897147064332, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_2d578d6e919dd25a0c2eec3ce9513e6a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_41ed769f7ac8ced2ae20fb82b26b77c3 = $(`<div id="html_41ed769f7ac8ced2ae20fb82b26b77c3" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.29 (top 89%)<br>NO₂ z: 0.74 | PM₂.₅ z: 1.02 | CO z: -0.08<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_2d578d6e919dd25a0c2eec3ce9513e6a.setContent(html_41ed769f7ac8ced2ae20fb82b26b77c3);
+            
+        
+
+        circle_marker_4850c7afd33c601479b27e11371fdad6.bindPopup(popup_2d578d6e919dd25a0c2eec3ce9513e6a)
+        ;
+
+        
+    
+    
+            circle_marker_4850c7afd33c601479b27e11371fdad6.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3b3ccdd6fc2cf36e034e7e0f46742969 = L.circleMarker(
+                [23.782897147064332, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_e0d3ec226e5101adbfc07de253c80ef5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_458dc972d8e42146691088dd9a98b57f = $(`<div id="html_458dc972d8e42146691088dd9a98b57f" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.68 (top 95%)<br>NO₂ z: 0.94 | PM₂.₅ z: 1.29 | CO z: 0.02<br>High PM₂.₅ (AOD proxy) → dust/combustion</div>`)[0];
+                popup_e0d3ec226e5101adbfc07de253c80ef5.setContent(html_458dc972d8e42146691088dd9a98b57f);
+            
+        
+
+        circle_marker_3b3ccdd6fc2cf36e034e7e0f46742969.bindPopup(popup_e0d3ec226e5101adbfc07de253c80ef5)
+        ;
+
+        
+    
+    
+            circle_marker_3b3ccdd6fc2cf36e034e7e0f46742969.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0d1693dc6c5dc1b9deb9088d3c54b664 = L.circleMarker(
+                [23.782897147064332, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_61111a33bcc24d776eeb1c9d36207dbd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8f31c1eff49bf78613300659a438b8a9 = $(`<div id="html_8f31c1eff49bf78613300659a438b8a9" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.21 (top 88%)<br>NO₂ z: 1.02 | PM₂.₅ z: 0.68 | CO z: -0.15<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_61111a33bcc24d776eeb1c9d36207dbd.setContent(html_8f31c1eff49bf78613300659a438b8a9);
+            
+        
+
+        circle_marker_0d1693dc6c5dc1b9deb9088d3c54b664.bindPopup(popup_61111a33bcc24d776eeb1c9d36207dbd)
+        ;
+
+        
+    
+    
+            circle_marker_0d1693dc6c5dc1b9deb9088d3c54b664.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1967bc9e41a06683dc022934ba5d978d = L.circleMarker(
+                [23.79188029990553, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_c7a2c604b26c588cfc2d492f1298c98f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cf39fa266b2e1ef1d1f39280544bd864 = $(`<div id="html_cf39fa266b2e1ef1d1f39280544bd864" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.25 (top 89%)<br>NO₂ z: 0.77 | PM₂.₅ z: 0.76 | CO z: 0.27<br>Mixed drivers</div>`)[0];
+                popup_c7a2c604b26c588cfc2d492f1298c98f.setContent(html_cf39fa266b2e1ef1d1f39280544bd864);
+            
+        
+
+        circle_marker_1967bc9e41a06683dc022934ba5d978d.bindPopup(popup_c7a2c604b26c588cfc2d492f1298c98f)
+        ;
+
+        
+    
+    
+            circle_marker_1967bc9e41a06683dc022934ba5d978d.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9e4b29996964086067508a7ded85b514 = L.circleMarker(
+                [23.79188029990553, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_5d65e28d9bf11db64ff3b493fec5009b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a0df6245a862125231dc5be4cfdbddf1 = $(`<div id="html_a0df6245a862125231dc5be4cfdbddf1" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.73 (top 95%)<br>NO₂ z: 1.46 | PM₂.₅ z: 0.81 | CO z: 0.08<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_5d65e28d9bf11db64ff3b493fec5009b.setContent(html_a0df6245a862125231dc5be4cfdbddf1);
+            
+        
+
+        circle_marker_9e4b29996964086067508a7ded85b514.bindPopup(popup_5d65e28d9bf11db64ff3b493fec5009b)
+        ;
+
+        
+    
+    
+            circle_marker_9e4b29996964086067508a7ded85b514.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a195a36a438f59684391ec9a91c8d6c7 = L.circleMarker(
+                [23.79188029990553, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_9b46e0cae62b55fe5378b833016bfc64 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6cdfc256c34b56dce8c114c865184f23 = $(`<div id="html_6cdfc256c34b56dce8c114c865184f23" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.53 (top 94%)<br>NO₂ z: 1.46 | PM₂.₅ z: 0.54 | CO z: 0.08<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_9b46e0cae62b55fe5378b833016bfc64.setContent(html_6cdfc256c34b56dce8c114c865184f23);
+            
+        
+
+        circle_marker_a195a36a438f59684391ec9a91c8d6c7.bindPopup(popup_9b46e0cae62b55fe5378b833016bfc64)
+        ;
+
+        
+    
+    
+            circle_marker_a195a36a438f59684391ec9a91c8d6c7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d3cfea89b04752bffe9257493245dac8 = L.circleMarker(
+                [23.79188029990553, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_ad7d4db8977e0975dc95c9285bbb14b4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_47359f7d4b61b54a449a796ad3b1c3b3 = $(`<div id="html_47359f7d4b61b54a449a796ad3b1c3b3" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.39 (top 91%)<br>NO₂ z: 1.56 | PM₂.₅ z: 0.11 | CO z: 0.35<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_ad7d4db8977e0975dc95c9285bbb14b4.setContent(html_47359f7d4b61b54a449a796ad3b1c3b3);
+            
+        
+
+        circle_marker_d3cfea89b04752bffe9257493245dac8.bindPopup(popup_ad7d4db8977e0975dc95c9285bbb14b4)
+        ;
+
+        
+    
+    
+            circle_marker_d3cfea89b04752bffe9257493245dac8.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_eb25a37ecb6e9f21f58e8a7192814181 = L.circleMarker(
+                [23.80086345274672, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_ec98e030eff955f603f62811b1e6cb0c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e8edaae5f910e4a95ff373674bf822ce = $(`<div id="html_e8edaae5f910e4a95ff373674bf822ce" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.09 (top 87%)<br>NO₂ z: 0.61 | PM₂.₅ z: 0.47 | CO z: 0.76<br>Mixed drivers</div>`)[0];
+                popup_ec98e030eff955f603f62811b1e6cb0c.setContent(html_e8edaae5f910e4a95ff373674bf822ce);
+            
+        
+
+        circle_marker_eb25a37ecb6e9f21f58e8a7192814181.bindPopup(popup_ec98e030eff955f603f62811b1e6cb0c)
+        ;
+
+        
+    
+    
+            circle_marker_eb25a37ecb6e9f21f58e8a7192814181.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_87402fed16bbfdd6f72c97ef5ba999a7 = L.circleMarker(
+                [23.80086345274672, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_98e6003eae42646051d7fdc1daa95b29 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_47e75af6f2fd706490d1b48082a95ca8 = $(`<div id="html_47e75af6f2fd706490d1b48082a95ca8" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.79 (top 96%)<br>NO₂ z: 1.41 | PM₂.₅ z: 0.66 | CO z: 0.65<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_98e6003eae42646051d7fdc1daa95b29.setContent(html_47e75af6f2fd706490d1b48082a95ca8);
+            
+        
+
+        circle_marker_87402fed16bbfdd6f72c97ef5ba999a7.bindPopup(popup_98e6003eae42646051d7fdc1daa95b29)
+        ;
+
+        
+    
+    
+            circle_marker_87402fed16bbfdd6f72c97ef5ba999a7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c4f6f23281ba6c037f93a550070bd147 = L.circleMarker(
+                [23.80086345274672, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_fe034d0f963f1e444d8c2cf115205d57 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_724c29721e2420c36451f1f67c30f7ea = $(`<div id="html_724c29721e2420c36451f1f67c30f7ea" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.69 (top 95%)<br>NO₂ z: 1.41 | PM₂.₅ z: 0.53 | CO z: 0.65<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_fe034d0f963f1e444d8c2cf115205d57.setContent(html_724c29721e2420c36451f1f67c30f7ea);
+            
+        
+
+        circle_marker_c4f6f23281ba6c037f93a550070bd147.bindPopup(popup_fe034d0f963f1e444d8c2cf115205d57)
+        ;
+
+        
+    
+    
+            circle_marker_c4f6f23281ba6c037f93a550070bd147.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4352cd528c677c48c6331fea1153a474 = L.circleMarker(
+                [23.80086345274672, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_8d264cf4ba2a7326081330f8d27631a5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_68099902713ee09d667ee384922de55c = $(`<div id="html_68099902713ee09d667ee384922de55c" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.40 (top 92%)<br>NO₂ z: 1.36 | PM₂.₅ z: 0.15 | CO z: 0.74<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_8d264cf4ba2a7326081330f8d27631a5.setContent(html_68099902713ee09d667ee384922de55c);
+            
+        
+
+        circle_marker_4352cd528c677c48c6331fea1153a474.bindPopup(popup_8d264cf4ba2a7326081330f8d27631a5)
+        ;
+
+        
+    
+    
+            circle_marker_4352cd528c677c48c6331fea1153a474.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0e0d122eff033e57bdfda568282af7bc = L.circleMarker(
+                [23.809846605587918, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_843dbe2d30150e6cb5ceff92b4f9c0df = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0327af2d682cfee75f23e87f64d2a657 = $(`<div id="html_0327af2d682cfee75f23e87f64d2a657" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.09 (top 86%)<br>NO₂ z: 1.41 | PM₂.₅ z: -0.27 | CO z: 0.65<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_843dbe2d30150e6cb5ceff92b4f9c0df.setContent(html_0327af2d682cfee75f23e87f64d2a657);
+            
+        
+
+        circle_marker_0e0d122eff033e57bdfda568282af7bc.bindPopup(popup_843dbe2d30150e6cb5ceff92b4f9c0df)
+        ;
+
+        
+    
+    
+            circle_marker_0e0d122eff033e57bdfda568282af7bc.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_121dbd05f207213b4cddf6f7bc265445 = L.circleMarker(
+                [23.809846605587918, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_49780c7b39ade21110ca3f02ec262fce = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_65850d613e99c01fc4e7bef55b9a4b3b = $(`<div id="html_65850d613e99c01fc4e7bef55b9a4b3b" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.60 (top 94%)<br>NO₂ z: 1.41 | PM₂.₅ z: 0.41 | CO z: 0.65<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_49780c7b39ade21110ca3f02ec262fce.setContent(html_65850d613e99c01fc4e7bef55b9a4b3b);
+            
+        
+
+        circle_marker_121dbd05f207213b4cddf6f7bc265445.bindPopup(popup_49780c7b39ade21110ca3f02ec262fce)
+        ;
+
+        
+    
+    
+            circle_marker_121dbd05f207213b4cddf6f7bc265445.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_563e05638e987805d279b33c42ad63d8 = L.circleMarker(
+                [23.809846605587918, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_6089e6e4d1587dc7b652af2ac4e0ae53 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_639828c2ecdede640ffb960be2531d96 = $(`<div id="html_639828c2ecdede640ffb960be2531d96" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.45 (top 92%)<br>NO₂ z: 1.36 | PM₂.₅ z: 0.21 | CO z: 0.74<br>High NO₂ → traffic/industry</div>`)[0];
+                popup_6089e6e4d1587dc7b652af2ac4e0ae53.setContent(html_639828c2ecdede640ffb960be2531d96);
+            
+        
+
+        circle_marker_563e05638e987805d279b33c42ad63d8.bindPopup(popup_6089e6e4d1587dc7b652af2ac4e0ae53)
+        ;
+
+        
+    
+    
+            circle_marker_563e05638e987805d279b33c42ad63d8.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_34d80a37016c0375e2250b959cb5e698 = L.circleMarker(
+                [23.809846605587918, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_9478fd930b62c504b3fcb5ac56937ea0 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_5dd60d6ed4f4a9a6e635f969784ceea8 = $(`<div id="html_5dd60d6ed4f4a9a6e635f969784ceea8" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.22 (top 88%)<br>NO₂ z: 0.64 | PM₂.₅ z: 0.24 | CO z: 1.50<br>High CO → combustion/transport</div>`)[0];
+                popup_9478fd930b62c504b3fcb5ac56937ea0.setContent(html_5dd60d6ed4f4a9a6e635f969784ceea8);
+            
+        
+
+        circle_marker_34d80a37016c0375e2250b959cb5e698.bindPopup(popup_9478fd930b62c504b3fcb5ac56937ea0)
+        ;
+
+        
+    
+    
+            circle_marker_34d80a37016c0375e2250b959cb5e698.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f48fd61a817621e3212d42e9df711ec5 = L.circleMarker(
+                [23.809846605587918, 90.54568906282718],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_cd9723cb6717e4f2652ee474e6fc5966 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6ca3046d66185e431f63e6b9223e0cef = $(`<div id="html_6ca3046d66185e431f63e6b9223e0cef" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.53 (top 94%)<br>NO₂ z: 0.68 | PM₂.₅ z: 0.78 | CO z: 1.18<br>High CO → combustion/transport</div>`)[0];
+                popup_cd9723cb6717e4f2652ee474e6fc5966.setContent(html_6ca3046d66185e431f63e6b9223e0cef);
+            
+        
+
+        circle_marker_f48fd61a817621e3212d42e9df711ec5.bindPopup(popup_cd9723cb6717e4f2652ee474e6fc5966)
+        ;
+
+        
+    
+    
+            circle_marker_f48fd61a817621e3212d42e9df711ec5.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a5f5903f1c614e4c4e723cf4782841c7 = L.circleMarker(
+                [23.836796064111503, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_0f9bcb8807bbc98e6e5044c779ec3570 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4191c56d33f4d3022e005f3df0efc770 = $(`<div id="html_4191c56d33f4d3022e005f3df0efc770" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.25 (top 89%)<br>NO₂ z: 0.10 | PM₂.₅ z: 0.86 | CO z: 1.41<br>High CO → combustion/transport</div>`)[0];
+                popup_0f9bcb8807bbc98e6e5044c779ec3570.setContent(html_4191c56d33f4d3022e005f3df0efc770);
+            
+        
+
+        circle_marker_a5f5903f1c614e4c4e723cf4782841c7.bindPopup(popup_0f9bcb8807bbc98e6e5044c779ec3570)
+        ;
+
+        
+    
+    
+            circle_marker_a5f5903f1c614e4c4e723cf4782841c7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ed0a71d925e81feee2d12103fca93f42 = L.circleMarker(
+                [23.836796064111503, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_ecd2c2746e8863345ad0e0f28b038148 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1be144e995a4b585dbe912972d3c4b87 = $(`<div id="html_1be144e995a4b585dbe912972d3c4b87" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.05 (top 86%)<br>NO₂ z: 1.29 | PM₂.₅ z: -0.68 | CO z: 1.59<br>High NO₂ → traffic/industry<br>High CO → combustion/transport</div>`)[0];
+                popup_ecd2c2746e8863345ad0e0f28b038148.setContent(html_1be144e995a4b585dbe912972d3c4b87);
+            
+        
+
+        circle_marker_ed0a71d925e81feee2d12103fca93f42.bindPopup(popup_ecd2c2746e8863345ad0e0f28b038148)
+        ;
+
+        
+    
+    
+            circle_marker_ed0a71d925e81feee2d12103fca93f42.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_51fc97d753af2239c9ec9982d96121d7 = L.circleMarker(
+                [23.836796064111503, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_905103c312422dd7fe0fa85d1456740a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_de66b9cc6d04d28e127310bb9ed2fe97 = $(`<div id="html_de66b9cc6d04d28e127310bb9ed2fe97" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.39 (top 91%)<br>NO₂ z: 1.29 | PM₂.₅ z: -0.23 | CO z: 1.59<br>High NO₂ → traffic/industry<br>High CO → combustion/transport</div>`)[0];
+                popup_905103c312422dd7fe0fa85d1456740a.setContent(html_de66b9cc6d04d28e127310bb9ed2fe97);
+            
+        
+
+        circle_marker_51fc97d753af2239c9ec9982d96121d7.bindPopup(popup_905103c312422dd7fe0fa85d1456740a)
+        ;
+
+        
+    
+    
+            circle_marker_51fc97d753af2239c9ec9982d96121d7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c0d2b39cc05228d655b3c45da39796eb = L.circleMarker(
+                [23.836796064111503, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_012f8eb38c069acd3bcead405b21becc = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e4628d94a71bf20e6503ae49b690d80b = $(`<div id="html_e4628d94a71bf20e6503ae49b690d80b" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.86 (top 97%)<br>NO₂ z: 0.61 | PM₂.₅ z: 0.26 | CO z: 3.20<br>High CO → combustion/transport</div>`)[0];
+                popup_012f8eb38c069acd3bcead405b21becc.setContent(html_e4628d94a71bf20e6503ae49b690d80b);
+            
+        
+
+        circle_marker_c0d2b39cc05228d655b3c45da39796eb.bindPopup(popup_012f8eb38c069acd3bcead405b21becc)
+        ;
+
+        
+    
+    
+            circle_marker_c0d2b39cc05228d655b3c45da39796eb.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_308cb31d8d983044277953b8ef1ed79d = L.circleMarker(
+                [23.8457792169527, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_08f0a0cad2fbc2685a719a1f966b922c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6f50f1e774e416645cbcdfcbc93a5fbc = $(`<div id="html_6f50f1e774e416645cbcdfcbc93a5fbc" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.45 (top 92%)<br>NO₂ z: 1.03 | PM₂.₅ z: 0.36 | CO z: 1.10<br>High NO₂ → traffic/industry<br>High CO → combustion/transport</div>`)[0];
+                popup_08f0a0cad2fbc2685a719a1f966b922c.setContent(html_6f50f1e774e416645cbcdfcbc93a5fbc);
+            
+        
+
+        circle_marker_308cb31d8d983044277953b8ef1ed79d.bindPopup(popup_08f0a0cad2fbc2685a719a1f966b922c)
+        ;
+
+        
+    
+    
+            circle_marker_308cb31d8d983044277953b8ef1ed79d.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_24a28ed00d66c10bd499a55d3782d500 = L.circleMarker(
+                [23.8457792169527, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_390e0f71df96d3676d531c709d340d57 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1e6a4695e075a08746618b72f58d350e = $(`<div id="html_1e6a4695e075a08746618b72f58d350e" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.60 (top 94%)<br>NO₂ z: 1.15 | PM₂.₅ z: 0.42 | CO z: 1.13<br>High NO₂ → traffic/industry<br>High CO → combustion/transport</div>`)[0];
+                popup_390e0f71df96d3676d531c709d340d57.setContent(html_1e6a4695e075a08746618b72f58d350e);
+            
+        
+
+        circle_marker_24a28ed00d66c10bd499a55d3782d500.bindPopup(popup_390e0f71df96d3676d531c709d340d57)
+        ;
+
+        
+    
+    
+            circle_marker_24a28ed00d66c10bd499a55d3782d500.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_029a8cae7c9d9079f80bc49f7513df7f = L.circleMarker(
+                [23.8457792169527, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_d2eafcffa23e4fae61b4797e37f2de3f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a4e5d151897372fda9f2af46028f1200 = $(`<div id="html_a4e5d151897372fda9f2af46028f1200" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.10 (top 87%)<br>NO₂ z: 1.15 | PM₂.₅ z: -0.25 | CO z: 1.13<br>High NO₂ → traffic/industry<br>High CO → combustion/transport</div>`)[0];
+                popup_d2eafcffa23e4fae61b4797e37f2de3f.setContent(html_a4e5d151897372fda9f2af46028f1200);
+            
+        
+
+        circle_marker_029a8cae7c9d9079f80bc49f7513df7f.bindPopup(popup_d2eafcffa23e4fae61b4797e37f2de3f)
+        ;
+
+        
+    
+    
+            circle_marker_029a8cae7c9d9079f80bc49f7513df7f.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b31ceab4a338286c82e82f1dbe3f4bf7 = L.circleMarker(
+                [23.8457792169527, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_c1682ed367599f8cd11ea381df08d36b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fe644ff52d8ac28ca5a321003ac7c371 = $(`<div id="html_fe644ff52d8ac28ca5a321003ac7c371" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.26 (top 89%)<br>NO₂ z: 0.78 | PM₂.₅ z: -0.14 | CO z: 2.08<br>High CO → combustion/transport</div>`)[0];
+                popup_c1682ed367599f8cd11ea381df08d36b.setContent(html_fe644ff52d8ac28ca5a321003ac7c371);
+            
+        
+
+        circle_marker_b31ceab4a338286c82e82f1dbe3f4bf7.bindPopup(popup_c1682ed367599f8cd11ea381df08d36b)
+        ;
+
+        
+    
+    
+            circle_marker_b31ceab4a338286c82e82f1dbe3f4bf7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f9fe11839e26d68ce7bad1286049ea17 = L.circleMarker(
+                [23.8457792169527, 90.52772275714479],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_b8a0363f69a2973bb7d2c5b9efcd7c51 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_688d1db38b9da3ed5db5136b1bb46e8b = $(`<div id="html_688d1db38b9da3ed5db5136b1bb46e8b" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.22 (top 88%)<br>NO₂ z: 0.64 | PM₂.₅ z: -0.14 | CO z: 2.26<br>High CO → combustion/transport</div>`)[0];
+                popup_b8a0363f69a2973bb7d2c5b9efcd7c51.setContent(html_688d1db38b9da3ed5db5136b1bb46e8b);
+            
+        
+
+        circle_marker_f9fe11839e26d68ce7bad1286049ea17.bindPopup(popup_b8a0363f69a2973bb7d2c5b9efcd7c51)
+        ;
+
+        
+    
+    
+            circle_marker_f9fe11839e26d68ce7bad1286049ea17.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c38b90652968d42e3029c31438f627d2 = L.circleMarker(
+                [23.854762369793896, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_b1658a9e4c66de4807853a4bf0984761 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_aeaf02649ec512f55b494796a6cbb069 = $(`<div id="html_aeaf02649ec512f55b494796a6cbb069" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.60 (top 94%)<br>NO₂ z: 0.77 | PM₂.₅ z: 0.72 | CO z: 1.30<br>High CO → combustion/transport</div>`)[0];
+                popup_b1658a9e4c66de4807853a4bf0984761.setContent(html_aeaf02649ec512f55b494796a6cbb069);
+            
+        
+
+        circle_marker_c38b90652968d42e3029c31438f627d2.bindPopup(popup_b1658a9e4c66de4807853a4bf0984761)
+        ;
+
+        
+    
+    
+            circle_marker_c38b90652968d42e3029c31438f627d2.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cae8bd851c25981b0e1e1a8235836986 = L.circleMarker(
+                [23.854762369793896, 90.56365536850956],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_1f3df1b2a7fbc44f9c9a720511a2b3c5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d3b9043c2ee5f2dc3dac38b3cac83f8e = $(`<div id="html_d3b9043c2ee5f2dc3dac38b3cac83f8e" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.04 (top 86%)<br>NO₂ z: 0.64 | PM₂.₅ z: 0.23 | CO z: 1.03<br>High CO → combustion/transport</div>`)[0];
+                popup_1f3df1b2a7fbc44f9c9a720511a2b3c5.setContent(html_d3b9043c2ee5f2dc3dac38b3cac83f8e);
+            
+        
+
+        circle_marker_cae8bd851c25981b0e1e1a8235836986.bindPopup(popup_1f3df1b2a7fbc44f9c9a720511a2b3c5)
+        ;
+
+        
+    
+    
+            circle_marker_cae8bd851c25981b0e1e1a8235836986.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_509ebddc7c7d6f4e955d822a90d45415 = L.circleMarker(
+                [23.86374552263509, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_c2977328e89650fa45d8671dbfba6627 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_75ea24ba83a49ba1577df500e7f011c8 = $(`<div id="html_75ea24ba83a49ba1577df500e7f011c8" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.82 (top 96%)<br>NO₂ z: 0.54 | PM₂.₅ z: 0.91 | CO z: 1.97<br>High CO → combustion/transport</div>`)[0];
+                popup_c2977328e89650fa45d8671dbfba6627.setContent(html_75ea24ba83a49ba1577df500e7f011c8);
+            
+        
+
+        circle_marker_509ebddc7c7d6f4e955d822a90d45415.bindPopup(popup_c2977328e89650fa45d8671dbfba6627)
+        ;
+
+        
+    
+    
+            circle_marker_509ebddc7c7d6f4e955d822a90d45415.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ba96c5ab30496a0228fe4b8e1cbae1a1 = L.circleMarker(
+                [23.872728675476285, 90.51873960430359],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+        var popup_d7c442304b806cf2f62e7f579a6c05ac = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b8efc886454b1140b151e1f98fae1473 = $(`<div id="html_b8efc886454b1140b151e1f98fae1473" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>AQ index z = 1.47 (top 92%)<br>NO₂ z: -0.24 | PM₂.₅ z: 0.87 | CO z: 2.67<br>High CO → combustion/transport</div>`)[0];
+                popup_d7c442304b806cf2f62e7f579a6c05ac.setContent(html_b8efc886454b1140b151e1f98fae1473);
+            
+        
+
+        circle_marker_ba96c5ab30496a0228fe4b8e1cbae1a1.bindPopup(popup_d7c442304b806cf2f62e7f579a6c05ac)
+        ;
+
+        
+    
+    
+            circle_marker_ba96c5ab30496a0228fe4b8e1cbae1a1.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var tile_layer_e39b39331af806c6d91a2127fb097b98 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_2091b1e042e30c0a308e267f78bd2104 = new L.Control.MiniMap(
+                tile_layer_e39b39331af806c6d91a2127fb097b98,
+                {
+  "position": "bottomright",
+  "width": 150,
+  "height": 150,
+  "collapsedWidth": 25,
+  "collapsedHeight": 25,
+  "zoomLevelOffset": -5,
+  "centerFixed": false,
+  "zoomAnimation": false,
+  "toggleDisplay": true,
+  "autoToggleDisplay": false,
+  "minimized": false,
+}
+            );
+            map_2437823f839599890eb6d85bad067316.addControl(mini_map_2091b1e042e30c0a308e267f78bd2104);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+        
+    
+            var mouse_position_6cc0f7e9f7db6361a32fb06f0a5d1cd6 = new L.Control.MousePosition(
+                {
+  "position": "topright",
+  "separator": " | ",
+  "emptyString": "Unavailable",
+  "lngFirst": false,
+  "numDigits": 5,
+  "prefix": "Lat/Lon:",
+}
+            );
+            mouse_position_6cc0f7e9f7db6361a32fb06f0a5d1cd6.options["latFormatter"] =
+                undefined;
+            mouse_position_6cc0f7e9f7db6361a32fb06f0a5d1cd6.options["lngFormatter"] =
+                undefined;
+            map_2437823f839599890eb6d85bad067316.addControl(mouse_position_6cc0f7e9f7db6361a32fb06f0a5d1cd6);
+        
+    
+            var measure_control_57deb5078939881f6cfafa692f1b0e73 = new L.Control.Measure(
+                {
+  "position": "topright",
+  "primaryLengthUnit": "kilometers",
+  "secondaryLengthUnit": "miles",
+  "primaryAreaUnit": "sqmeters",
+  "secondaryAreaUnit": "acres",
+});
+            map_2437823f839599890eb6d85bad067316.addControl(measure_control_57deb5078939881f6cfafa692f1b0e73);
+
+            // Workaround for using this plugin with Leaflet>=1.8.0
+            // https://github.com/ljagis/leaflet-measure/issues/171
+            L.Control.Measure.include({
+                _setCaptureMarkerIcon: function () {
+                    // disable autopan
+                    this._captureMarker.options.autoPanOnFocus = false;
+                    // default function
+                    this._captureMarker.setIcon(
+                        L.divIcon({
+                            iconSize: this._map.getSize().multiplyBy(2)
+                        })
+                    );
+                },
+            });
+
+        
+    
+            var layer_control_a3f72d697a21d75bfbdb1718f4670a4a_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_c6bbf6417f8bef05d4a82cc9ac6fb9aa,
+                },
+                overlays :  {
+                    "Cluster 0 (high, n=12)" : geo_json_e03ad6d51e616763028123e17d8dbf03,
+                    "Cluster 1 (high, n=18)" : geo_json_e80e9192112fc2692d4fa1c570b3053a,
+                    "Cluster 2 (high, n=6)" : geo_json_551e57bf67af25c0e1a8aec84a71b58a,
+                    "Cluster 3 (high, n=39)" : geo_json_7f474a549a2edcca2bc5134bea07cba0,
+                    "Cluster 4 (high, n=7)" : geo_json_f90d42c499759b4a73879a50ba055cde,
+                },
+            };
+            let layer_control_a3f72d697a21d75bfbdb1718f4670a4a = L.control.layers(
+                layer_control_a3f72d697a21d75bfbdb1718f4670a4a_layers.base_layers,
+                layer_control_a3f72d697a21d75bfbdb1718f4670a4a_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_2437823f839599890eb6d85bad067316);
+
+        
+</script>
+</html>
