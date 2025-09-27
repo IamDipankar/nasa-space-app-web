@@ -166,7 +166,7 @@ def gee_green_polygons(aoi_geom, ndvi_min=NDVI_GREEN_MIN, scale=30, max_features
 
 
 # ----------------------------
-# CORE LOGIC
+#          CORE LOGIC
 # ----------------------------
 def line_midpoint(geom: LineString):
     try:
@@ -186,7 +186,7 @@ def make_iso_polygon(edges_subset, buffer_m=EDGE_BUFFER_M):
     return gpd.GeoSeries([merged], crs=edges_subset.crs)
 
 
-def analyze_green_access_ndvi():
+def run(polygon = None, aoi_bbox = None, session_id = None):
     # Earth Engine init
     ee_init_headless()
 
@@ -196,7 +196,10 @@ def analyze_green_access_ndvi():
     ox.settings.timeout = 180
 
     print("Geocoding AOI…")
-    aoi = ox.geocode_to_gdf(PLACE)
+    if polygon:
+        aoi = polygon
+    else:
+        aoi = ox.geocode_to_gdf(PLACE)
     if aoi.empty:
         raise SystemExit("Could not geocode the AOI name.")
     aoi_polygon = aoi.geometry.iloc[0]
@@ -233,7 +236,10 @@ def analyze_green_access_ndvi():
     print("Vectorizing NDVI green polygons from GEE (this is server-side fast)…")
     # Build a simple rectangle AOI for GEE from the OSM aoi bounds
     minx, miny, maxx, maxy = aoi.to_crs(epsg=4326).total_bounds
-    gee_aoi = ee.Geometry.Rectangle([minx, miny, maxx, maxy])
+    if aoi_bbox:
+        gee_aoi = aoi_bbox
+    else:
+        gee_aoi = ee.Geometry.Rectangle([minx, miny, maxx, maxy])
 
     ndvi_greens = gee_green_polygons(gee_aoi, ndvi_min=NDVI_GREEN_MIN, scale=30, max_features=600)
 
@@ -399,7 +405,7 @@ def analyze_green_access_ndvi():
     print("Done.")
 
 def main():
-    return analyze_green_access_ndvi()
+    return run()
  
 if __name__ == "__main__":
     main()

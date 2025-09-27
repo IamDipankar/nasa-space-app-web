@@ -12,6 +12,7 @@ import time
 from datetime import datetime
 from typing import List, Dict, Optional
 import uuid
+from models.anlyzers import router
 
 # Add models directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'models', 'anlyzers'))
@@ -28,7 +29,8 @@ analysis_status: Dict[str, Dict] = {}
 
 # Pydantic models
 class AnalysisRequest(BaseModel):
-    location: str
+    upazila: str | None = None
+    district: str
     analyses: List[str]
     session_id: str
 
@@ -55,12 +57,12 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 analysis_type_modules = {
-    "aq_hotspot": "aq_hotspots.py",
+    "aq_hotspots": "aq_hotspots.py",
     "uhi_hotspots": "uhi_hotspots.py",
     "green_access": "green_access_ndvi.py"
 }
 
-def run_single_analysis(analysis_type: str, session_id: str):
+def run_single_analysis(analysis_type: str, session_id: str, ee_geometry, aoi_bbox):
     """Run a single analysis in a separate thread"""
     global analysis_type_modules
     try:
@@ -74,7 +76,6 @@ def run_single_analysis(analysis_type: str, session_id: str):
             asyncio.sleep(4)
             pass
         else:
-
             # Import and run the analysis module
             module_path = os.path.join("models", "anlyzers", analysis_type_modules[analysis_type])
             spec = importlib.util.spec_from_file_location(analysis_type, module_path)
@@ -82,7 +83,7 @@ def run_single_analysis(analysis_type: str, session_id: str):
             spec.loader.exec_module(module)
             
             # Run the main function
-            module.main()
+            module.run(session_id, ee_geometry, aoi_bbox)
         
         # Send completion message
         asyncio.run(manager.send_message(session_id, {
@@ -102,8 +103,10 @@ def run_single_analysis(analysis_type: str, session_id: str):
         }))
         return False
 
-def run_analyses_background(analyses: List[str], session_id: str):
+def run_analyses_background(analyses: List[str], session_id: str, district: str, upazila: str = None):
     """Run multiple analyses in sequence"""
+    # Extracting location
+    ee_geometry, aoi_bbox = router.get_polygon_and_bbox(district, upazila)
     try:
         completed_analyses = []
         total_analyses = len(analyses)
@@ -117,7 +120,7 @@ def run_analyses_background(analyses: List[str], session_id: str):
                 "message": f"Running {analysis.replace('_', ' ').title()} ({i + 1}/{total_analyses})"
             }))
             
-            success = run_single_analysis(analysis, session_id)
+            success = run_single_analysis(analysis, session_id, ee_geometry, aoi_bbox)
             if success:
                 completed_analyses.append(analysis)
             
@@ -172,11 +175,7 @@ async def run_analysis(request: AnalysisRequest, background_tasks: BackgroundTas
     """Start analysis in background and return immediately"""
     if not request.analyses:
         raise HTTPException(status_code=400, detail="No analyses selected")
-    
-    # For now, we'll ignore the location since it's hardcoded to Narayanganj
-    if request.location.lower() != "narayanganj":
-        # For future implementation, you can add location-specific logic here
-        pass
+    os.makedirs(os.path.join("web_outputs", request.session_id), exist_ok=True)
     
     # Initialize analysis status
     analysis_status[request.session_id] = {
@@ -186,7 +185,7 @@ async def run_analysis(request: AnalysisRequest, background_tasks: BackgroundTas
     }
     
     # Start analyses in background
-    background_tasks.add_task(run_analyses_background, request.analyses, request.session_id)
+    background_tasks.add_task(run_analyses_background, request.analyses, request.session_id, request.district, request.upazila)
     
     return {
         "message": "Analysis started successfully",
@@ -207,7 +206,7 @@ async def get_results(analysis_type: str):
     """Serve analysis results HTML file"""
     # Map analysis types to their HTML files
     html_files = {
-        "aq_hotspot": "aq_hotspots.html",
+        "aq_hotspots": "aq_hotspots.html",
         "uhi_hotspots": "uhi_hotspots.html", 
         "green_access": "green_access.html"
     }
@@ -240,14 +239,14 @@ async def get_available_results(session_id: str):
     
     available_results = []
     html_files = {
-        "aq_hotspot": "aq_hotspots.html",
+        "aq_hotspots": "aq_hotspots.html",
         "uhi_hotspots": "uhi_hotspots.html", 
         "green_access": "green_access.html"
     }
     
     for analysis in session_data.get("completed_analyses", []):
         if analysis in html_files:
-            file_path = os.path.join("web_outputs", html_files[analysis])
+            file_path = os.path.join("web_outputs", session_id, html_files[analysis])
             if os.path.exists(file_path):
                 available_results.append({
                     "analysis_type": analysis,
@@ -261,3 +260,21 @@ async def get_available_results(session_id: str):
 @app.get("/health")
 async def read_health():
     return {"status": "ok"}
+
+@app.get("/api/districts")
+async def get_districts():
+    """Get list of available districts"""
+    try:
+        districts = router.get_districts_list()
+        return {"districts": districts}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching districts: {str(e)}")
+
+@app.get("/api/upazilas/{district_name}")
+async def get_upazilas(district_name: str):
+    """Get list of upazilas for a specific district"""
+    try:
+        upazilas = router.get_upazilas_by_district(district_name)
+        return {"upazilas": upazilas}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching upazilas: {str(e)}")

@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectAllBtn = document.getElementById('selectAllBtn');
     const runAnalysisBtn = document.getElementById('runAnalysisBtn');
     const statusMessage = document.getElementById('statusMessage');
-    const locationInput = document.getElementById('location');
+    const districtSelect = document.getElementById('district');
+    const upazilaSelect = document.getElementById('upazila');
     const checkboxes = document.querySelectorAll('input[name="analysis[]"]');
     const btnText = runAnalysisBtn.querySelector('.btn-text');
     const btnLoading = runAnalysisBtn.querySelector('.btn-loading');
@@ -20,13 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSelectAllButton();
     updateRunAnalysisButton();
     
-    // Set default location to Narayanganj
-    locationInput.value = "Narayanganj";
+    // Load districts on page load
+    loadDistricts();
 
     // Event listeners
     selectAllBtn.addEventListener('click', toggleSelectAll);
     runAnalysisBtn.addEventListener('click', runAnalysis);
-    locationInput.addEventListener('input', updateRunAnalysisButton);
+    districtSelect.addEventListener('change', handleDistrictChange);
+    upazilaSelect.addEventListener('change', updateRunAnalysisButton);
     
     // Add event listeners to checkboxes
     checkboxes.forEach(checkbox => {
@@ -253,17 +255,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateRunAnalysisButton() {
         if (isAnalyzing) return;
         
-        const hasLocation = locationInput.value.trim().length > 0;
+        const hasDistrict = districtSelect.value.trim().length > 0;
         const hasSelectedAnalysis = Array.from(checkboxes).some(cb => cb.checked);
         
-        const canRun = hasLocation && hasSelectedAnalysis;
+        const canRun = hasDistrict && hasSelectedAnalysis;
         
         runAnalysisBtn.disabled = !canRun;
         
-        if (!hasLocation && !hasSelectedAnalysis) {
-            runAnalysisBtn.title = 'Please enter a location and select at least one analysis option';
-        } else if (!hasLocation) {
-            runAnalysisBtn.title = 'Please enter a location';
+        if (!hasDistrict && !hasSelectedAnalysis) {
+            runAnalysisBtn.title = 'Please select a district and at least one analysis option';
+        } else if (!hasDistrict) {
+            runAnalysisBtn.title = 'Please select a district';
         } else if (!hasSelectedAnalysis) {
             runAnalysisBtn.title = 'Please select at least one analysis option';
         } else {
@@ -274,26 +276,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function runAnalysis() {
         if (isAnalyzing || buttonMode === 'results') return;
         
-        const location = locationInput.value.trim();
+        const district = districtSelect.value.trim();
+        const upazila = upazilaSelect.value.trim() || null;
         const selectedAnalysis = Array.from(checkboxes)
             .filter(cb => cb.checked)
             .map(cb => cb.value);
         
-        if (!location || selectedAnalysis.length === 0) {
-            showNotification('Please enter a location and select at least one analysis option', 'error');
+        if (!district || selectedAnalysis.length === 0) {
+            showNotification('Please select a district and at least one analysis option', 'error');
             return;
         }
         
-        // Note: Currently only supports Narayanganj
-        if (location.toLowerCase() !== 'narayanganj') {
-            showNotification('Currently, only Narayanganj is supported as a location', 'warning');
-            locationInput.value = 'Narayanganj';
-        }
-        
-        startAnalysis(selectedAnalysis);
+        startAnalysis(selectedAnalysis, district, upazila);
     }
     
-    async function startAnalysis(selectedAnalysis) {
+    async function startAnalysis(selectedAnalysis, district, upazila) {
         try {
             isAnalyzing = true;
             
@@ -315,7 +312,8 @@ document.addEventListener('DOMContentLoaded', function() {
             statusMessage.style.display = 'flex';
             
             // Disable form elements
-            locationInput.disabled = true;
+            districtSelect.disabled = true;
+            upazilaSelect.disabled = true;
             selectAllBtn.disabled = true;
             checkboxes.forEach(cb => cb.disabled = true);
             
@@ -327,16 +325,20 @@ document.addEventListener('DOMContentLoaded', function() {
             if (existingProgressBar) existingProgressBar.remove();
             
             // Send request to backend
+            body = {
+                    district: district,
+                    analyses: selectedAnalysis,
+                    session_id: sessionId
+                }
+            if (upazila) {
+                body.upazila = upazila;
+            }
             const response = await fetch('/run-analysis', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    location: locationInput.value.trim(),
-                    analyses: selectedAnalysis,
-                    session_id: sessionId
-                })
+                body: body ? JSON.stringify(body) : null,
             });
             
             if (!response.ok) {
@@ -387,7 +389,8 @@ document.addEventListener('DOMContentLoaded', function() {
         statusMessage.classList.remove('success');
         
         // Re-enable form elements
-        locationInput.disabled = false;
+        districtSelect.disabled = false;
+        upazilaSelect.disabled = districtSelect.value ? false : true;
         selectAllBtn.disabled = false;
         checkboxes.forEach(cb => cb.disabled = false);
         
@@ -491,12 +494,86 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Ctrl/Cmd + A to select all (when not focused on input)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'a' && document.activeElement !== locationInput) {
+        // Ctrl/Cmd + A to select all (when not focused on inputs)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'a' && 
+            document.activeElement !== districtSelect && 
+            document.activeElement !== upazilaSelect) {
             e.preventDefault();
             if (!isAnalyzing) {
                 toggleSelectAll();
             }
         }
     });
+    
+    // Functions for district and upazila handling
+    async function loadDistricts() {
+        try {
+            const response = await fetch('/api/districts');
+            const data = await response.json();
+            
+            // Clear existing options except the first one
+            districtSelect.innerHTML = '<option value="">Select a district</option>';
+            
+            // Add districts to dropdown
+            data.districts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                districtSelect.appendChild(option);
+            });
+            
+            // Set default to Narayanganj if available
+            if (data.districts.includes('Narayanganj')) {
+                districtSelect.value = 'Narayanganj';
+                loadUpazilas('Narayanganj');
+            }
+            
+            updateRunAnalysisButton();
+        } catch (error) {
+            console.error('Error loading districts:', error);
+            showNotification('Failed to load districts', 'error');
+        }
+    }
+    
+    async function loadUpazilas(districtName) {
+        try {
+            upazilaSelect.disabled = true;
+            upazilaSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            const response = await fetch(`/api/upazilas/${encodeURIComponent(districtName)}`);
+            const data = await response.json();
+            
+            // Clear existing options
+            upazilaSelect.innerHTML = '<option value="">Select a upazila (optional)</option>';
+            
+            // Add upazilas to dropdown
+            data.upazilas.forEach(upazila => {
+                const option = document.createElement('option');
+                option.value = upazila;
+                option.textContent = upazila;
+                upazilaSelect.appendChild(option);
+            });
+            
+            upazilaSelect.disabled = false;
+            updateRunAnalysisButton();
+        } catch (error) {
+            console.error('Error loading upazilas:', error);
+            upazilaSelect.innerHTML = '<option value="">Error loading upazilas</option>';
+            upazilaSelect.disabled = false;
+            showNotification('Failed to load upazilas', 'error');
+        }
+    }
+    
+    function handleDistrictChange() {
+        const selectedDistrict = districtSelect.value;
+        
+        if (selectedDistrict) {
+            loadUpazilas(selectedDistrict);
+        } else {
+            upazilaSelect.innerHTML = '<option value="">Select a upazila (optional)</option>';
+            upazilaSelect.disabled = true;
+        }
+        
+        updateRunAnalysisButton();
+    }
 });

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e12c1fa51979a3459c7d532b548088f4 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
+</head>
+<body>
+    
+    
+    <div style="position: fixed; bottom: 18px; left: 18px; z-index:9999; background: white;
+                padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+      <b>Urban Heat Island Hotspots (Daytime LST, 60-day mean)</b><br>
+      <span style="display:inline-block;width:12px;height:12px;background:#b71c1c;border:1px solid #b71c1c;"></span>
+      Severe (≥2.0σ above AOI mean)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#e53935;border:1px solid #e53935;"></span>
+      High (1.5–2.0σ)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#fb8c00;border:1px solid #fb8c00;"></span>
+      Elevated (1.0–1.5σ)<br>
+      <i>Polygons show hotspot cluster areas.</i>
+    </div>
+    
+    
+            <div class="folium-map" id="map_e12c1fa51979a3459c7d532b548088f4" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_e12c1fa51979a3459c7d532b548088f4 = L.map(
+                "map_e12c1fa51979a3459c7d532b548088f4",
+                {
+                    center: [23.62189404350005, 90.47211608950008],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_e12c1fa51979a3459c7d532b548088f4);
+
+            
+
+        
+    
+            var tile_layer_c0b80c74903a9f4736fe39acabda8819 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_c0b80c74903a9f4736fe39acabda8819.addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        function geo_json_38a9c6454464a1d5c503866858be3b8a_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#fb8c00", "fillColor": "#fb8c00", "fillOpacity": 0.18, "weight": 2};
+            }
+        }
+
+        function geo_json_38a9c6454464a1d5c503866858be3b8a_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_38a9c6454464a1d5c503866858be3b8a = L.geoJson(null, {
+                onEachFeature: geo_json_38a9c6454464a1d5c503866858be3b8a_onEachFeature,
+            
+                style: geo_json_38a9c6454464a1d5c503866858be3b8a_styler,
+            ...{
+}
+        });
+
+        function geo_json_38a9c6454464a1d5c503866858be3b8a_add (data) {
+            geo_json_38a9c6454464a1d5c503866858be3b8a
+                .addData(data);
+        }
+            geo_json_38a9c6454464a1d5c503866858be3b8a_add({"features": [{"geometry": {"coordinates": [[[90.47382384009761, 23.62120039592282], [90.47382384009761, 23.648149854446405], [90.4828069929388, 23.648149854446405], [90.5007732986212, 23.63916670160521], [90.49179014578, 23.630183548764013], [90.4828069929388, 23.62120039592282], [90.47382384009761, 23.62120039592282]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_38a9c6454464a1d5c503866858be3b8a.bindTooltip(
+                `<div>
+                     UHI Cluster 0 — ELEV (n=9)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_38a9c6454464a1d5c503866858be3b8a.addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+            var circle_marker_0505944ad05ab106147fc5b7df10cc40 = L.circleMarker(
+                [23.603234090240427, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_ed4bb050abc293fbe11788de1138c9e9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_35f4242afa51c62fe9e3b8e88a9ef1b5 = $(`<div id="html_35f4242afa51c62fe9e3b8e88a9ef1b5" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.1 °C<br>LST z-score: 1.12 (top 80%)</div>`)[0];
+                popup_ed4bb050abc293fbe11788de1138c9e9.setContent(html_35f4242afa51c62fe9e3b8e88a9ef1b5);
+            
+        
+
+        circle_marker_0505944ad05ab106147fc5b7df10cc40.bindPopup(popup_ed4bb050abc293fbe11788de1138c9e9)
+        ;
+
+        
+    
+    
+            circle_marker_0505944ad05ab106147fc5b7df10cc40.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_36b90ed99d70ef092a0620263d18f1b1 = L.circleMarker(
+                [23.612217243081624, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_14d9c82990b53d452cdbd9226717c71f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_2a46df4b261cb1dd10260cded4caf5e0 = $(`<div id="html_2a46df4b261cb1dd10260cded4caf5e0" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.7 °C<br>LST z-score: 1.45 (top 91%)</div>`)[0];
+                popup_14d9c82990b53d452cdbd9226717c71f.setContent(html_2a46df4b261cb1dd10260cded4caf5e0);
+            
+        
+
+        circle_marker_36b90ed99d70ef092a0620263d18f1b1.bindPopup(popup_14d9c82990b53d452cdbd9226717c71f)
+        ;
+
+        
+    
+    
+            circle_marker_36b90ed99d70ef092a0620263d18f1b1.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9a0f7b0baa864fe5dd972b54bc0d0730 = L.circleMarker(
+                [23.62120039592282, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_39f8fdb19d5cc1064a31cdf7c29079d7 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cf0d9c70314d5a5ca9579cbaba7ee27e = $(`<div id="html_cf0d9c70314d5a5ca9579cbaba7ee27e" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.8 °C<br>LST z-score: 1.46 (top 92%)</div>`)[0];
+                popup_39f8fdb19d5cc1064a31cdf7c29079d7.setContent(html_cf0d9c70314d5a5ca9579cbaba7ee27e);
+            
+        
+
+        circle_marker_9a0f7b0baa864fe5dd972b54bc0d0730.bindPopup(popup_39f8fdb19d5cc1064a31cdf7c29079d7)
+        ;
+
+        
+    
+    
+            circle_marker_9a0f7b0baa864fe5dd972b54bc0d0730.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_55036a01b0a3368f45b8f763db237520 = L.circleMarker(
+                [23.62120039592282, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#e53935", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e53935", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_91cbeec50de69141546d56570b370abb = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_2841548fc914d86fae5c5ec8063f272b = $(`<div id="html_2841548fc914d86fae5c5ec8063f272b" style="width: 100.0%; height: 100.0%;"><b>HIGH UHI hotspot</b><br>LST: 33.3 °C<br>LST z-score: 1.71 (top 94%)</div>`)[0];
+                popup_91cbeec50de69141546d56570b370abb.setContent(html_2841548fc914d86fae5c5ec8063f272b);
+            
+        
+
+        circle_marker_55036a01b0a3368f45b8f763db237520.bindPopup(popup_91cbeec50de69141546d56570b370abb)
+        ;
+
+        
+    
+    
+            circle_marker_55036a01b0a3368f45b8f763db237520.bindTooltip(
+                `<div>
+                     HIGH UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c42a25bb8210c8e26ba551b55e970b38 = L.circleMarker(
+                [23.630183548764013, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#e53935", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e53935", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_2378804f50497a2c7551647ade2b5f1f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_11a8ecb4c46b4cdee91ebca54436dba0 = $(`<div id="html_11a8ecb4c46b4cdee91ebca54436dba0" style="width: 100.0%; height: 100.0%;"><b>HIGH UHI hotspot</b><br>LST: 33.3 °C<br>LST z-score: 1.75 (top 95%)</div>`)[0];
+                popup_2378804f50497a2c7551647ade2b5f1f.setContent(html_11a8ecb4c46b4cdee91ebca54436dba0);
+            
+        
+
+        circle_marker_c42a25bb8210c8e26ba551b55e970b38.bindPopup(popup_2378804f50497a2c7551647ade2b5f1f)
+        ;
+
+        
+    
+    
+            circle_marker_c42a25bb8210c8e26ba551b55e970b38.bindTooltip(
+                `<div>
+                     HIGH UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e2aad859d8f30b5db4d6b11d29195f64 = L.circleMarker(
+                [23.630183548764013, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_b92110617f701db876281df062c372b7 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e69106078b47776037ae1641ef9cfc09 = $(`<div id="html_e69106078b47776037ae1641ef9cfc09" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.2 °C<br>LST z-score: 1.21 (top 85%)</div>`)[0];
+                popup_b92110617f701db876281df062c372b7.setContent(html_e69106078b47776037ae1641ef9cfc09);
+            
+        
+
+        circle_marker_e2aad859d8f30b5db4d6b11d29195f64.bindPopup(popup_b92110617f701db876281df062c372b7)
+        ;
+
+        
+    
+    
+            circle_marker_e2aad859d8f30b5db4d6b11d29195f64.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_baf5de7fad820ce7748ffe6805498090 = L.circleMarker(
+                [23.63916670160521, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_9ab0b0ac16df6e6321d88a81d019211a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cc43a7af064d8ea936d028b3c8422dab = $(`<div id="html_cc43a7af064d8ea936d028b3c8422dab" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.2 °C<br>LST z-score: 1.21 (top 85%)</div>`)[0];
+                popup_9ab0b0ac16df6e6321d88a81d019211a.setContent(html_cc43a7af064d8ea936d028b3c8422dab);
+            
+        
+
+        circle_marker_baf5de7fad820ce7748ffe6805498090.bindPopup(popup_9ab0b0ac16df6e6321d88a81d019211a)
+        ;
+
+        
+    
+    
+            circle_marker_baf5de7fad820ce7748ffe6805498090.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4cbd92fa0e23188092101f7ef5c12242 = L.circleMarker(
+                [23.63916670160521, 90.49179014578],
+                {"bubblingMouseEvents": true, "color": "#e53935", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e53935", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_ab302d30957ef83562dd4f27ea9a13f5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_18c9ff8853f23c936e0b152d7fd712a1 = $(`<div id="html_18c9ff8853f23c936e0b152d7fd712a1" style="width: 100.0%; height: 100.0%;"><b>HIGH UHI hotspot</b><br>LST: 33.4 °C<br>LST z-score: 1.76 (top 97%)</div>`)[0];
+                popup_ab302d30957ef83562dd4f27ea9a13f5.setContent(html_18c9ff8853f23c936e0b152d7fd712a1);
+            
+        
+
+        circle_marker_4cbd92fa0e23188092101f7ef5c12242.bindPopup(popup_ab302d30957ef83562dd4f27ea9a13f5)
+        ;
+
+        
+    
+    
+            circle_marker_4cbd92fa0e23188092101f7ef5c12242.bindTooltip(
+                `<div>
+                     HIGH UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2bb7c2bd3458852fe32ee03ed6a35e49 = L.circleMarker(
+                [23.63916670160521, 90.5007732986212],
+                {"bubblingMouseEvents": true, "color": "#e53935", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e53935", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_e6a90c5cf44ecb6eb1394e0988141bff = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_98589a4871cb49fdc4fe5f41ee51c03e = $(`<div id="html_98589a4871cb49fdc4fe5f41ee51c03e" style="width: 100.0%; height: 100.0%;"><b>HIGH UHI hotspot</b><br>LST: 33.4 °C<br>LST z-score: 1.77 (top 98%)</div>`)[0];
+                popup_e6a90c5cf44ecb6eb1394e0988141bff.setContent(html_98589a4871cb49fdc4fe5f41ee51c03e);
+            
+        
+
+        circle_marker_2bb7c2bd3458852fe32ee03ed6a35e49.bindPopup(popup_e6a90c5cf44ecb6eb1394e0988141bff)
+        ;
+
+        
+    
+    
+            circle_marker_2bb7c2bd3458852fe32ee03ed6a35e49.bindTooltip(
+                `<div>
+                     HIGH UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b6645184915b4d825466380e50cb1b22 = L.circleMarker(
+                [23.63916670160521, 90.5097564514624],
+                {"bubblingMouseEvents": true, "color": "#e53935", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e53935", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_c3e817e0527eaf7c06d4e301dc1a2c13 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4477d1631a5f50b0c46098cd98621879 = $(`<div id="html_4477d1631a5f50b0c46098cd98621879" style="width: 100.0%; height: 100.0%;"><b>HIGH UHI hotspot</b><br>LST: 33.4 °C<br>LST z-score: 1.79 (top 100%)</div>`)[0];
+                popup_c3e817e0527eaf7c06d4e301dc1a2c13.setContent(html_4477d1631a5f50b0c46098cd98621879);
+            
+        
+
+        circle_marker_b6645184915b4d825466380e50cb1b22.bindPopup(popup_c3e817e0527eaf7c06d4e301dc1a2c13)
+        ;
+
+        
+    
+    
+            circle_marker_b6645184915b4d825466380e50cb1b22.bindTooltip(
+                `<div>
+                     HIGH UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_be7c9f9462fcbee8100737bf5fa6ed90 = L.circleMarker(
+                [23.648149854446405, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_ace8a9414856a43ae7a8a3d6720324da = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e2164c1cedcf11c05caeb762f76f4858 = $(`<div id="html_e2164c1cedcf11c05caeb762f76f4858" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.1 °C<br>LST z-score: 1.13 (top 81%)</div>`)[0];
+                popup_ace8a9414856a43ae7a8a3d6720324da.setContent(html_e2164c1cedcf11c05caeb762f76f4858);
+            
+        
+
+        circle_marker_be7c9f9462fcbee8100737bf5fa6ed90.bindPopup(popup_ace8a9414856a43ae7a8a3d6720324da)
+        ;
+
+        
+    
+    
+            circle_marker_be7c9f9462fcbee8100737bf5fa6ed90.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3325caa2babcd8a2474e12fbd26778a9 = L.circleMarker(
+                [23.648149854446405, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_c92b62804d410f364fe53d89b8efeb7c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_01e0142461aea297496d00df6bc47786 = $(`<div id="html_01e0142461aea297496d00df6bc47786" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.7 °C<br>LST z-score: 1.42 (top 88%)</div>`)[0];
+                popup_c92b62804d410f364fe53d89b8efeb7c.setContent(html_01e0142461aea297496d00df6bc47786);
+            
+        
+
+        circle_marker_3325caa2babcd8a2474e12fbd26778a9.bindPopup(popup_c92b62804d410f364fe53d89b8efeb7c)
+        ;
+
+        
+    
+    
+            circle_marker_3325caa2babcd8a2474e12fbd26778a9.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f71ea3acd209e9b0613215c65fb1f371 = L.circleMarker(
+                [23.666116160128794, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_e085eb74cc3f078c30ceca347384292b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1d0fe32ccea327e6e80509bbe1e0780c = $(`<div id="html_1d0fe32ccea327e6e80509bbe1e0780c" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.0 °C<br>LST z-score: 1.09 (top 78%)</div>`)[0];
+                popup_e085eb74cc3f078c30ceca347384292b.setContent(html_1d0fe32ccea327e6e80509bbe1e0780c);
+            
+        
+
+        circle_marker_f71ea3acd209e9b0613215c65fb1f371.bindPopup(popup_e085eb74cc3f078c30ceca347384292b)
+        ;
+
+        
+    
+    
+            circle_marker_f71ea3acd209e9b0613215c65fb1f371.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f20e31ee816c6ffbd096923faa7dce01 = L.circleMarker(
+                [23.67509931296999, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_b61108052c143da776d920adcbd0f90c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0a8349e9c3de14b5b04d0e93ff5c50f6 = $(`<div id="html_0a8349e9c3de14b5b04d0e93ff5c50f6" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.2 °C<br>LST z-score: 1.17 (top 83%)</div>`)[0];
+                popup_b61108052c143da776d920adcbd0f90c.setContent(html_0a8349e9c3de14b5b04d0e93ff5c50f6);
+            
+        
+
+        circle_marker_f20e31ee816c6ffbd096923faa7dce01.bindPopup(popup_b61108052c143da776d920adcbd0f90c)
+        ;
+
+        
+    
+    
+            circle_marker_f20e31ee816c6ffbd096923faa7dce01.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6034eda419d622f6c1e033c5f70e62be = L.circleMarker(
+                [23.684082465811187, 90.47382384009761],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_cfb3ed76d1c3dcd4625d6aa163defab9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_84c018fbb54791bafdc4f8117f264e3c = $(`<div id="html_84c018fbb54791bafdc4f8117f264e3c" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.7 °C<br>LST z-score: 1.42 (top 88%)</div>`)[0];
+                popup_cfb3ed76d1c3dcd4625d6aa163defab9.setContent(html_84c018fbb54791bafdc4f8117f264e3c);
+            
+        
+
+        circle_marker_6034eda419d622f6c1e033c5f70e62be.bindPopup(popup_cfb3ed76d1c3dcd4625d6aa163defab9)
+        ;
+
+        
+    
+    
+            circle_marker_6034eda419d622f6c1e033c5f70e62be.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6b8908869fc7eea8ed40dd4642e89592 = L.circleMarker(
+                [23.684082465811187, 90.4828069929388],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+        var popup_1acddaa6c5f71668f270637b41708e03 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0499fee775e1287c03dda342d36e89e9 = $(`<div id="html_0499fee775e1287c03dda342d36e89e9" style="width: 100.0%; height: 100.0%;"><b>ELEV UHI hotspot</b><br>LST: 32.7 °C<br>LST z-score: 1.44 (top 90%)</div>`)[0];
+                popup_1acddaa6c5f71668f270637b41708e03.setContent(html_0499fee775e1287c03dda342d36e89e9);
+            
+        
+
+        circle_marker_6b8908869fc7eea8ed40dd4642e89592.bindPopup(popup_1acddaa6c5f71668f270637b41708e03)
+        ;
+
+        
+    
+    
+            circle_marker_6b8908869fc7eea8ed40dd4642e89592.bindTooltip(
+                `<div>
+                     ELEV UHI hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var tile_layer_61a0be4d2831c66d9a2ad9528d2eaefd = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_5735269f4b73208ac86826d2a1cab77b = new L.Control.MiniMap(
+                tile_layer_61a0be4d2831c66d9a2ad9528d2eaefd,
+                {
+  "position": "bottomright",
+  "width": 150,
+  "height": 150,
+  "collapsedWidth": 25,
+  "collapsedHeight": 25,
+  "zoomLevelOffset": -5,
+  "centerFixed": false,
+  "zoomAnimation": false,
+  "toggleDisplay": true,
+  "autoToggleDisplay": false,
+  "minimized": false,
+}
+            );
+            map_e12c1fa51979a3459c7d532b548088f4.addControl(mini_map_5735269f4b73208ac86826d2a1cab77b);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+        
+    
+            var mouse_position_af0e590b765c2c8be7ef29a74eb6b33e = new L.Control.MousePosition(
+                {
+  "position": "topright",
+  "separator": " | ",
+  "emptyString": "Unavailable",
+  "lngFirst": false,
+  "numDigits": 5,
+  "prefix": "Lat/Lon:",
+}
+            );
+            mouse_position_af0e590b765c2c8be7ef29a74eb6b33e.options["latFormatter"] =
+                undefined;
+            mouse_position_af0e590b765c2c8be7ef29a74eb6b33e.options["lngFormatter"] =
+                undefined;
+            map_e12c1fa51979a3459c7d532b548088f4.addControl(mouse_position_af0e590b765c2c8be7ef29a74eb6b33e);
+        
+    
+            var measure_control_f653cd7c8221b893b516134ed3994898 = new L.Control.Measure(
+                {
+  "position": "topright",
+  "primaryLengthUnit": "kilometers",
+  "secondaryLengthUnit": "miles",
+  "primaryAreaUnit": "sqmeters",
+  "secondaryAreaUnit": "acres",
+});
+            map_e12c1fa51979a3459c7d532b548088f4.addControl(measure_control_f653cd7c8221b893b516134ed3994898);
+
+            // Workaround for using this plugin with Leaflet>=1.8.0
+            // https://github.com/ljagis/leaflet-measure/issues/171
+            L.Control.Measure.include({
+                _setCaptureMarkerIcon: function () {
+                    // disable autopan
+                    this._captureMarker.options.autoPanOnFocus = false;
+                    // default function
+                    this._captureMarker.setIcon(
+                        L.divIcon({
+                            iconSize: this._map.getSize().multiplyBy(2)
+                        })
+                    );
+                },
+            });
+
+        
+    
+            var layer_control_89f19ee8a862b7398cf1ed3daa9abf30_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_c0b80c74903a9f4736fe39acabda8819,
+                },
+                overlays :  {
+                    "Cluster 0 (elev, n=9)" : geo_json_38a9c6454464a1d5c503866858be3b8a,
+                },
+            };
+            let layer_control_89f19ee8a862b7398cf1ed3daa9abf30 = L.control.layers(
+                layer_control_89f19ee8a862b7398cf1ed3daa9abf30_layers.base_layers,
+                layer_control_89f19ee8a862b7398cf1ed3daa9abf30_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_e12c1fa51979a3459c7d532b548088f4);
+
+        
+</script>
+</html>

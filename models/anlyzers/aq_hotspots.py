@@ -246,13 +246,22 @@ def build_map(aoi_bbox, hotspots, clusters):
     return m
 
 
-def analyze_aq_hotspots(session_id = None):
+def run(session_id=None, ee_geometry=None, aoi_bbox=None):
     print("Initializing Earth Engine…")
     ee_init_headless()
 
-    aoi = ee.Geometry.Rectangle(AOI_BBOX)
+    if ee_geometry is None or aoi_bbox is None:
+        print("Using default AOI (Narayanganj)…")
+        aoi_bbox = AOI_BBOX
+        ee_geometry = ee.Geometry.Rectangle(AOI_BBOX)
+    if session_id is None:
+        save_dir = OUT_HTML
+    else:
+        save_dir = os.path.join("web_outputs", session_id, 'aq_hotspots.html')
+
+    aoi = ee_geometry
     start_iso, end_iso = str(START), str(END)
-    print(f"AOI: {AOI_BBOX} | Window: {start_iso} → {end_iso}")
+    print(f"AOI: {aoi_bbox} | Window: {start_iso} → {end_iso}")
 
     # Means
     no2_img, pm25_img, co_img = build_mean_images(aoi, start_iso, end_iso)
@@ -286,13 +295,13 @@ def analyze_aq_hotspots(session_id = None):
     clusters = cluster_dbscan(hotspots, eps_m=EPS_METERS, min_samples=MIN_SAMPLES) if hotspots else []
 
     # Map
-    m = build_map(AOI_BBOX, hotspots, clusters)
-    os.makedirs(os.path.dirname(OUT_HTML), exist_ok=True)
-    m.save(OUT_HTML)
-    print(f"✅ Saved: {OUT_HTML}")
+    m = build_map(aoi_bbox, hotspots, clusters)
+    os.makedirs(os.path.dirname(save_dir), exist_ok=True)
+    m.save(save_dir)
+    print(f"✅ Saved: {save_dir}")
 
 def main():
-    return analyze_aq_hotspots()
+    return run()
 
 if __name__ == "__main__":
     main()

@@ -227,13 +227,22 @@ def build_map(aoi_bbox, hotspots, clusters):
     return m
 
 
-def analyze_uhi_hotspots():
+def run(session_id=None, ee_geometry=None, aoi_bbox=None):
     print("Initializing Earth Engine…")
     ee_init_headless()
 
-    aoi = ee.Geometry.Rectangle(AOI_BBOX)
+    if ee_geometry is None or aoi_bbox is None:
+        print("Using default AOI (Narayanganj)…")
+        aoi_bbox = AOI_BBOX
+        ee_geometry = ee.Geometry.Rectangle(AOI_BBOX)
+    if session_id is None:
+        save_dir = OUT_HTML
+    else:
+        save_dir = os.path.join("web_outputs", session_id, 'uhi_hotspots.html')
+
+    aoi = ee_geometry
     start_iso, end_iso = str(START), str(END)
-    print(f"AOI: {AOI_BBOX} | Window: {start_iso} → {end_iso}")
+    print(f"AOI: {aoi_bbox} | Window: {start_iso} → {end_iso}")
 
     # Build 60-day mean daytime LST (°C)
     lst_img = build_lst_day_mean(aoi, start_iso, end_iso)
@@ -263,13 +272,13 @@ def analyze_uhi_hotspots():
     clusters = cluster_dbscan(hotspots, eps_m=EPS_METERS, min_samples=MIN_SAMPLES) if hotspots else []
 
     # Map
-    m = build_map(AOI_BBOX, hotspots, clusters)
+    m = build_map(aoi_bbox, hotspots, clusters)
     os.makedirs(os.path.dirname(OUT_HTML), exist_ok=True)
-    m.save(OUT_HTML)
-    print(f"✅ Saved UHI map to: {OUT_HTML}\nOpen this file in your browser to explore hotspots.")
+    m.save(save_dir)
+    print(f"✅ Saved UHI map to: {save_dir}\nOpen this file in your browser to explore hotspots.")
 
 def main():
-    return analyze_uhi_hotspots()
+    return run()
 
 if __name__ == "__main__":
     main()
