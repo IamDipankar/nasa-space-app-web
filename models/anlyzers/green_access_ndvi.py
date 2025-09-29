@@ -977,7 +977,7 @@ def run(session_id = None, gdf = None):
                     btn.innerText = "Generating...";
                     try {
                         response = await fetch(
-                            "/llm-inference",
+                            "https://nasa-space-app-web.onrender.com/llm-inference",
                             {
                                 method: "POST",
                                 headers: {"Content-Type": "application/json"},
@@ -998,7 +998,7 @@ def run(session_id = None, gdf = None):
                             btn.innerText = "Done";
                         }
                     } catch (error) {
-                        aiBox.innerHTML = "<hr><b>AI Suggestions:</b><br>Error during request.";
+                        aiBox.innerHTML = "<hr><b>AI Suggestions:</b><br>Error during request." + error;
                     }
                 });
             })();
