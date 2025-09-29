@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_5b4a92c1e8a81faac5b6bbab3b8a23d5 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
+</head>
+<body>
+    
+    
+    <div style="position: fixed; bottom: 18px; left: 18px; z-index:9999; background: white;
+                padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+      <b>Top hotspot clusters (area-wise)</b><br>
+      <span style="display:inline-block;width:12px;height:12px;background:#d32f2f;border:1px solid #d32f2f;"></span>
+      Severe (≥ 2σ above city typical)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#fb8c00;border:1px solid #fb8c00;"></span>
+      High (1–2σ)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#ffd54f;border:1px solid #ffd54f;"></span>
+      Elevated (0.5–1σ)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#673ab7;border:1px solid #673ab7;"></span>
+      Cluster polygon(s)
+    </div>
+    
+    
+            <div class="folium-map" id="map_5b4a92c1e8a81faac5b6bbab3b8a23d5" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_5b4a92c1e8a81faac5b6bbab3b8a23d5 = L.map(
+                "map_5b4a92c1e8a81faac5b6bbab3b8a23d5",
+                {
+                    center: [24.52767057300005, 92.14764152250004],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+
+            
+
+        
+    
+            var tile_layer_6b4c5fe6c4dd55c351a0a2726441de03 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_6b4c5fe6c4dd55c351a0a2726441de03.addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        function geo_json_1f4c7cf5db52d574deb02f0220aff206_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#673ab7", "fillColor": "#673ab7", "fillOpacity": 0.1, "weight": 3};
+            }
+        }
+
+        function geo_json_1f4c7cf5db52d574deb02f0220aff206_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_1f4c7cf5db52d574deb02f0220aff206 = L.geoJson(null, {
+                onEachFeature: geo_json_1f4c7cf5db52d574deb02f0220aff206_onEachFeature,
+            
+                style: geo_json_1f4c7cf5db52d574deb02f0220aff206_styler,
+            ...{
+}
+        });
+
+        function geo_json_1f4c7cf5db52d574deb02f0220aff206_add (data) {
+            geo_json_1f4c7cf5db52d574deb02f0220aff206
+                .addData(data);
+        }
+            geo_json_1f4c7cf5db52d574deb02f0220aff206_add({"features": [{"geometry": {"coordinates": [[[92.17256781451378, 24.54020449414577], [92.17261601801094, 24.540299188077555], [92.17301380639826, 24.540989877390878], [92.17345227926728, 24.541974841507116], [92.17378310369683, 24.54299437522392], [92.1740030912144, 24.544038660515497], [92.17411012052209, 24.545097640753283], [92.17410315802977, 24.546161117541022], [92.17398226791794, 24.547218848924523], [92.17374861163009, 24.548260648030798], [92.1734044367949, 24.549276481186237], [92.17295305568058, 24.5502565645686], [92.172677173774, 24.550721923228885], [92.17256817648796, 24.550929481220884], [92.17293126239419, 24.550774839989536], [92.17400811700122, 24.550373754853304], [92.17512276166687, 24.550071136053447], [92.17626446420714, 24.54986989733309], [92.17742223210088, 24.54977197632132], [92.1785849182502, 24.549778315888418], [92.17974132822404, 24.5498888550718], [92.1808803279565, 24.55010252965958], [92.18199095086655, 24.550417282426448], [92.18306250337214, 24.55083008292371], [92.1833220956258, 24.55094410960735], [92.18344879269848, 24.550962001597338], [92.18345268783035, 24.550360375589783], [92.1835735025928, 24.549302635044125], [92.18380708040192, 24.548260818774665], [92.18415116916654, 24.547244959464013], [92.18460245280025, 24.54626483960019], [92.18515658324642, 24.54532989729652], [92.18580822242713, 24.544449135434906], [92.18655109370923, 24.543631035006396], [92.1873780423898, 24.54288347348173], [92.18828110461683, 24.542213648996288], [92.18925158408113, 24.541628011077673], [92.18992885317411, 24.541301535304285], [92.18921439667197, 24.541362028425077], [92.18805178499576, 24.54135577283705], [92.18689544374602, 24.5412452991267], [92.1857565119154, 24.5410316715564], [92.18464596064901, 24.54071694805389], [92.18357448748617, 24.540304160371125], [92.18331773231856, 24.540191371443388], [92.18292421367339, 24.540359022511527], [92.18184747191236, 24.540760174850888], [92.18073292479642, 24.541062846324742], [92.17959130847602, 24.54126412139897], [92.17843362003823, 24.541362061274068], [92.17727101149512, 24.541355722572533], [92.17611468227445, 24.541245166430475], [92.17497577125266, 24.541031457905305], [92.17386524937392, 24.540716655705477], [92.1727938138936, 24.540303792341838], [92.17256781451378, 24.54020449414577]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_1f4c7cf5db52d574deb02f0220aff206.bindTooltip(
+                `<div>
+                     Top cluster #1 (cluster 0)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+        var popup_6c65bad438f1a13835bfbe3e9c36751c = L.popup({
+  "maxWidth": 700,
+  "maxHeight": 550,
+});
+
+        
+            
+                var i_frame_f007ef409503f29ff925b33b1800df14 = $(`<iframe src="data:text/html;charset=utf-8;base64,CiAgICAKICAgICAgICAgICAgPGRpdiBzdHlsZT0ibWFyZ2luLWJvdHRvbTogMC41ZW07Ij4KICAgICAgICAgICAgPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6IzAwN2JmZjtjb2xvcjp3aGl0ZTtwYWRkaW5nOjNweCA3cHg7Ym9yZGVyLXJhZGl1czo1cHg7bWFyZ2luLXJpZ2h0OjVweDsiPgogICAgICAgICAgICAgICAgQ2x1c3RlciBJRDogMAogICAgICAgICAgICA8L3NwYW4+CiAgICAgICAgICAgIDxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kOiMyOGE3NDU7Y29sb3I6d2hpdGU7cGFkZGluZzozcHggN3B4O2JvcmRlci1yYWRpdXM6NXB4OyI+CiAgICAgICAgICAgICAgICBSYW5rOiAxCiAgICAgICAgICAgIDwvc3Bhbj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDxoMyBpZD0idG9wLWNsdXN0ZXItMS1jbHVzdGVyLTAiPlRvcCBjbHVzdGVyICMxIChjbHVzdGVyIDApPC9oMz4KPHVsPgo8bGk+PHN0cm9uZz5BcmVhOjwvc3Ryb25nPiB+MS4yMSBrbcKyPC9saT4KPGxpPjxzdHJvbmc+UGVvcGxlIGxpdmluZyBpbnNpZGU6PC9zdHJvbmc+IG4vYTwvbGk+CjxsaT48c3Ryb25nPkN1cnJlbnQgbGV2ZWw6PC9zdHJvbmc+IEhpZ2ggKGFib3ZlIHR5cGljYWwpICh64omIMS4xNTsgMOKJiHR5cGljYWwpPC9saT4KPGxpPjxzdHJvbmc+U2Vhc29uYWxpdHk6PC9zdHJvbmc+IHdvcnNlIGluIHRoZSBkcnkgc2Vhc29uIHRoYW4gdGhlIG1vbnNvb24gKG1vbnNvb24gMC4yMiwgZHJ5IDEuMDkgaW4gc3RhbmRhcmRpemVkIHVuaXRzOyDOlD0tMC44Nyk8L2xpPgo8bGk+PHN0cm9uZz5TZW5zaXRpdmUgc2l0ZXMgaW5zaWRlOjwvc3Ryb25nPiBzY2hvb2xzOjAsIGNsaW5pY3M6MCwgaG9zcGl0YWxzOjAsIGVsZGVyIGhvbWVzOjA8L2xpPgo8bGk+PHN0cm9uZz5JbmR1c3RyaWFsL3BvcnQvcG9pbnQtc291cmNlIGZlYXR1cmVzIGluc2lkZTo8L3N0cm9uZz4gMDwvbGk+CjwvdWw+CiAgICAgICAgICAgIDxkaXYgc3R5bGU9Im1hcmdpbi10b3A6IDEwcHg7IHRleHQtYWxpZ246IGNlbnRlcjsiPgogICAgICAgICAgICAgICAgPGJ1dHRvbiBpZD0iYWktYnRuLTAiIG9uY2xpY2s9ImhhbmRsZUFJU3VnZ2VzdGlvbnMoMCkiIAogICAgICAgICAgICAgICAgICAgICAgICBzdHlsZT0iYmFja2dyb3VuZDogIzAwN2JmZjsgY29sb3I6IHdoaXRlOyBib3JkZXI6IG5vbmU7IHBhZGRpbmc6IDhweCAxNnB4OyAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDsgY3Vyc29yOiBwb2ludGVyOyBmb250LXNpemU6IDEycHg7Ij4KICAgICAgICAgICAgICAgICAgICBWaWV3IEFJIFN1Z2dlc3Rpb25zCiAgICAgICAgICAgICAgICA8L2J1dHRvbj4KICAgICAgICAgICAgICAgIDxkaXYgaWQ9ImFpLXJlc3BvbnNlLTAiIHN0eWxlPSJtYXJnaW4tdG9wOiAxMHB4OyBkaXNwbGF5OiBub25lOyI+PC9kaXY+CiAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8c2NyaXB0PgogICAgICAgICAgICAgICAgZnVuY3Rpb24gaGFuZGxlQUlTdWdnZXN0aW9ucyhjbHVzdGVySWQpIHsKICAgICAgICAgICAgICAgICAgICBjb25zdCBidG4gPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYWktYnRuLScgKyBjbHVzdGVySWQpOwogICAgICAgICAgICAgICAgICAgIGNvbnN0IHJlc3BvbnNlRGl2ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FpLXJlc3BvbnNlLScgKyBjbHVzdGVySWQpOwogICAgICAgICAgICAgICAgICAgIGNvbnN0IG9yaWdpbmFsVGV4dCA9IGJ0bi5pbm5lckhUTUw7CiAgICAgICAgICAgICAgICAgICAgYnRuLmlubmVySFRNTCA9ICdMb2FkaW5nLi4uJzsKICAgICAgICAgICAgICAgICAgICBidG4uZGlzYWJsZWQgPSB0cnVlOwogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIGNvbnN0IHBvcHVwQ29udGVudCA9IGJ0bi5jbG9zZXN0KCcubGVhZmxldC1wb3B1cC1jb250ZW50LXdyYXBwZXInKS5xdWVyeVNlbGVjdG9yKCcubGVhZmxldC1wb3B1cC1jb250ZW50JykuaW5uZXJIVE1MOwogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIGZldGNoKCcvbGxtLWluZmVyZW5jZScsIHsKICAgICAgICAgICAgICAgICAgICAgICAgbWV0aG9kOiAnUE9TVCcsCiAgICAgICAgICAgICAgICAgICAgICAgIGhlYWRlcnM6IHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICdDb250ZW50LVR5cGUnOiAnYXBwbGljYXRpb24vanNvbicsCiAgICAgICAgICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICAgICAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHByb21wdDogcG9wdXBDb250ZW50LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgdHlwZTogJ2FxJwogICAgICAgICAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICAgICAgICAgIH0pCiAgICAgICAgICAgICAgICAgICAgLnRoZW4ocmVzcG9uc2UgPT4gcmVzcG9uc2UuanNvbigpKQogICAgICAgICAgICAgICAgICAgIC50aGVuKGRhdGEgPT4gewogICAgICAgICAgICAgICAgICAgICAgICBidG4uaW5uZXJIVE1MID0gJ0NvbXBsZXRlZCc7CiAgICAgICAgICAgICAgICAgICAgICAgIGJ0bi5kaXNhYmxlZCA9IGZhbHNlOwogICAgICAgICAgICAgICAgICAgICAgICBidG4uc3R5bGUuYmFja2dyb3VuZCA9ICcjMjhhNzQ1JzsKICAgICAgICAgICAgICAgICAgICAgICAgcmVzcG9uc2VEaXYuaW5uZXJIVE1MID0gJzxoMyBzdHlsZT0ibWFyZ2luOiAxMHB4IDAgNXB4IDA7IGNvbG9yOiAjMzMzOyI+QUkgU3VnZ2VzdGlvbnM8L2gzPicgKyBkYXRhLnJlc3BvbnNlOwogICAgICAgICAgICAgICAgICAgICAgICByZXNwb25zZURpdi5zdHlsZS5kaXNwbGF5ID0gJ2Jsb2NrJzsKICAgICAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICAgICAgICAgIC5jYXRjaChlcnJvciA9PiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGJ0bi5pbm5lckhUTUwgPSBvcmlnaW5hbFRleHQ7CiAgICAgICAgICAgICAgICAgICAgICAgIGJ0bi5kaXNhYmxlZCA9IGZhbHNlOwogICAgICAgICAgICAgICAgICAgICAgICBjb25zb2xlLmVycm9yKCdFcnJvcjonLCBlcnJvcik7CiAgICAgICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIDwvc2NyaXB0PgogICAgICAgICAgICA=" width="300" style="border:none !important;" height="550"></iframe>`)[0];
+                popup_6c65bad438f1a13835bfbe3e9c36751c.setContent(i_frame_f007ef409503f29ff925b33b1800df14);
+            
+        
+
+        geo_json_1f4c7cf5db52d574deb02f0220aff206.bindPopup(popup_6c65bad438f1a13835bfbe3e9c36751c)
+        ;
+
+        
+    
+    
+            geo_json_1f4c7cf5db52d574deb02f0220aff206.addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        function geo_json_e635b18a8d08357324221973f5d43412_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#673ab7", "fillColor": "#673ab7", "fillOpacity": 0.1, "weight": 3};
+            }
+        }
+
+        function geo_json_e635b18a8d08357324221973f5d43412_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_e635b18a8d08357324221973f5d43412 = L.geoJson(null, {
+                onEachFeature: geo_json_e635b18a8d08357324221973f5d43412_onEachFeature,
+            
+                style: geo_json_e635b18a8d08357324221973f5d43412_styler,
+            ...{
+}
+        });
+
+        function geo_json_e635b18a8d08357324221973f5d43412_add (data) {
+            geo_json_e635b18a8d08357324221973f5d43412
+                .addData(data);
+        }
+            geo_json_e635b18a8d08357324221973f5d43412_add({"features": [{"geometry": {"coordinates": [[[92.0864421947298, 24.583055481809115], [92.08632098333491, 24.583285864096254], [92.08670670470688, 24.58334057765363], [92.0870482351181, 24.58337342912891], [92.08818735504714, 24.583587807596096], [92.08929801598762, 24.583903244052266], [92.09036952398797, 24.584316701473973], [92.09139156178355, 24.58482419902561], [92.09235428808299, 24.58542085035925], [92.09324843228791, 24.586100910629405], [92.09406538373598, 24.586857831771717], [92.0947972746097, 24.587684325515003], [92.09543705571245, 24.588572433521566], [92.09550988369034, 24.588699013273523], [92.09551428882824, 24.588085845893364], [92.09563588614087, 24.587028202607215], [92.09587026676313, 24.585986549957674], [92.096215170872, 24.584970919041794], [92.0966672745312, 24.58399109013877], [92.09693753248148, 24.58353594840357], [92.0970637677586, 24.583295970541492], [92.09700436716199, 24.583179150308794], [92.09660084331858, 24.582477785702405], [92.09616284809319, 24.58149261601608], [92.09583256652067, 24.58047293173292], [92.09561317692888, 24.579428553605446], [92.09550678945187, 24.578369539968527], [92.09551442581224, 24.577306089856556], [92.09563600959085, 24.576248444775405], [92.09587036707332, 24.575206790075036], [92.09621523866092, 24.57419115687245], [92.09666730073201, 24.573211325469284], [92.0969375546328, 24.572756148024542], [92.09704940325709, 24.572543499798876], [92.09667980900963, 24.572700656793945], [92.09560253362746, 24.573101175952647], [92.09448751213812, 24.57340319460408], [92.09334548527134, 24.573603803508178], [92.09218745407716, 24.573701070289133], [92.09102457387564, 24.573694058060752], [92.08986804671548, 24.573582834455134], [92.08872901338172, 24.573368470967438], [92.0876184459961, 24.573053032623317], [92.08654704224932, 24.572639558068918], [92.08632953521271, 24.572543860977948], [92.08637456626322, 24.57263244629321], [92.08677884974381, 24.573335309480026], [92.08721674446394, 24.574320504557882], [92.08754694121822, 24.575340206066397], [92.08776625756815, 24.57638459435686], [92.0878725786705, 24.57744361180063], [92.08786487774832, 24.57850705963407], [92.08774322608888, 24.579564696172298], [92.0875087924676, 24.580606335446017], [92.08716383199959, 24.581621945311383], [92.08671166452199, 24.582601744087643], [92.0864421947298, 24.583055481809115]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_e635b18a8d08357324221973f5d43412.bindTooltip(
+                `<div>
+                     Top cluster #2 (cluster 1)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+        var popup_471f200a6657eea753059d9ed824d844 = L.popup({
+  "maxWidth": 700,
+  "maxHeight": 550,
+});
+
+        
+            
+                var i_frame_adaa7327d287ddb962a2f83785b25f8b = $(`<iframe src="data:text/html;charset=utf-8;base64,CiAgICAKICAgICAgICAgICAgPGRpdiBzdHlsZT0ibWFyZ2luLWJvdHRvbTogMC41ZW07Ij4KICAgICAgICAgICAgPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6IzAwN2JmZjtjb2xvcjp3aGl0ZTtwYWRkaW5nOjNweCA3cHg7Ym9yZGVyLXJhZGl1czo1cHg7bWFyZ2luLXJpZ2h0OjVweDsiPgogICAgICAgICAgICAgICAgQ2x1c3RlciBJRDogMQogICAgICAgICAgICA8L3NwYW4+CiAgICAgICAgICAgIDxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kOiMyOGE3NDU7Y29sb3I6d2hpdGU7cGFkZGluZzozcHggN3B4O2JvcmRlci1yYWRpdXM6NXB4OyI+CiAgICAgICAgICAgICAgICBSYW5rOiAyCiAgICAgICAgICAgIDwvc3Bhbj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDxoMyBpZD0idG9wLWNsdXN0ZXItMi1jbHVzdGVyLTEiPlRvcCBjbHVzdGVyICMyIChjbHVzdGVyIDEpPC9oMz4KPHVsPgo8bGk+PHN0cm9uZz5BcmVhOjwvc3Ryb25nPiB+MS4xNiBrbcKyPC9saT4KPGxpPjxzdHJvbmc+UGVvcGxlIGxpdmluZyBpbnNpZGU6PC9zdHJvbmc+IG4vYTwvbGk+CjxsaT48c3Ryb25nPkN1cnJlbnQgbGV2ZWw6PC9zdHJvbmc+IEhpZ2ggKGFib3ZlIHR5cGljYWwpICh64omIMS4wMzsgMOKJiHR5cGljYWwpPC9saT4KPGxpPjxzdHJvbmc+U2Vhc29uYWxpdHk6PC9zdHJvbmc+IHdvcnNlIGluIHRoZSBtb25zb29uIHRoYW4gdGhlIGRyeSBzZWFzb24gKG1vbnNvb24gMC43NSwgZHJ5IC0wLjUzIGluIHN0YW5kYXJkaXplZCB1bml0czsgzpQ9KzEuMjcpPC9saT4KPGxpPjxzdHJvbmc+U2Vuc2l0aXZlIHNpdGVzIGluc2lkZTo8L3N0cm9uZz4gc2Nob29sczowLCBjbGluaWNzOjAsIGhvc3BpdGFsczowLCBlbGRlciBob21lczowPC9saT4KPGxpPjxzdHJvbmc+SW5kdXN0cmlhbC9wb3J0L3BvaW50LXNvdXJjZSBmZWF0dXJlcyBpbnNpZGU6PC9zdHJvbmc+IDA8L2xpPgo8L3VsPgogICAgICAgICAgICA8ZGl2IHN0eWxlPSJtYXJnaW4tdG9wOiAxMHB4OyB0ZXh0LWFsaWduOiBjZW50ZXI7Ij4KICAgICAgICAgICAgICAgIDxidXR0b24gaWQ9ImFpLWJ0bi0xIiBvbmNsaWNrPSJoYW5kbGVBSVN1Z2dlc3Rpb25zKDEpIiAKICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU9ImJhY2tncm91bmQ6ICMwMDdiZmY7IGNvbG9yOiB3aGl0ZTsgYm9yZGVyOiBub25lOyBwYWRkaW5nOiA4cHggMTZweDsgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib3JkZXItcmFkaXVzOiA0cHg7IGN1cnNvcjogcG9pbnRlcjsgZm9udC1zaXplOiAxMnB4OyI+CiAgICAgICAgICAgICAgICAgICAgVmlldyBBSSBTdWdnZXN0aW9ucwogICAgICAgICAgICAgICAgPC9idXR0b24+CiAgICAgICAgICAgICAgICA8ZGl2IGlkPSJhaS1yZXNwb25zZS0xIiBzdHlsZT0ibWFyZ2luLXRvcDogMTBweDsgZGlzcGxheTogbm9uZTsiPjwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPHNjcmlwdD4KICAgICAgICAgICAgICAgIGZ1bmN0aW9uIGhhbmRsZUFJU3VnZ2VzdGlvbnMoY2x1c3RlcklkKSB7CiAgICAgICAgICAgICAgICAgICAgY29uc3QgYnRuID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FpLWJ0bi0nICsgY2x1c3RlcklkKTsKICAgICAgICAgICAgICAgICAgICBjb25zdCByZXNwb25zZURpdiA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhaS1yZXNwb25zZS0nICsgY2x1c3RlcklkKTsKICAgICAgICAgICAgICAgICAgICBjb25zdCBvcmlnaW5hbFRleHQgPSBidG4uaW5uZXJIVE1MOwogICAgICAgICAgICAgICAgICAgIGJ0bi5pbm5lckhUTUwgPSAnTG9hZGluZy4uLic7CiAgICAgICAgICAgICAgICAgICAgYnRuLmRpc2FibGVkID0gdHJ1ZTsKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBjb25zdCBwb3B1cENvbnRlbnQgPSBidG4uY2xvc2VzdCgnLmxlYWZsZXQtcG9wdXAtY29udGVudC13cmFwcGVyJykucXVlcnlTZWxlY3RvcignLmxlYWZsZXQtcG9wdXAtY29udGVudCcpLmlubmVySFRNTDsKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBmZXRjaCgnL2xsbS1pbmZlcmVuY2UnLCB7CiAgICAgICAgICAgICAgICAgICAgICAgIG1ldGhvZDogJ1BPU1QnLAogICAgICAgICAgICAgICAgICAgICAgICBoZWFkZXJzOiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nLAogICAgICAgICAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgICAgICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBwcm9tcHQ6IHBvcHVwQ29udGVudCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU6ICdhcScKICAgICAgICAgICAgICAgICAgICAgICAgfSkKICAgICAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICAgICAgICAgIC50aGVuKHJlc3BvbnNlID0+IHJlc3BvbnNlLmpzb24oKSkKICAgICAgICAgICAgICAgICAgICAudGhlbihkYXRhID0+IHsKICAgICAgICAgICAgICAgICAgICAgICAgYnRuLmlubmVySFRNTCA9ICdDb21wbGV0ZWQnOwogICAgICAgICAgICAgICAgICAgICAgICBidG4uZGlzYWJsZWQgPSBmYWxzZTsKICAgICAgICAgICAgICAgICAgICAgICAgYnRuLnN0eWxlLmJhY2tncm91bmQgPSAnIzI4YTc0NSc7CiAgICAgICAgICAgICAgICAgICAgICAgIHJlc3BvbnNlRGl2LmlubmVySFRNTCA9ICc8aDMgc3R5bGU9Im1hcmdpbjogMTBweCAwIDVweCAwOyBjb2xvcjogIzMzMzsiPkFJIFN1Z2dlc3Rpb25zPC9oMz4nICsgZGF0YS5yZXNwb25zZTsKICAgICAgICAgICAgICAgICAgICAgICAgcmVzcG9uc2VEaXYuc3R5bGUuZGlzcGxheSA9ICdibG9jayc7CiAgICAgICAgICAgICAgICAgICAgfSkKICAgICAgICAgICAgICAgICAgICAuY2F0Y2goZXJyb3IgPT4gewogICAgICAgICAgICAgICAgICAgICAgICBidG4uaW5uZXJIVE1MID0gb3JpZ2luYWxUZXh0OwogICAgICAgICAgICAgICAgICAgICAgICBidG4uZGlzYWJsZWQgPSBmYWxzZTsKICAgICAgICAgICAgICAgICAgICAgICAgY29uc29sZS5lcnJvcignRXJyb3I6JywgZXJyb3IpOwogICAgICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICA8L3NjcmlwdD4KICAgICAgICAgICAg" width="300" style="border:none !important;" height="550"></iframe>`)[0];
+                popup_471f200a6657eea753059d9ed824d844.setContent(i_frame_adaa7327d287ddb962a2f83785b25f8b);
+            
+        
+
+        geo_json_e635b18a8d08357324221973f5d43412.bindPopup(popup_471f200a6657eea753059d9ed824d844)
+        ;
+
+        
+    
+    
+            geo_json_e635b18a8d08357324221973f5d43412.addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        function geo_json_5a5afd10b4299f5a8ebb207799b5a613_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#673ab7", "fillColor": "#673ab7", "fillOpacity": 0.1, "weight": 3};
+            }
+        }
+
+        function geo_json_5a5afd10b4299f5a8ebb207799b5a613_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_5a5afd10b4299f5a8ebb207799b5a613 = L.geoJson(null, {
+                onEachFeature: geo_json_5a5afd10b4299f5a8ebb207799b5a613_onEachFeature,
+            
+                style: geo_json_5a5afd10b4299f5a8ebb207799b5a613_styler,
+            ...{
+}
+        });
+
+        function geo_json_5a5afd10b4299f5a8ebb207799b5a613_add (data) {
+            geo_json_5a5afd10b4299f5a8ebb207799b5a613
+                .addData(data);
+        }
+            geo_json_5a5afd10b4299f5a8ebb207799b5a613_add({"features": [{"geometry": {"coordinates": [[[92.18759969637124, 24.528262960329965], [92.18820106106485, 24.52821204242409], [92.18936355172545, 24.528218293730156], [92.19051977671937, 24.52832874566436], [92.19165860375918, 24.528542334853647], [92.19276906792453, 24.528857004893545], [92.19384047716032, 24.529269726130376], [92.19409770136556, 24.529382708242032], [92.19448980613952, 24.529215608325888], [92.19556641087924, 24.52881436152178], [92.1966808167352, 24.52851157621124], [92.1978222938188, 24.528310167739733], [92.19897985177595, 24.52821207536935], [92.20014234552667, 24.52821824361857], [92.20056908943518, 24.528258979862148], [92.1997908049098, 24.527873086063554], [92.19882797863885, 24.52727711469716], [92.19793365162035, 24.526597671496038], [92.19711643716022, 24.525841301152912], [92.19638420536607, 24.525015289218338], [92.19574400735829, 24.524127591887257], [92.19520200738975, 24.523186759328464], [92.19476342352715, 24.522201853297293], [92.19443247746311, 24.521182359826653], [92.1942123539402, 24.52013809783868], [92.19410517017428, 24.519079124558537], [92.194095911775, 24.51888339645282], [92.19408294220291, 24.5190992168146], [92.19408227683857, 24.519202110867482], [92.19396112107839, 24.520261530733062], [92.19372686511706, 24.521304950389105], [92.19338176956329, 24.522322288423045], [92.19292916617174, 24.523303715189634], [92.1923734257438, 24.524239747809087], [92.19171991597518, 24.525121341822306], [92.19097494965486, 24.525939978615963], [92.19014572371331, 24.526687747771227], [92.18924024970775, 24.527357423538866], [92.18826727641508, 24.527942534699683], [92.18759969637124, 24.528262960329965]]], "type": "Polygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_5a5afd10b4299f5a8ebb207799b5a613.bindTooltip(
+                `<div>
+                     Top cluster #3 (cluster 2)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+        var popup_60601ca7f458df4f78881fa52f1772f8 = L.popup({
+  "maxWidth": 700,
+  "maxHeight": 550,
+});
+
+        
+            
+                var i_frame_c68e685272c3581b665a0dd0cae676f2 = $(`<iframe src="data:text/html;charset=utf-8;base64,CiAgICAKICAgICAgICAgICAgPGRpdiBzdHlsZT0ibWFyZ2luLWJvdHRvbTogMC41ZW07Ij4KICAgICAgICAgICAgPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6IzAwN2JmZjtjb2xvcjp3aGl0ZTtwYWRkaW5nOjNweCA3cHg7Ym9yZGVyLXJhZGl1czo1cHg7bWFyZ2luLXJpZ2h0OjVweDsiPgogICAgICAgICAgICAgICAgQ2x1c3RlciBJRDogMgogICAgICAgICAgICA8L3NwYW4+CiAgICAgICAgICAgIDxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kOiMyOGE3NDU7Y29sb3I6d2hpdGU7cGFkZGluZzozcHggN3B4O2JvcmRlci1yYWRpdXM6NXB4OyI+CiAgICAgICAgICAgICAgICBSYW5rOiAzCiAgICAgICAgICAgIDwvc3Bhbj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDxoMyBpZD0idG9wLWNsdXN0ZXItMy1jbHVzdGVyLTIiPlRvcCBjbHVzdGVyICMzIChjbHVzdGVyIDIpPC9oMz4KPHVsPgo8bGk+PHN0cm9uZz5BcmVhOjwvc3Ryb25nPiB+MC40NCBrbcKyPC9saT4KPGxpPjxzdHJvbmc+UGVvcGxlIGxpdmluZyBpbnNpZGU6PC9zdHJvbmc+IG4vYTwvbGk+CjxsaT48c3Ryb25nPkN1cnJlbnQgbGV2ZWw6PC9zdHJvbmc+IEhpZ2ggKGFib3ZlIHR5cGljYWwpICh64omIMS4xMTsgMOKJiHR5cGljYWwpPC9saT4KPGxpPjxzdHJvbmc+U2Vhc29uYWxpdHk6PC9zdHJvbmc+IHNpbWlsYXIgYmV0d2VlbiBzZWFzb25zIChtb25zb29uIDAuMzUsIGRyeSAwLjQ3IGluIHN0YW5kYXJkaXplZCB1bml0czsgzpQ9LTAuMTIpPC9saT4KPGxpPjxzdHJvbmc+U2Vuc2l0aXZlIHNpdGVzIGluc2lkZTo8L3N0cm9uZz4gc2Nob29sczowLCBjbGluaWNzOjAsIGhvc3BpdGFsczowLCBlbGRlciBob21lczowPC9saT4KPGxpPjxzdHJvbmc+SW5kdXN0cmlhbC9wb3J0L3BvaW50LXNvdXJjZSBmZWF0dXJlcyBpbnNpZGU6PC9zdHJvbmc+IDA8L2xpPgo8L3VsPgogICAgICAgICAgICA8ZGl2IHN0eWxlPSJtYXJnaW4tdG9wOiAxMHB4OyB0ZXh0LWFsaWduOiBjZW50ZXI7Ij4KICAgICAgICAgICAgICAgIDxidXR0b24gaWQ9ImFpLWJ0bi0yIiBvbmNsaWNrPSJoYW5kbGVBSVN1Z2dlc3Rpb25zKDIpIiAKICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU9ImJhY2tncm91bmQ6ICMwMDdiZmY7IGNvbG9yOiB3aGl0ZTsgYm9yZGVyOiBub25lOyBwYWRkaW5nOiA4cHggMTZweDsgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib3JkZXItcmFkaXVzOiA0cHg7IGN1cnNvcjogcG9pbnRlcjsgZm9udC1zaXplOiAxMnB4OyI+CiAgICAgICAgICAgICAgICAgICAgVmlldyBBSSBTdWdnZXN0aW9ucwogICAgICAgICAgICAgICAgPC9idXR0b24+CiAgICAgICAgICAgICAgICA8ZGl2IGlkPSJhaS1yZXNwb25zZS0yIiBzdHlsZT0ibWFyZ2luLXRvcDogMTBweDsgZGlzcGxheTogbm9uZTsiPjwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPHNjcmlwdD4KICAgICAgICAgICAgICAgIGZ1bmN0aW9uIGhhbmRsZUFJU3VnZ2VzdGlvbnMoY2x1c3RlcklkKSB7CiAgICAgICAgICAgICAgICAgICAgY29uc3QgYnRuID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FpLWJ0bi0nICsgY2x1c3RlcklkKTsKICAgICAgICAgICAgICAgICAgICBjb25zdCByZXNwb25zZURpdiA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhaS1yZXNwb25zZS0nICsgY2x1c3RlcklkKTsKICAgICAgICAgICAgICAgICAgICBjb25zdCBvcmlnaW5hbFRleHQgPSBidG4uaW5uZXJIVE1MOwogICAgICAgICAgICAgICAgICAgIGJ0bi5pbm5lckhUTUwgPSAnTG9hZGluZy4uLic7CiAgICAgICAgICAgICAgICAgICAgYnRuLmRpc2FibGVkID0gdHJ1ZTsKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBjb25zdCBwb3B1cENvbnRlbnQgPSBidG4uY2xvc2VzdCgnLmxlYWZsZXQtcG9wdXAtY29udGVudC13cmFwcGVyJykucXVlcnlTZWxlY3RvcignLmxlYWZsZXQtcG9wdXAtY29udGVudCcpLmlubmVySFRNTDsKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBmZXRjaCgnL2xsbS1pbmZlcmVuY2UnLCB7CiAgICAgICAgICAgICAgICAgICAgICAgIG1ldGhvZDogJ1BPU1QnLAogICAgICAgICAgICAgICAgICAgICAgICBoZWFkZXJzOiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nLAogICAgICAgICAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgICAgICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBwcm9tcHQ6IHBvcHVwQ29udGVudCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU6ICdhcScKICAgICAgICAgICAgICAgICAgICAgICAgfSkKICAgICAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICAgICAgICAgIC50aGVuKHJlc3BvbnNlID0+IHJlc3BvbnNlLmpzb24oKSkKICAgICAgICAgICAgICAgICAgICAudGhlbihkYXRhID0+IHsKICAgICAgICAgICAgICAgICAgICAgICAgYnRuLmlubmVySFRNTCA9ICdDb21wbGV0ZWQnOwogICAgICAgICAgICAgICAgICAgICAgICBidG4uZGlzYWJsZWQgPSBmYWxzZTsKICAgICAgICAgICAgICAgICAgICAgICAgYnRuLnN0eWxlLmJhY2tncm91bmQgPSAnIzI4YTc0NSc7CiAgICAgICAgICAgICAgICAgICAgICAgIHJlc3BvbnNlRGl2LmlubmVySFRNTCA9ICc8aDMgc3R5bGU9Im1hcmdpbjogMTBweCAwIDVweCAwOyBjb2xvcjogIzMzMzsiPkFJIFN1Z2dlc3Rpb25zPC9oMz4nICsgZGF0YS5yZXNwb25zZTsKICAgICAgICAgICAgICAgICAgICAgICAgcmVzcG9uc2VEaXYuc3R5bGUuZGlzcGxheSA9ICdibG9jayc7CiAgICAgICAgICAgICAgICAgICAgfSkKICAgICAgICAgICAgICAgICAgICAuY2F0Y2goZXJyb3IgPT4gewogICAgICAgICAgICAgICAgICAgICAgICBidG4uaW5uZXJIVE1MID0gb3JpZ2luYWxUZXh0OwogICAgICAgICAgICAgICAgICAgICAgICBidG4uZGlzYWJsZWQgPSBmYWxzZTsKICAgICAgICAgICAgICAgICAgICAgICAgY29uc29sZS5lcnJvcignRXJyb3I6JywgZXJyb3IpOwogICAgICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICA8L3NjcmlwdD4KICAgICAgICAgICAg" width="300" style="border:none !important;" height="550"></iframe>`)[0];
+                popup_60601ca7f458df4f78881fa52f1772f8.setContent(i_frame_c68e685272c3581b665a0dd0cae676f2);
+            
+        
+
+        geo_json_5a5afd10b4299f5a8ebb207799b5a613.bindPopup(popup_60601ca7f458df4f78881fa52f1772f8)
+        ;
+
+        
+    
+    
+            geo_json_5a5afd10b4299f5a8ebb207799b5a613.addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+            var circle_marker_de5ca8cd920b8fc4b68b483afeaa46a7 = L.circleMarker(
+                [24.54017693157709, 92.1940976091865],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_ba697a97892f94f2d42a73edb8d4e090 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d92823c8cec7b3aaeb3d2a67ba68358e = $(`<div id="html_d92823c8cec7b3aaeb3d2a67ba68358e" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>Current level: Very high (well above typical) (z≈2.22; 0≈typical)<br>NO₂ z: 1.54 | PM₂.₅ z: 0.37 | CO z: 1.66<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon 0.52, dry 1.07 in standardized units; Δ=-0.56)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.54017693157709-92.1940976091865' onclick='handleHotspotAISuggestions("24.54017693157709", "92.1940976091865")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.54017693157709-92.1940976091865' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_ba697a97892f94f2d42a73edb8d4e090.setContent(html_d92823c8cec7b3aaeb3d2a67ba68358e);
+            
+        
+
+        circle_marker_de5ca8cd920b8fc4b68b483afeaa46a7.bindPopup(popup_ba697a97892f94f2d42a73edb8d4e090)
+        ;
+
+        
+    
+    
+            circle_marker_de5ca8cd920b8fc4b68b483afeaa46a7.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bec6132b1326f4c1c2363f9df9be61eb = L.circleMarker(
+                [24.54017693157709, 92.18331782577707],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_2f3ddb9bab4934a0f9b4da9253ab19be = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fc588bf4e03a31998b063aacadf8664d = $(`<div id="html_fc588bf4e03a31998b063aacadf8664d" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.88; 0≈typical)<br>NO₂ z: 1.57 | PM₂.₅ z: 0.23 | CO z: 1.05<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon 0.36, dry 0.84 in standardized units; Δ=-0.48)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.54017693157709-92.18331782577707' onclick='handleHotspotAISuggestions("24.54017693157709", "92.18331782577707")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.54017693157709-92.18331782577707' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_2f3ddb9bab4934a0f9b4da9253ab19be.setContent(html_fc588bf4e03a31998b063aacadf8664d);
+            
+        
+
+        circle_marker_bec6132b1326f4c1c2363f9df9be61eb.bindPopup(popup_2f3ddb9bab4934a0f9b4da9253ab19be)
+        ;
+
+        
+    
+    
+            circle_marker_bec6132b1326f4c1c2363f9df9be61eb.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2f8835cd8df80f6f2f95a8e1fbbc533f = L.circleMarker(
+                [24.57251628180539, 92.09707955850159],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_29990db7a4de1e45aef0bf5b349c2ad3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_5fb5ad6792908910ecff4e2f5b4b1e19 = $(`<div id="html_5fb5ad6792908910ecff4e2f5b4b1e19" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.74; 0≈typical)<br>NO₂ z: 1.18 | PM₂.₅ z: 1.50 | CO z: -1.07<br><b>Likely driver:</b> Point sources / industry (high NO₂, low CO)<br><b>Seasonality:</b> worse in the monsoon than the dry season (monsoon 0.34, dry -0.01 in standardized units; Δ=+0.35)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.57251628180539-92.09707955850159' onclick='handleHotspotAISuggestions("24.57251628180539", "92.09707955850159")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.57251628180539-92.09707955850159' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_29990db7a4de1e45aef0bf5b349c2ad3.setContent(html_5fb5ad6792908910ecff4e2f5b4b1e19);
+            
+        
+
+        circle_marker_2f8835cd8df80f6f2f95a8e1fbbc533f.bindPopup(popup_29990db7a4de1e45aef0bf5b349c2ad3)
+        ;
+
+        
+    
+    
+            circle_marker_2f8835cd8df80f6f2f95a8e1fbbc533f.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_380d96680f7b15d8343349a689d0b8de = L.circleMarker(
+                [24.51861736475822, 92.1940976091865],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_db673cb63ccbe5be24d63647fda22a64 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_2a8aa39a35a257f5148ab8e0c32fa1c4 = $(`<div id="html_2a8aa39a35a257f5148ab8e0c32fa1c4" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.73; 0≈typical)<br>NO₂ z: 0.97 | PM₂.₅ z: 0.48 | CO z: 1.38<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> similar between seasons (monsoon 0.14, dry -0.10 in standardized units; Δ=+0.24)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.51861736475822-92.1940976091865' onclick='handleHotspotAISuggestions("24.51861736475822", "92.1940976091865")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.51861736475822-92.1940976091865' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_db673cb63ccbe5be24d63647fda22a64.setContent(html_2a8aa39a35a257f5148ab8e0c32fa1c4);
+            
+        
+
+        circle_marker_380d96680f7b15d8343349a689d0b8de.bindPopup(popup_db673cb63ccbe5be24d63647fda22a64)
+        ;
+
+        
+    
+    
+            circle_marker_380d96680f7b15d8343349a689d0b8de.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ec0f9c2d7a3c013ee86adde7b3d3d330 = L.circleMarker(
+                [24.529397148167654, 92.18331782577707],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_fa78bd381cbe2f23c4b9d14d32f58635 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_169abc9ce0f2a91bae59a71a489279fc = $(`<div id="html_169abc9ce0f2a91bae59a71a489279fc" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.65; 0≈typical)<br>NO₂ z: 0.92 | PM₂.₅ z: 0.61 | CO z: 1.04<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> similar between seasons (monsoon 0.44, dry 0.47 in standardized units; Δ=-0.03)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.529397148167654-92.18331782577707' onclick='handleHotspotAISuggestions("24.529397148167654", "92.18331782577707")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.529397148167654-92.18331782577707' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_fa78bd381cbe2f23c4b9d14d32f58635.setContent(html_169abc9ce0f2a91bae59a71a489279fc);
+            
+        
+
+        circle_marker_ec0f9c2d7a3c013ee86adde7b3d3d330.bindPopup(popup_fa78bd381cbe2f23c4b9d14d32f58635)
+        ;
+
+        
+    
+    
+            circle_marker_ec0f9c2d7a3c013ee86adde7b3d3d330.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b521a5e15c604b89458e36fa3e09cfc6 = L.circleMarker(
+                [24.550956714986523, 92.18331782577707],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_2a050374c0a1858bf282f04697bc9f19 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_65ac33ce416ecaa86550c287a0f12432 = $(`<div id="html_65ac33ce416ecaa86550c287a0f12432" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.51; 0≈typical)<br>NO₂ z: 1.00 | PM₂.₅ z: 0.19 | CO z: 1.36<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon 0.13, dry 1.30 in standardized units; Δ=-1.17)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.550956714986523-92.18331782577707' onclick='handleHotspotAISuggestions("24.550956714986523", "92.18331782577707")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.550956714986523-92.18331782577707' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_2a050374c0a1858bf282f04697bc9f19.setContent(html_65ac33ce416ecaa86550c287a0f12432);
+            
+        
+
+        circle_marker_b521a5e15c604b89458e36fa3e09cfc6.bindPopup(popup_2a050374c0a1858bf282f04697bc9f19)
+        ;
+
+        
+    
+    
+            circle_marker_b521a5e15c604b89458e36fa3e09cfc6.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1c6eb6987853ab5109e1d06b2a9e3108 = L.circleMarker(
+                [24.529397148167654, 92.17253804236762],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_99aaf84c4f9fe5048bb6290ffdc29849 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fc27e456b15cd4412d039dfb9b93d515 = $(`<div id="html_fc27e456b15cd4412d039dfb9b93d515" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.48; 0≈typical)<br>NO₂ z: 0.54 | PM₂.₅ z: 1.05 | CO z: 0.47<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon 0.55, dry 0.98 in standardized units; Δ=-0.43)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.529397148167654-92.17253804236762' onclick='handleHotspotAISuggestions("24.529397148167654", "92.17253804236762")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.529397148167654-92.17253804236762' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_99aaf84c4f9fe5048bb6290ffdc29849.setContent(html_fc27e456b15cd4412d039dfb9b93d515);
+            
+        
+
+        circle_marker_1c6eb6987853ab5109e1d06b2a9e3108.bindPopup(popup_99aaf84c4f9fe5048bb6290ffdc29849)
+        ;
+
+        
+    
+    
+            circle_marker_1c6eb6987853ab5109e1d06b2a9e3108.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c2a170e82d21ac7dbf7734d49ee9de8b = L.circleMarker(
+                [24.529397148167654, 92.1940976091865],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_94bd5eb833a9db3b95b79b61a2f432af = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_df3fcf41f03c3060d052bdc48f543193 = $(`<div id="html_df3fcf41f03c3060d052bdc48f543193" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.44; 0≈typical)<br>NO₂ z: 0.98 | PM₂.₅ z: -0.00 | CO z: 1.61<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> similar between seasons (monsoon 0.39, dry 0.57 in standardized units; Δ=-0.18)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.529397148167654-92.1940976091865' onclick='handleHotspotAISuggestions("24.529397148167654", "92.1940976091865")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.529397148167654-92.1940976091865' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_94bd5eb833a9db3b95b79b61a2f432af.setContent(html_df3fcf41f03c3060d052bdc48f543193);
+            
+        
+
+        circle_marker_c2a170e82d21ac7dbf7734d49ee9de8b.bindPopup(popup_94bd5eb833a9db3b95b79b61a2f432af)
+        ;
+
+        
+    
+    
+            circle_marker_c2a170e82d21ac7dbf7734d49ee9de8b.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bfbc0017dc816884bbe167702bc39c90 = L.circleMarker(
+                [24.583296065214828, 92.09707955850159],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_b43f5915626b06b7bd2c04f1b4b682d2 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a7b13b973095f695a2c28eb9c4856031 = $(`<div id="html_a7b13b973095f695a2c28eb9c4856031" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.42; 0≈typical)<br>NO₂ z: 1.40 | PM₂.₅ z: 0.99 | CO z: -1.26<br><b>Likely driver:</b> Point sources / industry (high NO₂, low CO)<br><b>Seasonality:</b> worse in the monsoon than the dry season (monsoon 0.69, dry -0.54 in standardized units; Δ=+1.23)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.583296065214828-92.09707955850159' onclick='handleHotspotAISuggestions("24.583296065214828", "92.09707955850159")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.583296065214828-92.09707955850159' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_b43f5915626b06b7bd2c04f1b4b682d2.setContent(html_a7b13b973095f695a2c28eb9c4856031);
+            
+        
+
+        circle_marker_bfbc0017dc816884bbe167702bc39c90.bindPopup(popup_b43f5915626b06b7bd2c04f1b4b682d2)
+        ;
+
+        
+    
+    
+            circle_marker_bfbc0017dc816884bbe167702bc39c90.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_70b7fc8d48203811e57a30bcc103955d = L.circleMarker(
+                [24.57251628180539, 92.08629977509216],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_6be7dd0ef15a531197a01c4245df2376 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_37ce3b9e29d5c92edcc3d8b10fa38646 = $(`<div id="html_37ce3b9e29d5c92edcc3d8b10fa38646" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.40; 0≈typical)<br>NO₂ z: 0.77 | PM₂.₅ z: 1.36 | CO z: -0.80<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the monsoon than the dry season (monsoon 1.37, dry -0.61 in standardized units; Δ=+1.98)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.57251628180539-92.08629977509216' onclick='handleHotspotAISuggestions("24.57251628180539", "92.08629977509216")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.57251628180539-92.08629977509216' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_6be7dd0ef15a531197a01c4245df2376.setContent(html_37ce3b9e29d5c92edcc3d8b10fa38646);
+            
+        
+
+        circle_marker_70b7fc8d48203811e57a30bcc103955d.bindPopup(popup_6be7dd0ef15a531197a01c4245df2376)
+        ;
+
+        
+    
+    
+            circle_marker_70b7fc8d48203811e57a30bcc103955d.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c5022482738b5f3e0c84eddd09e8a334 = L.circleMarker(
+                [24.59407584862426, 92.09707955850159],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_063bd0ed5299ce0bbbdee8ca54145fa4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_722757c9b7d406b677d830f3e0794412 = $(`<div id="html_722757c9b7d406b677d830f3e0794412" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.39; 0≈typical)<br>NO₂ z: 1.35 | PM₂.₅ z: 0.84 | CO z: -0.93<br><b>Likely driver:</b> Point sources / industry (high NO₂, low CO)<br><b>Seasonality:</b> worse in the monsoon than the dry season (monsoon 1.41, dry -0.95 in standardized units; Δ=+2.36)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.59407584862426-92.09707955850159' onclick='handleHotspotAISuggestions("24.59407584862426", "92.09707955850159")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.59407584862426-92.09707955850159' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_063bd0ed5299ce0bbbdee8ca54145fa4.setContent(html_722757c9b7d406b677d830f3e0794412);
+            
+        
+
+        circle_marker_c5022482738b5f3e0c84eddd09e8a334.bindPopup(popup_063bd0ed5299ce0bbbdee8ca54145fa4)
+        ;
+
+        
+    
+    
+            circle_marker_c5022482738b5f3e0c84eddd09e8a334.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2efc2549d003eb35e978bd5a92206fdf = L.circleMarker(
+                [24.529397148167654, 92.20487739259593],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_c1e497cdb5bda0ec37bec58b5049f611 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_310149bbf049421f611c7780ecf89b10 = $(`<div id="html_310149bbf049421f611c7780ecf89b10" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.32; 0≈typical)<br>NO₂ z: 1.71 | PM₂.₅ z: -0.93 | CO z: 1.68<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> similar between seasons (monsoon 0.52, dry 0.34 in standardized units; Δ=+0.18)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.529397148167654-92.20487739259593' onclick='handleHotspotAISuggestions("24.529397148167654", "92.20487739259593")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.529397148167654-92.20487739259593' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_c1e497cdb5bda0ec37bec58b5049f611.setContent(html_310149bbf049421f611c7780ecf89b10);
+            
+        
+
+        circle_marker_2efc2549d003eb35e978bd5a92206fdf.bindPopup(popup_c1e497cdb5bda0ec37bec58b5049f611)
+        ;
+
+        
+    
+    
+            circle_marker_2efc2549d003eb35e978bd5a92206fdf.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ab0a6146322759f9d32d038c21bcbecd = L.circleMarker(
+                [24.54017693157709, 92.20487739259593],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_149dbdc6684598fbed3bbe8d1421f516 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a96729a2184560cd051548c9686466b1 = $(`<div id="html_a96729a2184560cd051548c9686466b1" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.30; 0≈typical)<br>NO₂ z: 1.62 | PM₂.₅ z: -0.88 | CO z: 1.73<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon -0.14, dry 0.88 in standardized units; Δ=-1.01)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.54017693157709-92.20487739259593' onclick='handleHotspotAISuggestions("24.54017693157709", "92.20487739259593")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.54017693157709-92.20487739259593' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_149dbdc6684598fbed3bbe8d1421f516.setContent(html_a96729a2184560cd051548c9686466b1);
+            
+        
+
+        circle_marker_ab0a6146322759f9d32d038c21bcbecd.bindPopup(popup_149dbdc6684598fbed3bbe8d1421f516)
+        ;
+
+        
+    
+    
+            circle_marker_ab0a6146322759f9d32d038c21bcbecd.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_216f7a89e4b1734764749197ba2f8b3b = L.circleMarker(
+                [24.54017693157709, 92.17253804236762],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_789788ed583666b84764cf4ee0d9e117 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_61cee6cf368fe09c8ef296138de6578d = $(`<div id="html_61cee6cf368fe09c8ef296138de6578d" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.21; 0≈typical)<br>NO₂ z: 0.46 | PM₂.₅ z: 0.60 | CO z: 0.86<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon 0.44, dry 1.23 in standardized units; Δ=-0.79)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.54017693157709-92.17253804236762' onclick='handleHotspotAISuggestions("24.54017693157709", "92.17253804236762")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.54017693157709-92.17253804236762' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_789788ed583666b84764cf4ee0d9e117.setContent(html_61cee6cf368fe09c8ef296138de6578d);
+            
+        
+
+        circle_marker_216f7a89e4b1734764749197ba2f8b3b.bindPopup(popup_789788ed583666b84764cf4ee0d9e117)
+        ;
+
+        
+    
+    
+            circle_marker_216f7a89e4b1734764749197ba2f8b3b.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_47b5f6a40655c662c6eb40a237363393 = L.circleMarker(
+                [24.550956714986523, 92.17253804236762],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_2e2c61605ae539f0aa6d027f16e3b500 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_91f7ec25f12dfd3df68c5e6c9d870ff4 = $(`<div id="html_91f7ec25f12dfd3df68c5e6c9d870ff4" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.14; 0≈typical)<br>NO₂ z: 0.19 | PM₂.₅ z: 0.68 | CO z: 1.07<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon -0.16, dry 1.21 in standardized units; Δ=-1.37)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.550956714986523-92.17253804236762' onclick='handleHotspotAISuggestions("24.550956714986523", "92.17253804236762")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.550956714986523-92.17253804236762' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_2e2c61605ae539f0aa6d027f16e3b500.setContent(html_91f7ec25f12dfd3df68c5e6c9d870ff4);
+            
+        
+
+        circle_marker_47b5f6a40655c662c6eb40a237363393.bindPopup(popup_2e2c61605ae539f0aa6d027f16e3b500)
+        ;
+
+        
+    
+    
+            circle_marker_47b5f6a40655c662c6eb40a237363393.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_764e22093a806a570a18a27c51043639 = L.circleMarker(
+                [24.56173649839596, 92.1940976091865],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_8cae50058a50d7bdbbaf49532836273a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a8a75e9d0cc82fdcb3f096971be0317b = $(`<div id="html_a8a75e9d0cc82fdcb3f096971be0317b" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.05; 0≈typical)<br>NO₂ z: 0.96 | PM₂.₅ z: -0.29 | CO z: 1.25<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon -0.19, dry 0.92 in standardized units; Δ=-1.11)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.56173649839596-92.1940976091865' onclick='handleHotspotAISuggestions("24.56173649839596", "92.1940976091865")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.56173649839596-92.1940976091865' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_8cae50058a50d7bdbbaf49532836273a.setContent(html_a8a75e9d0cc82fdcb3f096971be0317b);
+            
+        
+
+        circle_marker_764e22093a806a570a18a27c51043639.bindPopup(popup_8cae50058a50d7bdbbaf49532836273a)
+        ;
+
+        
+    
+    
+            circle_marker_764e22093a806a570a18a27c51043639.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d2ba899c30a59894baa8af6a5e77b62c = L.circleMarker(
+                [24.583296065214828, 92.08629977509216],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_ebb364aacc4f30628f488769d1ecebe6 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ba5f796022d8fee6827896f418baca9f = $(`<div id="html_ba5f796022d8fee6827896f418baca9f" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.04; 0≈typical)<br>NO₂ z: 1.14 | PM₂.₅ z: 0.73 | CO z: -1.18<br><b>Likely driver:</b> Point sources / industry (high NO₂, low CO)<br><b>Seasonality:</b> worse in the monsoon than the dry season (monsoon 0.68, dry -0.80 in standardized units; Δ=+1.48)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.583296065214828-92.08629977509216' onclick='handleHotspotAISuggestions("24.583296065214828", "92.08629977509216")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.583296065214828-92.08629977509216' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_ebb364aacc4f30628f488769d1ecebe6.setContent(html_ba5f796022d8fee6827896f418baca9f);
+            
+        
+
+        circle_marker_d2ba899c30a59894baa8af6a5e77b62c.bindPopup(popup_ebb364aacc4f30628f488769d1ecebe6)
+        ;
+
+        
+    
+    
+            circle_marker_d2ba899c30a59894baa8af6a5e77b62c.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b7d98f301873d186ef6b6155cfc2ba41 = L.circleMarker(
+                [24.529397148167654, 92.21565717600537],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+        var popup_c9bcb9c76f58a586fc5770a1613781ef = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b2b6117ca09903fb9e069ed7ee5d5780 = $(`<div id="html_b2b6117ca09903fb9e069ed7ee5d5780" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.03; 0≈typical)<br>NO₂ z: 1.19 | PM₂.₅ z: -0.75 | CO z: 1.65<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> similar between seasons (monsoon 0.07, dry 0.13 in standardized units; Δ=-0.06)<br><div style='margin-top: 10px; text-align: center;'><button id='ai-btn-hotspot-24.529397148167654-92.21565717600537' onclick='handleHotspotAISuggestions("24.529397148167654", "92.21565717600537")' style='background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;'>View AI Suggestions</button><div id='ai-response-hotspot-24.529397148167654-92.21565717600537' style='margin-top: 10px; display: none;'></div></div><script>function handleHotspotAISuggestions(lat, lon) {const btn = document.getElementById('ai-btn-hotspot-' + lat + '-' + lon);const responseDiv = document.getElementById('ai-response-hotspot-' + lat + '-' + lon);const originalText = btn.innerHTML;btn.innerHTML = 'Loading...';btn.disabled = true;const popupContent = btn.closest('.leaflet-popup-content-wrapper').querySelector('.leaflet-popup-content').innerHTML;fetch('/llm-inference', {method: 'POST',headers: {'Content-Type': 'application/json',},body: JSON.stringify({prompt: popupContent,type: 'aq'})}).then(response => response.json()).then(data => {btn.innerHTML = 'Completed';btn.disabled = false;btn.style.background = '#28a745';responseDiv.innerHTML = '<h3 style="margin: 10px 0 5px 0; color: #333;">AI Suggestions</h3>' + data.response;responseDiv.style.display = 'block';}).catch(error => {btn.innerHTML = originalText;btn.disabled = false;console.error('Error:', error);});}</script></div>`)[0];
+                popup_c9bcb9c76f58a586fc5770a1613781ef.setContent(html_b2b6117ca09903fb9e069ed7ee5d5780);
+            
+        
+
+        circle_marker_b7d98f301873d186ef6b6155cfc2ba41.bindPopup(popup_c9bcb9c76f58a586fc5770a1613781ef)
+        ;
+
+        
+    
+    
+            circle_marker_b7d98f301873d186ef6b6155cfc2ba41.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var tile_layer_c6c7250dbd86d155a386c0a71d93954c = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_a5961ee8f5e383c0be3abff53bca041c = new L.Control.MiniMap(
+                tile_layer_c6c7250dbd86d155a386c0a71d93954c,
+                {
+  "position": "bottomright",
+  "width": 150,
+  "height": 150,
+  "collapsedWidth": 25,
+  "collapsedHeight": 25,
+  "zoomLevelOffset": -5,
+  "centerFixed": false,
+  "zoomAnimation": false,
+  "toggleDisplay": true,
+  "autoToggleDisplay": false,
+  "minimized": false,
+}
+            );
+            map_5b4a92c1e8a81faac5b6bbab3b8a23d5.addControl(mini_map_a5961ee8f5e383c0be3abff53bca041c);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+        
+    
+            var mouse_position_5c14521e195125b868e6fd1935aeeb7a = new L.Control.MousePosition(
+                {
+  "position": "topright",
+  "separator": " | ",
+  "emptyString": "Unavailable",
+  "lngFirst": false,
+  "numDigits": 5,
+  "prefix": "Lat/Lon:",
+}
+            );
+            mouse_position_5c14521e195125b868e6fd1935aeeb7a.options["latFormatter"] =
+                undefined;
+            mouse_position_5c14521e195125b868e6fd1935aeeb7a.options["lngFormatter"] =
+                undefined;
+            map_5b4a92c1e8a81faac5b6bbab3b8a23d5.addControl(mouse_position_5c14521e195125b868e6fd1935aeeb7a);
+        
+    
+            var measure_control_cb464ee866611ebd528feccd49fecd31 = new L.Control.Measure(
+                {
+  "position": "topright",
+  "primaryLengthUnit": "kilometers",
+  "secondaryLengthUnit": "miles",
+  "primaryAreaUnit": "sqmeters",
+  "secondaryAreaUnit": "acres",
+});
+            map_5b4a92c1e8a81faac5b6bbab3b8a23d5.addControl(measure_control_cb464ee866611ebd528feccd49fecd31);
+
+            // Workaround for using this plugin with Leaflet>=1.8.0
+            // https://github.com/ljagis/leaflet-measure/issues/171
+            L.Control.Measure.include({
+                _setCaptureMarkerIcon: function () {
+                    // disable autopan
+                    this._captureMarker.options.autoPanOnFocus = false;
+                    // default function
+                    this._captureMarker.setIcon(
+                        L.divIcon({
+                            iconSize: this._map.getSize().multiplyBy(2)
+                        })
+                    );
+                },
+            });
+
+        
+    
+            var layer_control_1558744a6bc3398a365df6ad505a9d2c_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_6b4c5fe6c4dd55c351a0a2726441de03,
+                },
+                overlays :  {
+                    "Top cluster #1 (cluster 0)" : geo_json_1f4c7cf5db52d574deb02f0220aff206,
+                    "Top cluster #2 (cluster 1)" : geo_json_e635b18a8d08357324221973f5d43412,
+                    "Top cluster #3 (cluster 2)" : geo_json_5a5afd10b4299f5a8ebb207799b5a613,
+                },
+            };
+            let layer_control_1558744a6bc3398a365df6ad505a9d2c = L.control.layers(
+                layer_control_1558744a6bc3398a365df6ad505a9d2c_layers.base_layers,
+                layer_control_1558744a6bc3398a365df6ad505a9d2c_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_5b4a92c1e8a81faac5b6bbab3b8a23d5);
+
+        
+</script>
+</html>

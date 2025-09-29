@@ -15,3 +15,6 @@ pydantic
 folium
 google-auth>=2.30.0
 python-dotenv
+groq
+markdown
+markdownify

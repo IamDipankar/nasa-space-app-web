@@ -1,5 +1,5 @@
-from . import geom_provider as gp
-from . import aq_hotspots, green_access_ndvi, uhi_hotspots
+from . import aq_hotspots, geom_provider as gp
+from . import green_access_ndvi, uhi_hotspots
 from folium import GeoJson
 from shapely.geometry import mapping
 from ee import Geometry

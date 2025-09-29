@@ -13,11 +13,24 @@ from datetime import datetime
 from typing import List, Dict, Optional
 import uuid
 from models.anlyzers import router
+from models.llms import groq_api
+import markdown
+from markdownify import markdownify as md
+from fastapi.middleware.cors import CORSMiddleware
 
 # Add models directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'models', 'anlyzers'))
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount static files
 app.mount("/statics", StaticFiles(directory="statics"), name="static")
@@ -33,6 +46,12 @@ class AnalysisRequest(BaseModel):
     district: str
     analyses: List[str]
     session_id: str
+
+class LLM_Inference_Request(BaseModel):
+    prompt: str
+    systemPrompt: str | None = None
+    type : str | None = None
+    markdown : bool = True
 
 class ConnectionManager:
     def __init__(self):
@@ -278,3 +297,28 @@ async def get_upazilas(district_name: str):
         return {"upazilas": upazilas}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching upazilas: {str(e)}")
+    
+@app.post('/llm-inference')
+async def llm_inference(request: LLM_Inference_Request):
+    prompt = md(request.prompt)
+    system_prompt = request.systemPrompt or groq_api.SYSTEM_PROMPT
+    if request.type:
+        if "green" in request.type.lower():
+            system_prompt = groq_api.SYSTEM_PROMPT_GREEN
+        if "uhi" in request.type.lower():
+            system_prompt = groq_api.SYSTEM_PROMPT_UHI
+        if "aq" in request.type.lower():
+            system_prompt = groq_api.SYSTEM_PROMPT_AQ
+
+    content, prompt_tokens, completion_tokens, total_tokens = groq_api.call_groq_with_system_and_user(system_prompt, prompt, groq_api.MODEL)
+    markdowned = False
+    if request.markdown:
+        try:
+            content = markdown.markdown(content, extensions=['extra', 'toc', 'tables'])
+            markdowned = True
+        except Exception as e:
+            print(f"Error converting to markdown: {e}")
+    return {
+        "response": content.replace('\n', ''),
+        "markdowned": markdowned
+    }

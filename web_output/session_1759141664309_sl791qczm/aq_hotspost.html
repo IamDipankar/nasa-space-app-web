@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_d6e0b74b3855ade53a279789c9c29cc5 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
+</head>
+<body>
+    
+    
+    <div style="position: fixed; bottom: 18px; left: 18px; z-index:9999; background: white;
+                padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+      <b>Top hotspot clusters (area-wise)</b><br>
+      <span style="display:inline-block;width:12px;height:12px;background:#d32f2f;border:1px solid #d32f2f;"></span>
+      Severe (≥ 2σ above city typical)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#fb8c00;border:1px solid #fb8c00;"></span>
+      High (1–2σ)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#ffd54f;border:1px solid #ffd54f;"></span>
+      Elevated (0.5–1σ)<br>
+      <span style="display:inline-block;width:12px;height:12px;background:#673ab7;border:1px solid #673ab7;"></span>
+      Cluster polygon(s)
+    </div>
+    
+    
+            <div class="folium-map" id="map_d6e0b74b3855ade53a279789c9c29cc5" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_d6e0b74b3855ade53a279789c9c29cc5 = L.map(
+                "map_d6e0b74b3855ade53a279789c9c29cc5",
+                {
+                    center: [23.62189404350005, 90.47211608950008],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+
+            
+
+        
+    
+            var tile_layer_2f5337e1bdf24092c7df88c4a4dca92c = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_2f5337e1bdf24092c7df88c4a4dca92c.addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+        function geo_json_87ebcc4b73b85fb6689282427ccc21d0_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#673ab7", "fillColor": "#673ab7", "fillOpacity": 0.1, "weight": 3};
+            }
+        }
+
+        function geo_json_87ebcc4b73b85fb6689282427ccc21d0_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_87ebcc4b73b85fb6689282427ccc21d0 = L.geoJson(null, {
+                onEachFeature: geo_json_87ebcc4b73b85fb6689282427ccc21d0_onEachFeature,
+            
+                style: geo_json_87ebcc4b73b85fb6689282427ccc21d0_styler,
+            ...{
+}
+        });
+
+        function geo_json_87ebcc4b73b85fb6689282427ccc21d0_add (data) {
+            geo_json_87ebcc4b73b85fb6689282427ccc21d0
+                .addData(data);
+        }
+            geo_json_87ebcc4b73b85fb6689282427ccc21d0_add({"features": [{"geometry": {"coordinates": [[[[90.48064149494216, 23.624821138901456], [90.48106408423877, 23.62581010015568], [90.48137943544596, 23.626832462878625], [90.48158450910239, 23.62787838161224], [90.48167732758836, 23.628937783802957], [90.48166763063385, 23.629444584915746], [90.48196833193784, 23.6289475394056], [90.48262603010416, 23.628074355237086], [90.48337344544544, 23.627264766652], [90.48420337975466, 23.62652656917037], [90.4851078406596, 23.625866870807215], [90.48607811858028, 23.62529202366565], [90.48659319876896, 23.625048990484235], [90.48586088944425, 23.625103479949328], [90.48470751325021, 23.625084776214162], [90.48356168315233, 23.624961992685183], [90.482434436723, 23.624736312345906], [90.48133663234329, 23.62440990934773], [90.4802788445392, 23.62398592804374], [90.48014288898578, 23.623923955397633], [90.48064149494216, 23.624821138901456]]], [[[90.48165711770633, 23.64078032853266], [90.48152380607227, 23.64183605558218], [90.48127880778749, 23.642874660421217], [90.48092447993547, 23.643886139990673], [90.4804642328151, 23.644860752275093], [90.4803104137508, 23.645114964511514], [90.48012770991713, 23.64545516327948], [90.48013195354686, 23.645463820989], [90.48064166051336, 23.64638086117406], [90.48106430285486, 23.647369825850607], [90.4813796889716, 23.64839219041326], [90.48158477906325, 23.64943810938688], [90.48167759534874, 23.650497510216077], [90.48167043154614, 23.65087153619729], [90.48188509541187, 23.65051677840865], [90.48254291641504, 23.649643606018255], [90.48329046821769, 23.648834030346094], [90.48412055129819, 23.6480958467866], [90.48502517185177, 23.647436163219425], [90.4859956187618, 23.646861331603997], [90.48702254745898, 23.64637688685093], [90.48809606986214, 23.64598749355743], [90.48920584953663, 23.645696901118043], [90.49034120115638, 23.645507907641917], [90.49079533283154, 23.645453346180172], [90.4906230906814, 23.64542695136128], [90.49001434755468, 23.645361747149263], [90.48888691390044, 23.64513609850674], [90.48778892361145, 23.64480972617704], [90.48673095300698, 23.64438577421804], [90.48572319260313, 23.643868326585284], [90.4847753489077, 23.643262367760272], [90.48389655089426, 23.6425737347018], [90.48309526205743, 23.64180906058504], [90.48237919889765, 23.64097571087181], [90.48175525662047, 23.640081712329838], [90.48167331428361, 23.63993428378671], [90.48165711770633, 23.64078032853266]]]], "type": "MultiPolygon"}, "id": "0", "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+            geo_json_87ebcc4b73b85fb6689282427ccc21d0.bindTooltip(
+                `<div>
+                     Top cluster #1 (cluster 0)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+        var popup_f77c16c49a2497d6bf501ddb50734314 = L.popup({
+  "maxWidth": 700,
+  "maxHeight": 500,
+});
+
+        
+            
+                var i_frame_85289578e724518d7f5736a0dc8be2ec = $(`<iframe src="data:text/html;charset=utf-8;base64,CiAgICAKICAgICAgICAgICAgPGRpdiBzdHlsZT0ibWFyZ2luLWJvdHRvbTogMC41ZW07Ij4KICAgICAgICAgICAgPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6IzAwN2JmZjtjb2xvcjp3aGl0ZTtwYWRkaW5nOjNweCA3cHg7Ym9yZGVyLXJhZGl1czo1cHg7bWFyZ2luLXJpZ2h0OjVweDsiPgogICAgICAgICAgICAgICAgQ2x1c3RlciBJRDogMAogICAgICAgICAgICA8L3NwYW4+CiAgICAgICAgICAgIDxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kOiMyOGE3NDU7Y29sb3I6d2hpdGU7cGFkZGluZzozcHggN3B4O2JvcmRlci1yYWRpdXM6NXB4OyI+CiAgICAgICAgICAgICAgICBSYW5rOiAxCiAgICAgICAgICAgIDwvc3Bhbj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDxoMyBpZD0idG9wLWNsdXN0ZXItMS1jbHVzdGVyLTAiPlRvcCBjbHVzdGVyICMxIChjbHVzdGVyIDApPC9oMz4KPHVsPgo8bGk+PHN0cm9uZz5BcmVhOjwvc3Ryb25nPiB+MC41NSBrbcKyPC9saT4KPGxpPjxzdHJvbmc+UGVvcGxlIGxpdmluZyBpbnNpZGU6PC9zdHJvbmc+IG4vYTwvbGk+CjxsaT48c3Ryb25nPkN1cnJlbnQgbGV2ZWw6PC9zdHJvbmc+IFZlcnkgaGlnaCAod2VsbCBhYm92ZSB0eXBpY2FsKSAoeuKJiDIuMTQ7IDDiiYh0eXBpY2FsKTwvbGk+CjxsaT48c3Ryb25nPlNlYXNvbmFsaXR5Ojwvc3Ryb25nPiB3b3JzZSBpbiB0aGUgZHJ5IHNlYXNvbiB0aGFuIHRoZSBtb25zb29uIChtb25zb29uIDAuMjgsIGRyeSAxLjM1IGluIHN0YW5kYXJkaXplZCB1bml0czsgzpQ9LTEuMDYpPC9saT4KPGxpPjxzdHJvbmc+U2Vuc2l0aXZlIHNpdGVzIGluc2lkZTo8L3N0cm9uZz4gc2Nob29sczowLCBjbGluaWNzOjAsIGhvc3BpdGFsczowLCBlbGRlciBob21lczowPC9saT4KPGxpPjxzdHJvbmc+SW5kdXN0cmlhbC9wb3J0L3BvaW50LXNvdXJjZSBmZWF0dXJlcyBpbnNpZGU6PC9zdHJvbmc+IDA8L2xpPgo8L3VsPg==" width="300" style="border:none !important;" height="500"></iframe>`)[0];
+                popup_f77c16c49a2497d6bf501ddb50734314.setContent(i_frame_85289578e724518d7f5736a0dc8be2ec);
+            
+        
+
+        geo_json_87ebcc4b73b85fb6689282427ccc21d0.bindPopup(popup_f77c16c49a2497d6bf501ddb50734314)
+        ;
+
+        
+    
+    
+            geo_json_87ebcc4b73b85fb6689282427ccc21d0.addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+            var circle_marker_8d9cb6d193b8b1ffabd1f43af804eac7 = L.circleMarker(
+                [23.645454908594047, 90.48011204708645],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+        var popup_ef2a5d697ac2cf7621c40fde2e21f654 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1e849377aa81cfaf00c09a4dae89b545 = $(`<div id="html_1e849377aa81cfaf00c09a4dae89b545" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>Current level: Very high (well above typical) (z≈2.64; 0≈typical)<br>NO₂ z: 1.87 | PM₂.₅ z: 1.90 | CO z: 1.05<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon 0.10, dry 1.54 in standardized units; Δ=-1.44)</div>`)[0];
+                popup_ef2a5d697ac2cf7621c40fde2e21f654.setContent(html_1e849377aa81cfaf00c09a4dae89b545);
+            
+        
+
+        circle_marker_8d9cb6d193b8b1ffabd1f43af804eac7.bindPopup(popup_ef2a5d697ac2cf7621c40fde2e21f654)
+        ;
+
+        
+    
+    
+            circle_marker_8d9cb6d193b8b1ffabd1f43af804eac7.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5ddeb72602a115f7eff42bbf72d66d79 = L.circleMarker(
+                [23.65623469200348, 90.48011204708645],
+                {"bubblingMouseEvents": true, "color": "#d32f2f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d32f2f", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+        var popup_c651ebc232fe55819ab88c5f9b5945aa = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3ee4171013c4cc3b0e0b25052cc065ed = $(`<div id="html_3ee4171013c4cc3b0e0b25052cc065ed" style="width: 100.0%; height: 100.0%;"><b>SEVERE hotspot</b><br>Current level: Very high (well above typical) (z≈2.62; 0≈typical)<br>NO₂ z: 1.73 | PM₂.₅ z: 2.25 | CO z: 0.56<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon -0.27, dry 2.01 in standardized units; Δ=-2.28)</div>`)[0];
+                popup_c651ebc232fe55819ab88c5f9b5945aa.setContent(html_3ee4171013c4cc3b0e0b25052cc065ed);
+            
+        
+
+        circle_marker_5ddeb72602a115f7eff42bbf72d66d79.bindPopup(popup_c651ebc232fe55819ab88c5f9b5945aa)
+        ;
+
+        
+    
+    
+            circle_marker_5ddeb72602a115f7eff42bbf72d66d79.bindTooltip(
+                `<div>
+                     SEVERE hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3a39ad6dd2cdb32a7e126c154501655c = L.circleMarker(
+                [23.623895341775178, 90.48011204708645],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+        var popup_9cda0173c4626494c8fe9c3974b9dbef = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_404b61ff398c6ca5a24931154ba15968 = $(`<div id="html_404b61ff398c6ca5a24931154ba15968" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.37; 0≈typical)<br>NO₂ z: 0.63 | PM₂.₅ z: 0.93 | CO z: 1.32<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the monsoon than the dry season (monsoon 1.23, dry 0.74 in standardized units; Δ=+0.49)</div>`)[0];
+                popup_9cda0173c4626494c8fe9c3974b9dbef.setContent(html_404b61ff398c6ca5a24931154ba15968);
+            
+        
+
+        circle_marker_3a39ad6dd2cdb32a7e126c154501655c.bindPopup(popup_9cda0173c4626494c8fe9c3974b9dbef)
+        ;
+
+        
+    
+    
+            circle_marker_3a39ad6dd2cdb32a7e126c154501655c.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0b6d1c44e5dda9bade95a8067fd18a89 = L.circleMarker(
+                [23.623895341775178, 90.49089183049588],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+        var popup_229ac65e76844d4abfd034009b29a0e8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_65e1c04777243767241939df83e46315 = $(`<div id="html_65e1c04777243767241939df83e46315" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.24; 0≈typical)<br>NO₂ z: 0.63 | PM₂.₅ z: 1.10 | CO z: 0.58<br><b>Likely driver:</b> Mixed drivers<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon 0.59, dry 1.69 in standardized units; Δ=-1.10)</div>`)[0];
+                popup_229ac65e76844d4abfd034009b29a0e8.setContent(html_65e1c04777243767241939df83e46315);
+            
+        
+
+        circle_marker_0b6d1c44e5dda9bade95a8067fd18a89.bindPopup(popup_229ac65e76844d4abfd034009b29a0e8)
+        ;
+
+        
+    
+    
+            circle_marker_0b6d1c44e5dda9bade95a8067fd18a89.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6f05a3b54c7e04da31a3655d5fd488f7 = L.circleMarker(
+                [23.645454908594047, 90.49089183049588],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+        var popup_c4b62374c1c0435294ec6c7ed2520ff9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_86613a310684856eb2f4407cfa1618bc = $(`<div id="html_86613a310684856eb2f4407cfa1618bc" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.21; 0≈typical)<br>NO₂ z: 1.58 | PM₂.₅ z: 0.17 | CO z: 0.44<br><b>Likely driver:</b> Point sources / industry (high NO₂, low CO)<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon -0.45, dry 1.41 in standardized units; Δ=-1.86)</div>`)[0];
+                popup_c4b62374c1c0435294ec6c7ed2520ff9.setContent(html_86613a310684856eb2f4407cfa1618bc);
+            
+        
+
+        circle_marker_6f05a3b54c7e04da31a3655d5fd488f7.bindPopup(popup_c4b62374c1c0435294ec6c7ed2520ff9)
+        ;
+
+        
+    
+    
+            circle_marker_6f05a3b54c7e04da31a3655d5fd488f7.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bbf2820da9c6bf320b50a2c6a0d9e851 = L.circleMarker(
+                [23.63467512518461, 90.48011204708645],
+                {"bubblingMouseEvents": true, "color": "#fb8c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb8c00", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+        var popup_698acc2ac9157789b53cc899eeb788d8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_87fac7b27dbdee1d5bcd045c6dc91e12 = $(`<div id="html_87fac7b27dbdee1d5bcd045c6dc91e12" style="width: 100.0%; height: 100.0%;"><b>HIGH hotspot</b><br>Current level: High (above typical) (z≈1.08; 0≈typical)<br>NO₂ z: 1.52 | PM₂.₅ z: -0.70 | CO z: 1.87<br><b>Likely driver:</b> Traffic / combustion (high NO₂ + CO)<br><b>Seasonality:</b> worse in the dry season than the monsoon (monsoon -0.32, dry 1.00 in standardized units; Δ=-1.32)</div>`)[0];
+                popup_698acc2ac9157789b53cc899eeb788d8.setContent(html_87fac7b27dbdee1d5bcd045c6dc91e12);
+            
+        
+
+        circle_marker_bbf2820da9c6bf320b50a2c6a0d9e851.bindPopup(popup_698acc2ac9157789b53cc899eeb788d8)
+        ;
+
+        
+    
+    
+            circle_marker_bbf2820da9c6bf320b50a2c6a0d9e851.bindTooltip(
+                `<div>
+                     HIGH hotspot
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var tile_layer_872c228424974fac0e73de4846abf3ed = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_8fad3ea465fb99e1859e839c19946ec1 = new L.Control.MiniMap(
+                tile_layer_872c228424974fac0e73de4846abf3ed,
+                {
+  "position": "bottomright",
+  "width": 150,
+  "height": 150,
+  "collapsedWidth": 25,
+  "collapsedHeight": 25,
+  "zoomLevelOffset": -5,
+  "centerFixed": false,
+  "zoomAnimation": false,
+  "toggleDisplay": true,
+  "autoToggleDisplay": false,
+  "minimized": false,
+}
+            );
+            map_d6e0b74b3855ade53a279789c9c29cc5.addControl(mini_map_8fad3ea465fb99e1859e839c19946ec1);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+        
+    
+            var mouse_position_e6d1c744a4fac4551af40263476c0291 = new L.Control.MousePosition(
+                {
+  "position": "topright",
+  "separator": " | ",
+  "emptyString": "Unavailable",
+  "lngFirst": false,
+  "numDigits": 5,
+  "prefix": "Lat/Lon:",
+}
+            );
+            mouse_position_e6d1c744a4fac4551af40263476c0291.options["latFormatter"] =
+                undefined;
+            mouse_position_e6d1c744a4fac4551af40263476c0291.options["lngFormatter"] =
+                undefined;
+            map_d6e0b74b3855ade53a279789c9c29cc5.addControl(mouse_position_e6d1c744a4fac4551af40263476c0291);
+        
+    
+            var measure_control_f8a205cb0f4e77ba6ca8c5916bfb27e5 = new L.Control.Measure(
+                {
+  "position": "topright",
+  "primaryLengthUnit": "kilometers",
+  "secondaryLengthUnit": "miles",
+  "primaryAreaUnit": "sqmeters",
+  "secondaryAreaUnit": "acres",
+});
+            map_d6e0b74b3855ade53a279789c9c29cc5.addControl(measure_control_f8a205cb0f4e77ba6ca8c5916bfb27e5);
+
+            // Workaround for using this plugin with Leaflet>=1.8.0
+            // https://github.com/ljagis/leaflet-measure/issues/171
+            L.Control.Measure.include({
+                _setCaptureMarkerIcon: function () {
+                    // disable autopan
+                    this._captureMarker.options.autoPanOnFocus = false;
+                    // default function
+                    this._captureMarker.setIcon(
+                        L.divIcon({
+                            iconSize: this._map.getSize().multiplyBy(2)
+                        })
+                    );
+                },
+            });
+
+        
+    
+            var layer_control_74cf3f322bd7cbfa65e4ee007cb2f972_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_2f5337e1bdf24092c7df88c4a4dca92c,
+                },
+                overlays :  {
+                    "Top cluster #1 (cluster 0)" : geo_json_87ebcc4b73b85fb6689282427ccc21d0,
+                },
+            };
+            let layer_control_74cf3f322bd7cbfa65e4ee007cb2f972 = L.control.layers(
+                layer_control_74cf3f322bd7cbfa65e4ee007cb2f972_layers.base_layers,
+                layer_control_74cf3f322bd7cbfa65e4ee007cb2f972_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_d6e0b74b3855ade53a279789c9c29cc5);
+
+        
+</script>
+</html>
