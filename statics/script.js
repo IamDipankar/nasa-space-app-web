@@ -471,14 +471,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add some nice interactions
-    locationInput.addEventListener('focus', function() {
-        this.parentElement.style.transform = 'translateY(-2px)';
-    });
+    // // Add some nice interactions
+    // locationInput.addEventListener('focus', function() {
+    //     this.parentElement.style.transform = 'translateY(-2px)';
+    // });
     
-    locationInput.addEventListener('blur', function() {
-        this.parentElement.style.transform = 'translateY(0)';
-    });
+    // locationInput.addEventListener('blur', function() {
+    //     this.parentElement.style.transform = 'translateY(0)';
+    // });
     
     // Add keyboard shortcuts
     document.addEventListener('keydown', function(e) {
