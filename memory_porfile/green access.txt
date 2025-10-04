@@ -1,0 +1,515 @@
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+   562    242.0 MiB    242.0 MiB           1   @profile
+   563                                         def run(session_id = None, gdf = None):
+   564    242.1 MiB      0.1 MiB           1       ee_init_headless()
+   565
+   566                                             # Soil sources & images
+   567    242.1 MiB      0.0 MiB           1       soil_imgs = soil_sources_images() if DO_SOIL else []
+   568    242.1 MiB      0.0 MiB           1       dem_img, slope_img = dem_and_slope() if DO_HAND else (None, None)
+   569
+   570                                             # OSMnx
+   571    242.1 MiB      0.0 MiB           1       ox.settings.log_console = True
+   572    242.1 MiB      0.0 MiB           1       ox.settings.use_cache = True
+   573    242.1 MiB      0.0 MiB           1       ox.settings.timeout = 180
+   574
+   575    242.1 MiB      0.0 MiB           1       print("Geocoding AOI…")
+   576    242.1 MiB      0.0 MiB           1       aoi = gdf
+   577    242.1 MiB      0.0 MiB           1       if aoi.empty:
+   578                                                 raise SystemExit("Could not geocode the AOI name.")
+   579    242.1 MiB      0.0 MiB           1       aoi_polygon = aoi.geometry.iloc[0]
+   580    242.1 MiB      0.0 MiB           1       aoi_bounds = aoi.to_crs(epsg=4326).total_bounds
+   581    242.1 MiB      0.0 MiB           1       gee_aoi = ee.Geometry.Rectangle(list(aoi_bounds))
+   582
+   583    242.1 MiB      0.0 MiB           1       print("Downloading pedestrian network…")
+   584   1101.9 MiB    859.8 MiB           1       G = ox.graph_from_polygon(aoi_polygon, network_type="walk", simplify=True)
+   585
+   586   1102.0 MiB      0.0 MiB           1       print("Projecting graph to local metric CRS…")
+   587   1034.6 MiB    -67.3 MiB           1       Gp = ox.project_graph(G)
+   588    839.0 MiB   -195.6 MiB           1       nodes_gdf, edges_gdf = ox.graph_to_gdfs(Gp)
+   589    839.0 MiB      0.0 MiB           1       if "u" not in edges_gdf.columns or "v" not in edges_gdf.columns:
+   590    837.4 MiB     -1.6 MiB           1           edges_gdf = edges_gdf.reset_index()
+   591    837.4 MiB      0.0 MiB           1       graph_crs = nodes_gdf.crs
+   592
+   593                                             # OSM green areas
+   594    837.4 MiB      0.0 MiB           1       print("Downloading OSM green areas…")
+   595    837.4 MiB      0.0 MiB           1       green_layers = []
+   596    853.7 MiB      0.0 MiB           4       for k, v in GREEN_TAGS.items():
+   597    853.1 MiB      0.0 MiB           3           try:
+   598    853.7 MiB     18.9 MiB           3               g = osm_features_from_polygon(aoi_polygon, tags={k: v})
+   599    853.7 MiB      0.0 MiB           2               if g is not None and not g.empty:
+   600    853.7 MiB      0.0 MiB           2                   green_layers.append(g)
+   601    851.4 MiB      0.0 MiB           1           except Exception:
+   602    848.8 MiB     -2.6 MiB           1               pass
+   603    853.7 MiB      0.0 MiB           1       osm_greens = None
+   604    853.7 MiB      0.0 MiB           1       if green_layers:
+   605    853.7 MiB      0.0 MiB           1           base_crs = getattr(green_layers[0], "crs", None) or "EPSG:4326"
+   606    853.8 MiB      0.0 MiB           1           osm_greens = gpd.GeoDataFrame(gpd.pd.concat(green_layers, ignore_index=True), crs=base_crs)
+   607    853.8 MiB      0.0 MiB           1           osm_greens = osm_greens[osm_greens.geometry.type.isin(["Polygon", "MultiPolygon"])].copy()
+   608
+   609                                             # NDVI greens
+   610    853.8 MiB      0.0 MiB           1       print("Vectorizing NDVI green polygons (GEE)…")
+   611    855.8 MiB      2.0 MiB           1       ndvi_greens = gee_green_polygons(gee_aoi, ndvi_min=NDVI_GREEN_MIN, scale=30, max_features=700)
+   612
+   613    855.8 MiB      0.0 MiB           1       greens_list = []
+   614    855.8 MiB      0.0 MiB           1       if osm_greens is not None and not osm_greens.empty:
+   615    855.8 MiB      0.0 MiB           1           greens_list.append(osm_greens.to_crs(epsg=4326))
+   616    855.8 MiB      0.0 MiB           1       if ndvi_greens is not None and not ndvi_greens.empty:
+   617    855.8 MiB      0.0 MiB           1           greens_list.append(ndvi_greens.to_crs(epsg=4326))
+   618    855.8 MiB      0.0 MiB           1       if not greens_list:
+   619                                                 raise SystemExit("No green polygons found from OSM or NDVI.")
+   620
+   621    856.0 MiB      0.2 MiB           1       greens_all = gpd.GeoDataFrame(gpd.pd.concat(greens_list, ignore_index=True), crs="EPSG:4326")
+   622    856.0 MiB      0.0 MiB           1       print(f"Green polygons: OSM={0 if osm_greens is None else len(osm_greens)} | NDVI={len(ndvi_greens)} | merged={len(greens_all)}")
+   623
+   624                                             # Project greens
+   625    856.0 MiB      0.0 MiB           1       greens_poly_proj = greens_all.to_crs(graph_crs)
+   626
+   627                                             # Destination nodes from green centroids
+   628    856.0 MiB      0.0 MiB           1       print("Computing destination nodes from green centroids…")
+   629    856.0 MiB      0.0 MiB           1       greens_poly_proj["centroid"] = greens_poly_proj.geometry.centroid
+   630    856.0 MiB      0.0 MiB           1       dest_nodes = set()
+   631    859.9 MiB -439767.3 MiB        1182       for c in greens_poly_proj["centroid"]:
+   632    859.9 MiB -439334.9 MiB        1181           try:
+   633    859.9 MiB -439763.4 MiB        1181               dest_nodes.add(ox.distance.nearest_nodes(Gp, X=c.x, Y=c.y))
+   634                                                 except Exception:
+   635                                                     pass
+   636    427.5 MiB   -432.4 MiB           1       if not dest_nodes:
+   637                                                 raise SystemExit("No destination nodes from green centroids.")
+   638
+   639                                             # Edge costs
+   640    427.5 MiB      0.0 MiB           1       print("Assigning time costs to edges…")
+   641    441.1 MiB -54242.7 MiB      157007       for u, v, k, data in Gp.edges(keys=True, data=True):
+   642    441.1 MiB -54235.4 MiB      157006           length_m = float(data.get("length", 0.0)) or 0.0
+   643    441.1 MiB -54236.6 MiB      157006           data["time_s"] = length_m / WALK_MPS
+   644
+   645                                             # Multi-source Dijkstra (reverse trick)
+   646    441.1 MiB      0.0 MiB           1       print("Running multi-source shortest path (Dijkstra)…")
+   647    606.6 MiB    165.5 MiB           1       Gr = Gp.reverse()
+   648    611.2 MiB      4.7 MiB           1       min_time_s = nx.multi_source_dijkstra_path_length(Gr, sources=list(dest_nodes), weight="time_s")
+   649
+   650    676.7 MiB -70678.5 MiB      314013       def covered_by_threshold(u, v, threshold_s):
+   651    676.7 MiB -298596.3 MiB      314012           tu = min_time_s.get(u, math.inf); tv = min_time_s.get(v, math.inf)
+   652    676.7 MiB -298601.1 MiB      314012           return (tu <= threshold_s) or (tv <= threshold_s)
+   653
+   654    677.3 MiB      0.0 MiB      157007       def both_beyond_10(u, v):
+   655    677.3 MiB      0.0 MiB      157006           return (min_time_s.get(u, math.inf) > T10) and (min_time_s.get(v, math.inf) > T10)
+   656
+   657    611.2 MiB      0.0 MiB           1       print("Classifying edges by coverage…")
+   658    676.7 MiB     33.0 MiB      314013       edges_gdf["covered_5min"] = edges_gdf.apply(lambda r: covered_by_threshold(r["u"], r["v"], T5), axis=1)
+   659    676.1 MiB -369307.2 MiB      314013       edges_gdf["covered_10min"] = edges_gdf.apply(lambda r: covered_by_threshold(r["u"], r["v"], T10), axis=1)
+   660    677.3 MiB    -28.9 MiB      314013       edges_gdf["uncovered_10min"] = edges_gdf.apply(lambda r: both_beyond_10(r["u"], r["v"]), axis=1)
+   661    671.3 MiB     -6.0 MiB           1       uncovered = edges_gdf[edges_gdf["uncovered_10min"]].copy()
+   662    671.3 MiB      0.0 MiB           1       print(f"Uncovered road segments >10 min: {len(uncovered)}")
+   663
+   664                                             # Isochrones (for display)
+   665    671.3 MiB      0.0 MiB           1       print("Building isochrone polygons…")
+   666    673.3 MiB      2.1 MiB           1       iso5_edges = edges_gdf[edges_gdf["covered_5min"]]
+   667    677.6 MiB      4.2 MiB           1       iso10_edges = edges_gdf[edges_gdf["covered_10min"]]
+   668    706.7 MiB     29.2 MiB           1       iso5_poly = make_iso_polygon(iso5_edges, buffer_m=EDGE_BUFFER_M)
+   669    721.9 MiB     15.2 MiB           1       iso10_poly = make_iso_polygon(iso10_edges, buffer_m=EDGE_BUFFER_M)
+   670
+   671                                             # Candidates: midpoints of longest uncovered segments (dedup)
+   672    721.9 MiB      0.0 MiB           1       print("Selecting candidate micro-park points…")
+   673    728.5 MiB      6.6 MiB           1       uncovered["length_m"] = uncovered.geometry.length
+   674    733.5 MiB      5.0 MiB           1       candidates = uncovered.sort_values("length_m", ascending=False).head(3 * TOP_N_CANDIDATES).copy()
+   675    733.6 MiB      0.0 MiB           1       candidates["midpt"] = candidates.geometry.apply(line_midpoint)
+   676    733.6 MiB      0.1 MiB           1       cand_proj = gpd.GeoDataFrame(geometry=candidates["midpt"], crs=edges_gdf.crs)
+   677    736.3 MiB      2.7 MiB           1       cand_wgs84 = cand_proj.to_crs(epsg=4326)  # <-- FIX: transform the GeoDataFrame (not Points)
+   678    736.3 MiB      0.0 MiB         121       cand_wgs84["xy_round"] = cand_wgs84.geometry.apply(lambda g: (round(g.x, 6), round(g.y, 6)))
+   679    736.4 MiB      0.1 MiB           1       cand_wgs84 = cand_wgs84.drop_duplicates(subset="xy_round").head(TOP_N_CANDIDATES).copy()
+   680    736.5 MiB      0.1 MiB           1       cand_proj = cand_wgs84.to_crs(edges_gdf.crs)[["geometry"]].copy()  # keep projected too
+   681
+   682                                             # OSM context
+   683    736.5 MiB      0.0 MiB           1       print("Downloading OSM context layers…")
+   684    855.4 MiB    119.0 MiB           1       pois_wgs84, water_wgs84, buildings_wgs84 = fetch_osm_context(aoi_polygon)
+   685    886.0 MiB     30.6 MiB           1       pois_proj = pois_wgs84.to_crs(graph_crs) if not pois_wgs84.empty else pois_wgs84
+   686    906.8 MiB     20.7 MiB           1       water_proj = water_wgs84.to_crs(graph_crs) if not water_wgs84.empty else water_wgs84
+   687    910.3 MiB      3.5 MiB           1       buildings_proj = buildings_wgs84.to_crs(graph_crs) if not buildings_wgs84.empty else buildings_wgs84
+   688    945.2 MiB     34.9 MiB           1       water_union = unary_union(list(water_proj.geometry.values)) if (water_proj is not None and not water_proj.empty) else None
+   689
+   690                                             # Assemble candidate basics
+   691    945.2 MiB      0.0 MiB           1       ids = list(range(1, len(cand_proj) + 1))
+   692                                             # Use the already-transformed WGS84 points for lon/lat lists  <-- FIXED
+   693    945.2 MiB      0.0 MiB          23       lonlats = [(pt.x, pt.y) for pt in cand_wgs84.geometry]
+   694    948.5 MiB      3.3 MiB          23       nearest_nodes = [ox.distance.nearest_nodes(Gp, X=geom.x, Y=geom.y) for geom in cand_proj.geometry]
+   695
+   696                                             # Build 10-min isochrone polygons once (local; 20 sites → OK)
+   697    948.5 MiB      0.0 MiB           1       iso_polys = []
+   698    949.1 MiB  -3506.6 MiB          21       for nid in nearest_nodes:
+   699    949.1 MiB  -3507.9 MiB          20           edges_iso, _times = edges_within_time(Gp, edges_gdf, nid, T10)
+   700    949.1 MiB  -3506.3 MiB          20           iso_polys.append(make_iso_polygon(edges_iso, buffer_m=EDGE_BUFFER_M).iloc[0] if (edges_iso is not None and not edges_iso.empty) else None)
+   701
+   702                                             # ----------------------------
+   703                                             # BATCHED EE CALLS
+   704                                             # ----------------------------
+   705    756.7 MiB   -192.4 MiB           1       print("\nComputing batched metrics (EE)…")
+   706
+   707                                             # Population (sum over isochrone polygons)
+   708    756.7 MiB      0.0 MiB           1       pop_results = {}
+   709    756.7 MiB      0.0 MiB           1       if DO_POP:
+   710    759.8 MiB      3.1 MiB           1           pop_img = population_image(gee_aoi)
+   711    759.8 MiB      0.0 MiB           1           if pop_img is not None:
+   712                                                     fc_iso = fc_from_polys(ids, iso_polys)
+   713                                                     pop_results = reduce_regions_to_dict(
+   714                                                         image=pop_img, fc=fc_iso, reducer=ee.Reducer.sum(), scale=POP_SCALE
+   715                                                     )
+   716                                                 else:
+   717    759.8 MiB      0.0 MiB           1               print("Population raster not available; walkshed population will be 'n/a'.")
+   718
+   719                                             # JRC water (mean and max in 150 m) — do as two simple batched calls (robust)
+   720    759.8 MiB      0.0 MiB           1       jrc_mean_results = {}
+   721    759.8 MiB      0.0 MiB           1       jrc_max_results = {}
+   722    759.8 MiB      0.0 MiB           1       occ = jrc_occurrence_img()
+   723    759.8 MiB      0.0 MiB           1       if occ is not None:
+   724    759.8 MiB      0.0 MiB           1           fc_water = fc_from_buffers(ids, lonlats, WATER_STATS_RADIUS_M)
+   725    759.9 MiB      0.1 MiB           2           jrc_mean_results = reduce_regions_to_dict(
+   726    759.8 MiB      0.0 MiB           1               image=occ, fc=fc_water, reducer=ee.Reducer.mean(), scale=JRC_SCALE
+   727                                                 )
+   728    759.9 MiB      0.0 MiB           2           jrc_max_results = reduce_regions_to_dict(
+   729    759.9 MiB      0.0 MiB           1               image=occ, fc=fc_water, reducer=ee.Reducer.max(), scale=JRC_SCALE
+   730                                                 )
+   731
+   732                                             # Soil (buffered mean 150 m) with fallbacks (run per source, but batched)
+   733    759.9 MiB      0.0 MiB           1       soil_results = {}
+   734    759.9 MiB      0.0 MiB           1       if DO_SOIL and soil_imgs:
+   735    759.9 MiB      0.0 MiB           1           fc_soil = fc_from_buffers(ids, lonlats, 150)
+   736    760.0 MiB      0.0 MiB           2           for label, img in soil_imgs:
+   737    760.0 MiB      0.0 MiB           2               tmp = reduce_regions_to_dict(
+   738    759.9 MiB      0.0 MiB           1                   image=img, fc=fc_soil, reducer=ee.Reducer.mean(), scale=SOIL_SCALE
+   739                                                     )
+   740    760.0 MiB      0.0 MiB          21               for cid in ids:
+   741    760.0 MiB      0.0 MiB          20                   if cid in tmp and cid not in soil_results:
+   742                                                             # store label + properties dict
+   743                                                             soil_results[cid] = (label, tmp[cid])
+   744    760.0 MiB      0.0 MiB          21       for cid in ids:
+   745    760.0 MiB      0.0 MiB          20           if cid not in soil_results:
+   746    760.0 MiB      0.0 MiB          20               soil_results[cid] = (None, {})
+   747
+   748                                             # DEM low-lying proxy & slope (batched)
+   749    760.0 MiB      0.0 MiB           1       hand_results = {}
+   750    760.0 MiB      0.0 MiB           1       slope_results = {}
+   751    760.0 MiB      0.0 MiB           1       if DO_HAND and dem_img is not None and slope_img is not None:
+   752    760.0 MiB      0.0 MiB           1           kernel = ee.Kernel.circle(HAND_RADIUS_M, 'meters')
+   753    760.0 MiB      0.0 MiB           1           try:
+   754    760.0 MiB      0.0 MiB           1               p5 = dem_img.reduceNeighborhood(ee.Reducer.percentile([5]), kernel)
+   755    760.0 MiB      0.0 MiB           1               hand_img = dem_img.subtract(p5).rename("hand_proxy")
+   756    760.0 MiB      0.0 MiB           1               fc_hand = fc_from_buffers(ids, lonlats, 30)   # small buffer
+   757    760.0 MiB      0.0 MiB           1               fc_slope = fc_from_buffers(ids, lonlats, 60)  # slope a bit larger
+   758    760.0 MiB      0.0 MiB           2               hand_results = reduce_regions_to_dict(
+   759    760.0 MiB      0.0 MiB           1                   image=hand_img, fc=fc_hand, reducer=ee.Reducer.mean(), scale=DEM_SCALE
+   760                                                     )
+   761    760.0 MiB      0.0 MiB           2               slope_results = reduce_regions_to_dict(
+   762    760.0 MiB      0.0 MiB           1                   image=slope_img, fc=fc_slope, reducer=ee.Reducer.mean(), scale=DEM_SCALE
+   763                                                     )
+   764                                                 except Exception:
+   765                                                     pass
+   766
+   767                                             # Heat (batched)
+   768    760.0 MiB      0.0 MiB           1       heat_modis = {}
+   769    760.0 MiB      0.0 MiB           1       heat_eco = {}
+   770    760.0 MiB      0.0 MiB           1       if DO_HEAT:
+   771    760.0 MiB      0.0 MiB           1           modis_img, eco_img = heat_images(gee_aoi)
+   772    760.0 MiB      0.0 MiB           1           fc_heat = fc_from_buffers(ids, lonlats, 300)
+   773    760.0 MiB      0.0 MiB           1           if modis_img is not None:
+   774    760.0 MiB      0.0 MiB           2               heat_modis = reduce_regions_to_dict(
+   775    760.0 MiB      0.0 MiB           1                   image=modis_img, fc=fc_heat, reducer=ee.Reducer.mean(), scale=MODIS_SCALE
+   776                                                     )
+   777    760.0 MiB      0.0 MiB           1           if eco_img is not None:
+   778                                                     heat_eco = reduce_regions_to_dict(
+   779                                                         image=eco_img, fc=fc_heat, reducer=ee.Reducer.mean(), scale=ECOS_SCALE
+   780                                                     )
+   781
+   782                                             # SMAP (batched)
+   783    760.0 MiB      0.0 MiB           1       smap_results = {}
+   784    760.0 MiB      0.0 MiB           1       if DO_SMAP:
+   785    760.0 MiB      0.0 MiB           1           smap_img = smap_image(gee_aoi)
+   786    760.0 MiB      0.0 MiB           1           if smap_img is not None:
+   787                                                     fc_smap = fc_from_buffers(ids, lonlats, 800)  # trimmed buffer
+   788                                                     smap_results = reduce_regions_to_dict(
+   789                                                         image=smap_img, fc=fc_smap, reducer=ee.Reducer.mean(), scale=SMAP_SCALE
+   790                                                     )
+   791
+   792                                             # ----------------------------
+   793                                             # Local OSM-derived metrics (fast w/ sindex)
+   794                                             # ----------------------------
+   795    760.0 MiB      0.0 MiB           1       print("Computing local OSM metrics…")
+   796    760.0 MiB      0.0 MiB           1       all_counts = []
+   797    760.0 MiB      0.0 MiB           1       all_build_road = []
+   798    821.6 MiB      0.0 MiB          21       for cid, proj_geom in zip(ids, cand_proj.geometry):
+   799    821.6 MiB      0.0 MiB          20           radius_used = SITE_BUFFER_M
+   800    821.6 MiB      0.0 MiB          20           buf = proj_geom.buffer(radius_used)
+   801
+   802    821.6 MiB      0.0 MiB          58           def compute_counts(buffer_geom):
+   803    821.6 MiB      0.0 MiB          38               counts_local = {}
+   804    821.6 MiB      0.0 MiB          38               if not DO_COUNTS or pois_proj is None or pois_proj.empty:
+   805                                                         for label in POI_CATEGORIES: counts_local[label] = 0
+   806                                                         return counts_local
+   807    821.6 MiB      0.0 MiB         646               for label, (key, values) in POI_CATEGORIES.items():
+   808    821.6 MiB      2.5 MiB         608                   counts_local[label] = count_features_in_buffer(pois_proj, buffer_geom, key, values)
+   809    821.6 MiB      0.0 MiB          38               return counts_local
+   810
+   811    821.6 MiB      0.0 MiB          20           counts = compute_counts(buf)
+   812    821.6 MiB      0.0 MiB          20           if DO_COUNTS and sum(counts.values()) == 0 and SITE_BUFFER_M_FALLBACK and SITE_BUFFER_M_FALLBACK > SITE_BUFFER_M:
+   813    821.6 MiB      0.0 MiB          18               radius_used = SITE_BUFFER_M_FALLBACK
+   814    821.6 MiB      0.0 MiB          18               buf = proj_geom.buffer(radius_used)
+   815    821.6 MiB      0.0 MiB          18               counts = compute_counts(buf)
+   816
+   817    821.6 MiB     59.1 MiB          20           bldg_pct, road_density = building_and_road_density(buildings_proj, edges_gdf, buf)
+   818    821.6 MiB      0.0 MiB          20           all_counts.append((radius_used, counts))
+   819    821.6 MiB      0.0 MiB          20           all_build_road.append((bldg_pct, road_density))
+   820
+   821                                             # ----------------------------
+   822                                             # Assemble per-candidate results
+   823                                             # ----------------------------
+   824    821.6 MiB      0.0 MiB           1       print("\nBuilding Folium map…")
+   825    822.3 MiB      0.7 MiB           1       aoi_latlon = aoi.to_crs(epsg=4326)
+   826    822.3 MiB      0.0 MiB           1       center = [aoi_latlon.geometry.iloc[0].centroid.y, aoi_latlon.geometry.iloc[0].centroid.x]
+   827
+   828    856.8 MiB     34.5 MiB           1       edges_latlon = edges_gdf.to_crs(epsg=4326)
+   829    913.2 MiB     56.4 MiB           1       uncovered_latlon = uncovered.to_crs(epsg=4326)
+   830    916.1 MiB      2.9 MiB           1       greens_latlon = greens_poly_proj.to_crs(epsg=4326)
+   831    916.1 MiB     -0.0 MiB           1       cand_latlon_final = cand_proj.to_crs(epsg=4326)  # for plotting markers
+   832    920.9 MiB      4.8 MiB           1       iso5_latlon = iso5_poly.to_crs(epsg=4326) if iso5_poly is not None else None
+   833    928.1 MiB      7.2 MiB           1       iso10_latlon = iso10_poly.to_crs(epsg=4326) if iso10_poly is not None else None
+   834
+   835    928.8 MiB      0.8 MiB           1       m = folium.Map(location=center, zoom_start=12, control_scale=True, tiles="cartodbpositron")
+   836    931.4 MiB      0.0 MiB           2       folium.GeoJson(
+   837    928.8 MiB      0.0 MiB           1           greens_latlon[["geometry"]],
+   838    928.8 MiB      0.0 MiB           1           name=f"Green areas (OSM + NDVI≥{NDVI_GREEN_MIN:.2f})",
+   839   1134.0 MiB      2.7 MiB        2365           style_function=lambda _: {"color": "#2e7d32", "weight": 1, "fillColor": "#66bb6a", "fillOpacity": 0.35},
+   840    931.4 MiB      0.0 MiB           1       ).add_to(m)
+   841    931.4 MiB      0.0 MiB           1       if iso10_latlon is not None:
+   842    955.6 MiB     24.1 MiB           2           folium.GeoJson(iso10_latlon.__geo_interface__, name="Within 10 min of green",
+   843   1140.2 MiB      6.2 MiB           6                           style_function=lambda _: {"color": "#ff9800", "weight": 1, "fillColor": "#ffcc80", "fillOpacity": 0.25}).add_to(m)
+   844    955.6 MiB      0.0 MiB           1       if iso5_latlon is not None:
+   845    968.4 MiB     12.9 MiB           2           folium.GeoJson(iso5_latlon.__geo_interface__, name="Within 5 min of green",
+   846   1161.9 MiB     21.7 MiB           6                           style_function=lambda _: {"color": "#1976d2", "weight": 1, "fillColor": "#90caf9", "fillOpacity": 0.25}).add_to(m)
+   847   1131.0 MiB     -0.0 MiB           2       folium.GeoJson(
+   848    969.3 MiB      0.9 MiB           1           uncovered_latlon[["geometry"]],
+   849    969.3 MiB      0.0 MiB           1           name="Road segments beyond 10 min (need green access)",
+   850   1169.7 MiB    169.6 MiB      228943           style_function=lambda _: {"color": "#e53935", "weight": 2, "opacity": 0.9},
+   851   1131.0 MiB      0.0 MiB           1       ).add_to(m)
+   852
+   853   1131.0 MiB      0.0 MiB           1       description = ""
+   854
+   855   1131.0 MiB      0.0 MiB           1       description += ("\n================= Candidate Site Context =================\n")
+   856   1131.0 MiB      0.0 MiB           1       summary_rows = []
+   857
+   858   1133.9 MiB      0.0 MiB          21       for idx, (cid, latlon_geom, proj_geom) in enumerate(zip(ids, cand_latlon_final.geometry, cand_proj.geometry), start=1):
+   859   1133.8 MiB      0.0 MiB          20           lat, lon = latlon_geom.y, latlon_geom.x
+   860
+   861                                                 # Lookups from batched dicts
+   862   1133.8 MiB      0.0 MiB          20           pop_val = first_number(pop_results.get(cid, {}), ["pop", "sum"]) if DO_POP else None
+   863
+   864   1133.8 MiB      0.0 MiB          20           gsw_mean = first_number(jrc_mean_results.get(cid, {}), ["occurrence", "mean"])
+   865   1133.8 MiB      0.0 MiB          20           gsw_max  = first_number(jrc_max_results.get(cid, {}), ["occurrence", "max"])
+   866
+   867   1133.8 MiB      0.0 MiB          20           soil_label, soil_props = soil_results.get(cid, (None, {}))
+   868   1133.8 MiB      0.0 MiB         100           def _get(d, keys):
+   869   1133.8 MiB      0.0 MiB          80               for k in d.keys():
+   870                                                         lk = k.lower()
+   871                                                         if all(t in lk for t in keys):
+   872                                                             try:
+   873                                                                 return float(d[k])
+   874                                                             except Exception:
+   875                                                                 pass
+   876   1133.8 MiB      0.0 MiB          80               return None
+   877   1133.8 MiB      0.0 MiB          20           soil_ph   = round(_get(soil_props, ("ph",))        , 2) if _get(soil_props, ("ph",))         is not None else None
+   878   1133.8 MiB      0.0 MiB          20           soil_clay = round(_get(soil_props, ("clay",))      , 1) if _get(soil_props, ("clay",))       is not None else None
+   879   1133.8 MiB      0.0 MiB          20           soil_sand = round(_get(soil_props, ("sand",))      , 1) if _get(soil_props, ("sand",))       is not None else None
+   880   1133.8 MiB      0.0 MiB          20           soil_soc  = round(_get(soil_props, ("org","carb")) , 1) if _get(soil_props, ("org","carb"))  is not None else None
+   881   1133.8 MiB      0.0 MiB          20           if soil_ph is None and soil_clay is None and soil_sand is None and soil_soc is None:
+   882   1133.8 MiB      0.0 MiB          20               soil_label = None
+   883
+   884   1133.8 MiB      0.0 MiB          20           hand_val  = first_number(hand_results.get(cid, {}), ["hand_proxy", "mean"]) if DO_HAND else None
+   885   1133.8 MiB      0.0 MiB          20           slope_val = first_number(slope_results.get(cid, {}), ["slope", "mean"]) if DO_HAND else None
+   886   1133.8 MiB      0.0 MiB          20           modis_c   = first_number(heat_modis.get(cid, {}), ["LST_modis_C", "mean"]) if DO_HEAT else None
+   887   1133.8 MiB      0.0 MiB          20           eco_c     = first_number(heat_eco.get(cid, {}), ["LST_eco_C", "mean"]) if DO_HEAT else None
+   888   1133.8 MiB      0.0 MiB          20           smap_sm   = first_number(smap_results.get(cid, {}), ["soil_moisture", "mean"]) if DO_SMAP else None
+   889
+   890                                                 # Distance to OSM water
+   891   1133.8 MiB      0.0 MiB          20           dist_to_water_m = None
+   892   1133.8 MiB      0.0 MiB          20           if water_union is not None:
+   893   1133.8 MiB      0.0 MiB          20               try:
+   894   1133.8 MiB      2.3 MiB          20                   dist_to_water_m = round(float(proj_geom.distance(water_union)), 1)
+   895                                                     except Exception:
+   896                                                         pass
+   897
+   898                                                 # Counts & urban form (local)
+   899   1133.8 MiB      0.0 MiB          20           radius_used, counts = all_counts[idx-1]
+   900   1133.8 MiB      0.0 MiB          20           bldg_pct, road_density = all_build_road[idx-1]
+   901
+   902                                                 # Interpretations
+   903   1133.8 MiB      0.0 MiB          20           water_distance_msg = f"{interpret_distance_to_water(dist_to_water_m)} — {fmt_meters_and_walk(dist_to_water_m)}."
+   904   1133.8 MiB      0.0 MiB          20           water_occ_msg = interpret_water_occurrence(gsw_mean)
+   905   1133.8 MiB      0.0 MiB          20           ph_msg = interpret_ph(soil_ph)
+   906   1133.8 MiB      0.0 MiB          20           texture_msg = interpret_texture(soil_sand, soil_clay)
+   907   1133.8 MiB      0.0 MiB          20           density_msg = interpret_density(bldg_pct, road_density)
+   908   1133.8 MiB      0.0 MiB          20           heat_msg = interpret_heat(modis_c, eco_c)
+   909   1133.8 MiB      0.0 MiB          20           hand_msg = interpret_hand_proxy(hand_val, slope_val, gsw_mean)
+   910
+   911                                                 # ---- CLEAN CONSOLE OUTPUT (no nearby-counts line) ----
+   912   1133.8 MiB      0.0 MiB          20           description += (f"\n📍 Candidate #{cid}  (Lat, Lon: {lat:.6f}, {lon:.6f})\n")
+   913   1133.8 MiB      0.0 MiB          20           if DO_POP and pop_val is not None:
+   914                                                     description += (f"  People within a 10-min walk (estimated): ~{int(pop_val):,}\n")
+   915   1133.8 MiB      0.0 MiB          20           description += (f"  Water: nearest mapped water is {fmt_meters_and_walk(dist_to_water_m)}. {water_distance_msg}\n")
+   916   1133.9 MiB      0.1 MiB          20           description += (f"  Water presence (satellite history ≤{WATER_STATS_RADIUS_M} m): mean {gsw_mean}, max {gsw_max}. {water_occ_msg}\n")
+   917   1133.9 MiB      0.0 MiB          20           description += (f"  Soil (0–5 cm): pH={soil_ph} (src: {soil_label}), clay%={soil_clay}, sand%={soil_sand}, SOC g/kg={soil_soc}.\n")
+   918   1133.9 MiB      0.0 MiB          20           description += (f"  ↳ {ph_msg}  |  {texture_msg}\n")
+   919   1133.9 MiB      0.0 MiB          20           if DO_HAND:
+   920   1133.9 MiB      0.0 MiB          20               description += (f"  Terrain: HAND-proxy {hand_val} m; slope ~{slope_val}°. {hand_msg}\n")
+   921   1133.9 MiB      0.0 MiB          20           if DO_HEAT:
+   922   1133.9 MiB      0.0 MiB          60               description += (f"  Heat (Apr–Jun): MODIS≈{modis_c}°C"
+   923   1133.9 MiB      0.0 MiB          40                       f"{' | ECOSTRESS≈'+str(eco_c)+'°C' if eco_c is not None else ''}. {heat_msg}\n")
+   924   1133.9 MiB      0.0 MiB          20           if DO_SMAP and smap_sm is not None:
+   925                                                     description += (f"  Soil moisture (SMAP {SMAP_DAYS}-day mean): {smap_sm} m³/m³\n")
+   926   1133.9 MiB      0.0 MiB          20           if bldg_pct is not None or road_density is not None:
+   927   1133.9 MiB      0.0 MiB          60               description += (f"  Urban form: building cover ~{bldg_pct if bldg_pct is not None else 'n/a'}% "
+   928   1133.9 MiB      0.0 MiB          40                       f"& roads ~{road_density if road_density is not None else 'n/a'} km/km² → {density_msg}\n")
+   929                                                 # Map popup (keeps counts)
+   930   1133.9 MiB      0.0 MiB         800           description_html = f"""
+   931                                                 <div style='font-size:12px;line-height:1.35' id = 'popup-desc'>
+   932   1133.9 MiB      0.0 MiB          40               <i>Lat, Lon:</i> {lat:.6f}, {lon:.6f}<br>
+   933   1133.9 MiB      0.0 MiB          20               <b>People within 10-min walk:</b> {('{:,}'.format(int(pop_val)) if (DO_POP and pop_val is not None) else 'n/a')}<br>
+   934   1133.9 MiB      0.0 MiB          20               <b>Nearby (≤{radius_used} m)</b><br>
+   935   1133.9 MiB      0.0 MiB          60               schools:{counts.get('schools',0)} · colleges:{counts.get('colleges',0)} · universities:{counts.get('universities',0)}<br>
+   936   1133.9 MiB      0.0 MiB          60               hospitals:{counts.get('hospitals',0)} · clinics:{counts.get('clinics',0)} · pharmacies:{counts.get('pharmacies',0)}<br>
+   937   1133.9 MiB      0.0 MiB          60               markets:{counts.get('markets',0)} · worship:{counts.get('worship',0)} · supermarkets:{counts.get('supermarkets',0)}<br>
+   938   1133.9 MiB      0.0 MiB          60               playgrounds:{counts.get('playgrounds',0)} · sports:{counts.get('sports',0)} · parks/gardens:{counts.get('parks_gardens',0)}<br>
+   939                                                     <b>Water</b><br>
+   940   1133.9 MiB      0.0 MiB          20               nearest: {fmt_meters_and_walk(dist_to_water_m)}<br>
+   941   1133.9 MiB      0.0 MiB          60               JRC occurrence (≤{WATER_STATS_RADIUS_M} m, mean/max): {gsw_mean} / {gsw_max}<br>
+   942   1133.9 MiB      0.0 MiB          20               <i>{water_occ_msg}</i><br>
+   943                                                     <b>Soil (0–5 cm)</b><br>
+   944   1133.9 MiB      0.0 MiB          60               pH: {soil_ph} (src: {soil_label}) — <i>{ph_msg}</i><br>
+   945   1133.9 MiB      0.0 MiB          60               texture: sand {soil_sand}% / clay {soil_clay}% — <i>{texture_msg}</i><br>
+   946   1133.9 MiB      0.0 MiB          20               SOC: {soil_soc} g/kg<br>
+   947                                                     <b>Terrain</b><br>
+   948   1133.9 MiB      0.0 MiB          40               HAND-proxy: {hand_val} m · slope: {slope_val}°<br>
+   949   1133.9 MiB      0.0 MiB          20               <i>{hand_msg}</i><br>
+   950                                                     <b>Heat (Apr–Jun)</b><br>
+   951   1133.9 MiB      0.0 MiB          40               MODIS: {modis_c}°C{(' · ECOSTRESS: '+str(eco_c)+'°C') if eco_c is not None else ''}<br>
+   952   1133.9 MiB      0.0 MiB          20               <i>{heat_msg}</i><br>
+   953                                                     <b>Soil moisture</b><br>
+   954   1133.9 MiB      0.0 MiB          40               SMAP {SMAP_DAYS}-day mean: {smap_sm} m³/m³<br>
+   955                                                     <b>Urban form</b><br>
+   956   1133.9 MiB      0.0 MiB          40               buildings ~{bldg_pct if bldg_pct is not None else 'n/a'}% · roads ~{road_density if road_density is not None else 'n/a'} km/km²<br>
+   957   1133.9 MiB      0.0 MiB          20               <i>{density_msg}</i>
+   958                                                 </div>
+   959                                                 """
+   960
+   961   1133.9 MiB      0.0 MiB          20           button_html =  """<center><button id="popup-btn"
+   962                                                             style="margin-top:10px; padding:6px 10px; border:none; border-radius:6px;
+   963                                                                     background:#2563eb; color:white; cursor:pointer; font-size:13px;">
+   964                                                         Generate AI Suggestions
+   965                                                     </button></center>
+   966
+   967                                                     <div id = "ai-answer"> </div>
+   968
+   969                                                     <script>
+   970                                                     (function() {
+   971                                                         var btn = document.getElementById("popup-btn");
+   972                                                         var desc = document.getElementById("popup-desc");
+   973                                                         var aiBox = document.getElementById("ai-answer");
+   974
+   975                                                         if (!btn || !desc) {console.log("Button or description not found"); return;}
+   976
+   977                                                         btn.addEventListener("click", async function() {
+   978                                                             btn.disabled = true;
+   979                                                             btn.innerText = "Generating...";
+   980                                                             try {
+   981                                                                 response = await fetch(
+   982                                                                     "https://nasa-space-app-web.onrender.com/llm-inference",
+   983                                                                     {
+   984                                                                         method: "POST",
+   985                                                                         headers: {"Content-Type": "application/json"},
+   986                                                                         body: JSON.stringify({
+   987                                                                             prompt: desc.innerHTML,
+   988                                                                             type: "uhi"
+   989                                                                         })
+   990                                                                     }
+   991                                                                 );
+   992
+   993                                                                 if (!response.ok) {
+   994                                                                     console.log("Error in response");
+   995                                                                     aiBox.innerHTML = "<hr><b>AI Suggestions:</b><br>" + content;
+   996                                                                 } else {
+   997                                                                     var data = await response.json();
+   998                                                                     var content = data.response;
+   999                                                                     aiBox.innerHTML = "<hr><h2>AI Suggestions:</h2><br>" + content;
+  1000                                                                     btn.innerText = "Done";
+  1001                                                                 }
+  1002                                                             } catch (error) {
+  1003                                                                 aiBox.innerHTML = "<hr><b>AI Suggestions:</b><br>Error during request." + error;
+  1004                                                             }
+  1005                                                         });
+  1006                                                     })();
+  1007                                                     </script>
+  1008
+  1009                                                     """
+  1010
+  1011   1133.9 MiB      0.3 MiB          20           iframe = folium.IFrame(html=description_html + button_html, width=300, height=350)
+  1012
+  1013   1133.9 MiB      0.0 MiB          40           folium.CircleMarker(
+  1014   1133.9 MiB      0.0 MiB          20               location=(lat, lon), radius=6, color="#2962FF",
+  1015   1133.9 MiB      0.0 MiB          20               fill=True, fill_color="#2962FF", fill_opacity=0.95,
+  1016   1133.9 MiB      0.0 MiB          20               popup=folium.Popup(iframe, max_width=600),
+  1017   1133.9 MiB      0.0 MiB          20           ).add_to(m)
+  1018
+  1019                                                 # CSV row
+  1020   1133.9 MiB      0.0 MiB         380           row = {
+  1021   1133.9 MiB      0.0 MiB          20               "candidate_id": cid,
+  1022   1133.9 MiB      0.0 MiB          40               "lat": lat, "lon": lon,
+  1023   1133.9 MiB      0.0 MiB          20               "radius_used_m": radius_used,
+  1024   1133.9 MiB      0.0 MiB          20               "people_walk10": int(pop_val) if (DO_POP and pop_val is not None) else None,
+  1025   1133.9 MiB      0.0 MiB          20               "dist_to_osm_water_m": dist_to_water_m,
+  1026   1133.9 MiB      0.0 MiB          40               "gsw_occ_mean": gsw_mean, "gsw_occ_max": gsw_max,
+  1027   1133.9 MiB      0.0 MiB          40               "soil_ph_0_5cm": soil_ph, "soil_clay_pct_0_5cm": soil_clay,
+  1028   1133.9 MiB      0.0 MiB          40               "soil_sand_pct_0_5cm": soil_sand, "soil_soc_gkg_0_5cm": soil_soc,
+  1029   1133.9 MiB      0.0 MiB          20               "soil_source": soil_label,
+  1030   1133.9 MiB      0.0 MiB          40               "hand_proxy_m": hand_val, "slope_deg": slope_val,
+  1031   1133.9 MiB      0.0 MiB          40               "modis_lst_C": modis_c, "ecostress_lst_C": eco_c,
+  1032   1133.9 MiB      0.0 MiB          20               "smap_sm_m3m3": smap_sm,
+  1033   1133.9 MiB      0.0 MiB          20               "building_cover_pct": bldg_pct, "road_km_per_km2": road_density,
+  1034                                                 }
+  1035   1133.9 MiB      0.0 MiB         340           for k in POI_CATEGORIES.keys():
+  1036   1133.9 MiB      0.0 MiB         320               row[f"cnt_{k}__{radius_used}m"] = counts.get(k, 0)
+  1037   1133.9 MiB      0.0 MiB          20           summary_rows.append(row)
+  1038
+  1039                                             # Legend & controls
+  1040   1133.9 MiB      0.0 MiB           2       legend_html = f"""
+  1041                                             <div style="position: fixed; bottom: 18px; left: 18px; z-index:9999; background: white;
+  1042                                                         padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+  1043                                                 <b>Legend</b><br>
+  1044                                                 <span style="display:inline-block;width:12px;height:12px;background:#66bb6a;border:1px solid #2e7d32;"></span>
+  1045   1133.9 MiB      0.0 MiB           1           Green areas (OSM + NDVI≥{NDVI_GREEN_MIN:.2f})<br>
+  1046                                                 <span style="display:inline-block;width:12px;height:12px;background:#ffcc80;border:1px solid #ff9800;"></span>
+  1047                                                 ≤ 10 min walk<br>
+  1048                                                 <span style="display:inline-block;width:12px;height:12px;background:#90caf9;border:1px solid #1976d2;"></span>
+  1049                                                 ≤ 5 min walk<br>
+  1050                                                 <span style="display:inline-block;width:18px;height:2px;background:#e53935;vertical-align:middle;display:inline-block;"></span>
+  1051                                                 Uncovered roads (> 10 min)<br>
+  1052                                                 <span style="display:inline-block;width:12px;height:12px;background:#2962FF;border:1px solid #2962FF;"></span>
+  1053                                                 Candidate micro-park
+  1054                                             </div>
+  1055                                             """
+  1056   1133.9 MiB      0.0 MiB           1       m.get_root().html.add_child(folium.Element(legend_html))
+  1057   1133.9 MiB      0.0 MiB           1       folium.LayerControl(collapsed=False).add_to(m)
+  1058
+  1059   1133.9 MiB      0.0 MiB           1       out_html = os.path.join("web_outputs", session_id , "green_access.html")
+  1060   1133.9 MiB      0.0 MiB           1       out_csv = os.path.join("web_outputs", session_id , "green_access.csv")
+  1061
+  1062                                             # Save map
+  1063   1196.1 MiB     26.4 MiB           1       m.save(out_html)
+  1064   1196.1 MiB      0.0 MiB           1       print(f"\n✅ Saved map in current folder: {out_html}")
+  1065
+  1066                                             # Save CSV
+  1067   1196.1 MiB      0.0 MiB           1       try:
+  1068   1196.2 MiB      0.0 MiB           1           df = gpd.pd.DataFrame(summary_rows)
+  1069   1197.2 MiB      1.0 MiB           1           df.to_csv(out_csv, index=False)
+  1070   1197.2 MiB      0.0 MiB           1           print(f"✅ Site context CSV saved to: {out_csv}")
+  1071                                             except Exception as e:
+  1072                                                 print("Could not write CSV:", e)
+  1073
+  1074   1197.2 MiB      0.0 MiB           1       print("\nDone.")

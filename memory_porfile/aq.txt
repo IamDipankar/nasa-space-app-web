@@ -1,0 +1,188 @@
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+   599    241.0 MiB    241.0 MiB           1   @profile
+   600                                         def run(session_id=None, ee_geometry=None, aoi_bbox=None):
+   601    241.0 MiB      0.0 MiB           1       print("Initializing Earth Engine…")
+   602    241.0 MiB      0.0 MiB           1       ee_init_headless()
+   603
+   604    241.0 MiB      0.0 MiB           1       aoi = ee_geometry or ee.Geometry.Rectangle(AOI_BBOX)
+   605    241.0 MiB      0.0 MiB           1       start_iso, end_iso = str(START), str(END)
+   606    241.0 MiB      0.0 MiB           1       print(f"Geometry: Given | Window: {start_iso} → {end_iso}")
+   607
+   608                                             # Current-window images & z stacks
+   609    241.0 MiB      0.0 MiB           1       no2_img, pm25_img, co_img = build_mean_images(aoi, start_iso, end_iso)
+   610    241.0 MiB      0.0 MiB           1       stack = no2_img.addBands(pm25_img).addBands(co_img)
+   611    241.1 MiB      0.0 MiB           1       no2z_now, pmz_now, coz_now, aqz_now_img = combined_z_image(aoi, start_iso, end_iso)
+   612
+   613                                             # Sample grid (capped)
+   614    244.2 MiB      3.2 MiB           1       rows = sample_grid(aoi, stack, scale_m=SCALE_M, max_points=MAX_POINTS)
+   615    244.2 MiB      0.0 MiB           1       if not rows:
+   616                                                 raise SystemExit("No samples. Try expanding AOI or increasing DAYS_BACK.")
+   617
+   618                                             # Z-scores (current window)
+   619    244.2 MiB      0.0 MiB        1125       no2_z = zscores([r["no2"] for r in rows])
+   620    244.2 MiB      0.0 MiB        1125       pm25_z = zscores([r["pm25"] for r in rows])
+   621    244.2 MiB      0.0 MiB        1125       co_z   = zscores([r["co"] for r in rows])
+   622    244.2 MiB      0.0 MiB        1125       aq_raw = [W_NO2*n + W_PM25*p + W_CO*c for n, p, c in zip(no2_z, pm25_z, co_z)]
+   623    244.2 MiB      0.0 MiB           1       aq_index_z = zscores(aq_raw)
+   624
+   625                                             # Hotspot selection (cap)
+   626    244.2 MiB     -9.5 MiB        2245       def prc(vs, v): return p_rank(vs, v)
+   627    244.2 MiB     -4.9 MiB        1125       pcts = [prc(aq_index_z, v) for v in aq_index_z]
+   628    244.2 MiB     -0.1 MiB           1       candidates = []
+   629    244.2 MiB      0.0 MiB        1123       for r, nz, pz, cz, az, pr in zip(rows, no2_z, pm25_z, co_z, aq_index_z, pcts):
+   630    244.2 MiB      0.0 MiB        1122           if (az >= Z_THRESHOLD) or (pr >= PCTL_THRESHOLD):
+   631    244.2 MiB      0.0 MiB         211               if (nz >= 1.0) and (cz >= 1.0):
+   632    244.2 MiB      0.0 MiB           8                   driver = "Traffic / combustion (high NO₂ + CO)"
+   633    244.2 MiB      0.0 MiB         203               elif (pz >= 1.0) and (nz < 0.5):
+   634    244.2 MiB      0.0 MiB          47                   driver = "Dust / construction / open burning (high PM proxy, low NO₂)"
+   635    244.2 MiB      0.0 MiB         156               elif (nz >= 1.0) and (cz < 0.5):
+   636    244.2 MiB      0.0 MiB          61                   driver = "Point sources / industry (high NO₂, low CO)"
+   637                                                     else:
+   638    244.2 MiB      0.0 MiB          95                   driver = "Mixed drivers"
+   639    244.2 MiB      0.0 MiB         422               candidates.append({
+   640    244.2 MiB      0.0 MiB         211                   "lat": r["lat"], "lon": r["lon"],
+   641    244.2 MiB      0.0 MiB         211                   "no2_z": nz, "pm25_z": pz, "co_z": cz,
+   642    244.2 MiB      0.0 MiB         211                   "aq_index_z": az, "percentile": pr,
+   643    244.2 MiB      0.0 MiB         211                   "driver_hint": driver
+   644                                                     })
+   645    244.2 MiB      0.0 MiB           1       if not candidates:
+   646                                                 raise SystemExit("No hotspots met the threshold; relax Z_THRESHOLD/PCTL_THRESHOLD.")
+   647
+   648    244.2 MiB      0.0 MiB         423       candidates.sort(key=lambda x: x["aq_index_z"], reverse=True)
+   649    244.2 MiB      0.0 MiB           1       hotspots = candidates[:MAX_HOTSPOTS]
+   650
+   651                                             # Cluster (with fallback)
+   652    244.2 MiB      0.0 MiB           1       clusters = ensure_clusters(hotspots)
+   653    244.2 MiB      0.0 MiB         121       for hp, cid in zip(hotspots, clusters):
+   654    244.2 MiB      0.0 MiB         120           hp["_cid"] = cid
+   655
+   656                                             # Seasonality quick-look (batched)
+   657    244.2 MiB      0.0 MiB           1       dry_start, dry_end, mon_start, mon_end = season_windows(date.today())
+   658    244.2 MiB      0.0 MiB           1       _, _, _, aqz_dry_img = combined_z_image(aoi, str(dry_start), str(dry_end))
+   659    244.2 MiB      0.0 MiB           1       _, _, _, aqz_mon_img = combined_z_image(aoi, str(mon_start), str(mon_end))
+   660
+   661    244.2 MiB      0.0 MiB           2       def fc_from_points(hps):
+   662    244.2 MiB      0.0 MiB         244           feats = [ee.Feature(ee.Geometry.Point([hp["lon"], hp["lat"]]), {"idx": i})
+   663    244.2 MiB      0.0 MiB         121                    for i, hp in enumerate(hps)]
+   664    244.2 MiB      0.0 MiB           1           return ee.FeatureCollection(feats)
+   665
+   666    244.2 MiB      0.0 MiB           1       pts_fc = fc_from_points(hotspots)
+   667    244.2 MiB      0.0 MiB           1       aq_dry_coll = aqz_dry_img.sampleRegions(collection=pts_fc, scale=SCALE_M, geometries=False, tileScale=EE_TILE_SCALE)
+   668    244.2 MiB      0.0 MiB           1       aq_mon_coll = aqz_mon_img.sampleRegions(collection=pts_fc, scale=SCALE_M, geometries=False, tileScale=EE_TILE_SCALE)
+   669    249.5 MiB      5.4 MiB           1       aq_dry = aq_dry_coll.getInfo().get("features", [])
+   670    252.5 MiB      3.0 MiB           1       aq_mon = aq_mon_coll.getInfo().get("features", [])
+   671    252.5 MiB      0.0 MiB         121       for feat in aq_dry:
+   672    252.5 MiB      0.0 MiB         120           i = int(feat["properties"]["idx"])
+   673    252.5 MiB      0.0 MiB         120           val = feat["properties"].get("aq_index_z")
+   674    252.5 MiB      0.0 MiB         120           hotspots[i]["aq_z_dry"] = float(val) if val is not None else None
+   675    252.5 MiB      0.0 MiB         121       for feat in aq_mon:
+   676    252.5 MiB      0.0 MiB         120           i = int(feat["properties"]["idx"])
+   677    252.5 MiB      0.0 MiB         120           val = feat["properties"].get("aq_index_z")
+   678    252.5 MiB      0.0 MiB         120           hotspots[i]["aq_z_monsoon"] = float(val) if val is not None else None
+   679
+   680                                             # OSM context
+   681    252.5 MiB      0.0 MiB           1       aoi_poly = aoi_polygon_wgs84()
+   682    252.5 MiB      0.0 MiB           1       try:
+   683    258.9 MiB      6.3 MiB           2           sens_all = osm_geoms_from_polygon(aoi_poly, {"amenity": ["school","clinic","hospital","doctors"],
+   684    252.5 MiB      0.0 MiB           1                                                        "social_facility": ["nursing_home","assisted_living"]})
+   685                                             except Exception:
+   686                                                 sens_all = gpd.GeoDataFrame(geometry=[], crs="EPSG:4326")
+   687    258.9 MiB      0.0 MiB           1       try:
+   688    258.9 MiB     -3.4 MiB           2           ind_all  = osm_geoms_from_polygon(aoi_poly, {
+   689    258.9 MiB      0.0 MiB           1               "landuse": ["industrial"], "industrial": True, "man_made": ["works","chimney"],
+   690    258.9 MiB      0.0 MiB           1               "power": ["plant","generator"], "harbour": ["yes"], "waterway": ["dock"]
+   691                                                 })
+   692    255.5 MiB     -4.6 MiB           2           extra_port = osm_geoms_from_polygon(aoi_poly, {"man_made": ["pier"], "landuse": ["port"],
+   693    255.5 MiB      0.0 MiB           1                                                          "harbour": ["yes"], "waterway": ["dock"]})
+   694    254.3 MiB     -1.2 MiB           1           if ind_all is not None and not ind_all.empty and extra_port is not None and not extra_port.empty:
+   695    254.3 MiB     -0.1 MiB           1               ind_all = gpd.GeoDataFrame(gpd.pd.concat([ind_all, extra_port], ignore_index=True), crs=ind_all.crs or "EPSG:4326")
+   696                                                 elif (ind_all is None or ind_all.empty) and extra_port is not None and not extra_port.empty:
+   697                                                     ind_all = extra_port
+   698                                             except Exception:
+   699                                                 ind_all = gpd.GeoDataFrame(geometry=[], crs="EPSG:4326")
+   700
+   701                                             # Build concave envelopes per cluster (filter tiny/degenerate)
+   702    254.3 MiB      0.0 MiB           1       metric_crs = utm_crs_from_bbox(aoi_bbox or AOI_BBOX)
+   703    254.4 MiB      0.1 MiB           1       envelopes_by_cid = build_concave_envelopes(hotspots, clusters, metric_crs, alpha_m=ALPHA_M, min_pts=MIN_ENVELOPE_POINTS)
+   704    254.4 MiB      0.0 MiB           1       if not envelopes_by_cid:
+   705                                                 envelopes_by_cid = build_concave_envelopes(hotspots, [0]*len(hotspots), metric_crs, alpha_m=ALPHA_M, min_pts=3)
+   706
+   707                                             # Union to single polygon per cluster & compute area
+   708    254.4 MiB      0.0 MiB           1       cluster_union = {}
+   709    254.4 MiB      0.0 MiB           1       cluster_area_km2 = {}
+   710    254.4 MiB      0.0 MiB           7       for cid, polys in envelopes_by_cid.items():
+   711    254.4 MiB      0.0 MiB           6           if not polys:
+   712                                                     continue
+   713    254.4 MiB      0.0 MiB           6           polys_proj = gpd.GeoSeries(polys, crs="EPSG:4326").to_crs(metric_crs)
+   714    254.4 MiB      0.0 MiB           6           union_geom = unary_union(list(polys_proj.values))
+   715    254.4 MiB      0.0 MiB           6           area_km2 = float(union_geom.area / 1e6)
+   716    254.4 MiB      0.0 MiB           6           if area_km2 <= 0:
+   717                                                     continue
+   718    254.4 MiB      0.0 MiB           6           union_wgs = gpd.GeoSeries([union_geom], crs=metric_crs).to_crs(epsg=4326).iloc[0]
+   719    254.4 MiB      0.0 MiB           6           cluster_union[cid] = union_wgs
+   720    254.4 MiB      0.0 MiB           6           cluster_area_km2[cid] = area_km2
+   721
+   722                                             # Pick Top-3 clusters by area
+   723    254.4 MiB      0.0 MiB          13       top_cids = sorted(cluster_area_km2.keys(), key=lambda c: cluster_area_km2[c], reverse=True)[:3]
+   724    254.4 MiB      0.0 MiB           6       selected = [(cid, cluster_union[cid]) for cid in top_cids]
+   725
+   726                                             # ---------- Print summaries for Top-3 (plain language) ----------
+   727    254.4 MiB      0.0 MiB           1       description_string = ""
+   728
+   729    254.4 MiB      0.0 MiB           1       description_string += ("\n================= Top bad air quality hotspot clusters (area-wise) =================\n")
+   730    254.4 MiB      0.0 MiB           1       description_string += ("(Note: z (σ) = standardized units; 0 means ‘typical’ for the city in the last 60 days.)\n")
+   731    197.9 MiB    -56.5 MiB           1       pop_img = population_image(aoi)
+   732    197.9 MiB      0.0 MiB           1       z_imgs_now = {"no2_z": no2z_now, "pm25_z": pmz_now, "co_z": coz_now, "aq_index_z": aqz_now_img}
+   733
+   734    197.9 MiB      0.0 MiB           1       cid_wise_descriptions = dict()
+   735
+   736    199.0 MiB    -75.1 MiB           4       for rank, (cid, poly) in enumerate(selected, start=1):
+   737    199.0 MiB    -25.8 MiB           3           area_km2 = cluster_area_km2[cid]
+   738    199.0 MiB    -25.8 MiB           3           pop_sum = reduce_region_sum(pop_img, ee.Geometry(poly.__geo_interface__), scale=200) if pop_img is not None else None
+   739    198.9 MiB    -70.1 MiB           3           means_now = ee_means_in_poly(z_imgs_now, poly)
+   740    198.9 MiB    -71.1 MiB           3           zn = means_now.get("aq_index_z")
+   741    199.0 MiB    -71.1 MiB           3           zd = ee_means_in_poly({"aq_index_z": aqz_dry_img}, poly).get("aq_index_z")
+   742    199.0 MiB    -75.4 MiB           3           zm = ee_means_in_poly({"aq_index_z": aqz_mon_img}, poly).get("aq_index_z")
+   743    199.0 MiB    -75.1 MiB           3           sens_inside = count_sensitive_inside(sens_all, poly)
+   744    199.0 MiB    -75.1 MiB           3           ind_names, ind_count = list_osm_names_in_poly(ind_all, poly, max_show=60)
+   745
+   746    199.0 MiB    -75.1 MiB           3           curr_desc = ""
+   747
+   748    199.0 MiB    -75.1 MiB           3           curr_desc += (f"\n### Top cluster #{rank} (cluster {cid})\n")
+   749    199.0 MiB    -75.1 MiB           3           curr_desc += (f"- **Area:** ~{area_km2:.2f} km²\n")
+   750    199.0 MiB    -75.1 MiB           3           curr_desc += (f"- **People living inside:** {(f'{int(pop_sum):,}' if pop_sum is not None else 'n/a')}\n")
+   751    199.0 MiB    -75.1 MiB           3           if zn is not None:
+   752    199.0 MiB    -75.1 MiB           3               curr_desc += (f"- **Current level:** {z_to_level_text(zn)} (z≈{zn:.2f}; 0≈typical)\n")
+   753                                                 else:
+   754                                                     curr_desc += ("- **Current level:** n/a\n")
+   755    199.0 MiB    -75.1 MiB           3           curr_desc += (f"- **Seasonality:** {seasonality_plain(zd, zm)}\n")
+   756    199.0 MiB   -300.3 MiB          12           curr_desc += (f"- **Sensitive sites inside:** schools:{sens_inside.get('schools',0)}, "
+   757    199.0 MiB   -150.2 MiB           6                 f"clinics:{sens_inside.get('clinics',0)}, hospitals:{sens_inside.get('hospitals',0)}, "
+   758    199.0 MiB    -75.1 MiB           3                 f"elder homes:{sens_inside.get('elder_homes',0)}\n")
+   759    199.0 MiB    -75.1 MiB           3           curr_desc += (f"- **Industrial/port/point-source features inside:** {ind_count}\n")
+   760    199.0 MiB    -75.1 MiB           3           if ind_count > 0:
+   761                                                     curr_desc += ("  **Names / tags:**\n")
+   762                                                     for nm in ind_names:
+   763                                                         curr_desc += (f"   - {nm}\n")
+   764
+   765    199.0 MiB    -75.1 MiB           3           description_string += curr_desc
+   766    199.0 MiB    -75.1 MiB           3           cid_wise_descriptions[cid] = curr_desc
+   767
+   768    149.8 MiB    -49.2 MiB           1       print(description_string)
+   769                                             # # result = groq_api.inference(description_string)
+   770                                             # print()
+   771                                             # print()
+   772                                             # print("LLM Response")
+   773                                             # print(result)
+   774                                             # print('\n\n\n')
+   775                                             # # result = groq_api.parse_llm_response(result[0])
+   776                                             # print(result)
+   777
+   778
+   779                                             # ---------- Map with Top-3 only ----------
+   780    152.5 MiB      2.8 MiB           1       m = build_map(aoi_bbox or AOI_BBOX, hotspots, selected, cid_wise_descriptions)
+   781    152.5 MiB      0.0 MiB           1       html_output_dir = f'web_outputs/{session_id}/aq_hotspots.html' if session_id else 'web_outputs/temp/aq_hotspots.html'
+   782    152.5 MiB      0.0 MiB           1       os.makedirs(os.path.dirname(html_output_dir), exist_ok=True)
+   783    153.4 MiB      0.9 MiB           1       m.save(html_output_dir)
+   784    153.4 MiB      0.0 MiB           1       print(f"\n✅ Saved: {html_output_dir}")

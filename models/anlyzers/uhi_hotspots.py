@@ -8,6 +8,7 @@ from folium.plugins import MiniMap, Fullscreen, MousePosition, MeasureControl
 from shapely.geometry import Point, box
 from shapely.ops import unary_union
 import dotenv
+from memory_profiler import profile
 import markdown
 
 dotenv.load_dotenv()
@@ -62,6 +63,7 @@ USER = os.getenv("USER") or os.getenv("USERNAME") or "user"
 OUT_HTML = f"/Users/{USER}/Downloads/narayanganj_uhi_hotspots.html"
 
 # ------------------ EE INIT ------------------
+@profile
 def ee_init_headless():
     sa = os.environ["EE_SERVICE_ACCOUNT"]       # ee-runner@<project>.iam.gserviceaccount.com
     key_b64 = os.environ["EE_KEY_B64"]          # base64 of the JSON key
@@ -87,6 +89,7 @@ def aoi_polygon_wgs84():
     minx, miny, maxx, maxy = AOI_BBOX
     return box(minx, miny, maxx, maxy)
 
+@profile
 def zscores(vals):
     good = [v for v in vals if v is not None and math.isfinite(v)]
     if len(good) < 2: return [0.0 for _ in vals]
@@ -95,12 +98,14 @@ def zscores(vals):
     std  = math.sqrt(max(var, 1e-12))
     return [0.0 if (v is None or not math.isfinite(v)) else (v-mean)/std for v in vals]
 
+@profile
 def p_rank(all_vals, v):
     s = sorted(all_vals)
     if not s: return 0.0
     cnt = sum(1 for x in s if x <= v)
     return 100.0 * cnt / len(s)
 
+@profile
 def haversine_m(lat1, lon1, lat2, lon2):
     R = 6371000.0
     p1, p2 = math.radians(lat1), math.radians(lat2)
@@ -109,6 +114,7 @@ def haversine_m(lat1, lon1, lat2, lon2):
     a = math.sin(dphi/2)**2 + math.cos(p1)*math.cos(p2)*math.sin(dl/2)**2
     return 2*R*math.asin(math.sqrt(a))
 
+@profile
 def cluster_dbscan(points, eps_m=EPS_METERS, min_samples=MIN_SAMPLES):
     n = len(points)
     if n == 0: return []
@@ -151,6 +157,7 @@ def cluster_dbscan(points, eps_m=EPS_METERS, min_samples=MIN_SAMPLES):
         cid += 1
     return clusters
 
+@profile
 def ensure_clusters(hotspots):
     clusters = cluster_dbscan(hotspots, eps_m=EPS_METERS, min_samples=MIN_SAMPLES)
     if not any(c >= 0 for c in clusters):
@@ -159,6 +166,7 @@ def ensure_clusters(hotspots):
         clusters = [0 for _ in hotspots]
     return clusters
 
+@profile
 def build_concave_envelopes(hotspots, clusters, metric_crs, alpha_m=ALPHA_M, min_pts=MIN_ENVELOPE_POINTS):
     """Returns dict cid -> list[Polygon in WGS84], tiny parts removed."""
     by_cluster = {}
@@ -182,12 +190,14 @@ def build_concave_envelopes(hotspots, clusters, metric_crs, alpha_m=ALPHA_M, min
         out[cid] = kept_wgs
     return out
 
+@profile
 def severity_from_z(z):
     if z >= SEVERE_Z: return "severe"
     if z >= HIGH_Z:   return "high"
     if z >= ELEV_Z:   return "elev"
     return None
 
+@profile
 def z_to_level_text(z):
     if z is None: return "n/a"
     if z >= 2.0: return "Very high (well above typical)"
@@ -196,6 +206,7 @@ def z_to_level_text(z):
     if z > -0.5: return "Around typical"
     return "Below typical"
 
+@profile
 def season_bands_today():
     """Return (pre_monsoon, monsoon, post_monsoon) windows as (start_iso,end_iso)."""
     y = date.today().year
@@ -206,6 +217,7 @@ def season_bands_today():
     return [tuple(map(str, w)) for w in (pre, mon, post)]
 
 # ------------------ EARTH ENGINE IMAGES ------------------
+@profile
 def lst_day_mean(aoi, start_iso, end_iso):
     coll = (ee.ImageCollection("MODIS/061/MOD11A2")
             .filterBounds(aoi).filterDate(start_iso, end_iso)
@@ -213,6 +225,7 @@ def lst_day_mean(aoi, start_iso, end_iso):
     lst_c = coll.mean().multiply(0.02).subtract(273.15).rename("lst_day_c").clip(aoi)
     return lst_c
 
+@profile
 def lst_night_mean(aoi, start_iso, end_iso):
     coll = (ee.ImageCollection("MODIS/061/MOD11A2")
             .filterBounds(aoi).filterDate(start_iso, end_iso)
@@ -220,12 +233,14 @@ def lst_night_mean(aoi, start_iso, end_iso):
     lst_c = coll.mean().multiply(0.02).subtract(273.15).rename("lst_night_c").clip(aoi)
     return lst_c
 
+@profile
 def lst_day_daily_collection(aoi, start_iso, end_iso):
     coll = (ee.ImageCollection("MODIS/061/MOD11A1")
             .filterBounds(aoi).filterDate(start_iso, end_iso)
             .select("LST_Day_1km").map(lambda img: img.updateMask(img.gt(0))))
     return coll
 
+@profile
 def sentinel2_ndvi_recent(aoi, months_back=6):
     start = date.today() - timedelta(days=months_back*30)
     end   = date.today()
@@ -241,6 +256,7 @@ def sentinel2_ndvi_recent(aoi, months_back=6):
     ndvi = med.normalizedDifference(['B8','B4']).rename('ndvi').clip(aoi)
     return ndvi
 
+@profile
 def worldcover_map(year=2021):
     # ESA WorldCover v200 (2021/2020). Built-up class = 50, Tree cover = 10
     try:
@@ -252,6 +268,7 @@ def worldcover_map(year=2021):
         except Exception:
             return None
 
+@profile
 def population_image(aoi):
     # Prefer WorldPop; fall back to GHSL/GPW if needed
     for yr in [2025, 2023, 2022, 2021, 2020, 2019]:
@@ -280,6 +297,7 @@ def population_image(aoi):
         pass
     return None
 
+@profile
 def worldpop_children_elderly(aoi):
     """Try to assemble children% and elderly% rasters (defensive). Returns (child_img, elder_img) as fractions 0..1 or (None,None)."""
     # WorldPop has age-sex layers by country; availability varies.
@@ -309,6 +327,7 @@ def worldpop_children_elderly(aoi):
     return None, None
 
 # ------------------ REDUCERS ------------------
+@profile
 def reduce_mean(image, geom, scale):
     try:
         val = image.reduceRegion(ee.Reducer.mean(), geom, scale=scale,
@@ -319,6 +338,7 @@ def reduce_mean(image, geom, scale):
     except Exception:
         return None
 
+@profile
 def reduce_sum(image, geom, scale):
     try:
         val = image.reduceRegion(ee.Reducer.sum(), geom, scale=scale,
@@ -328,6 +348,7 @@ def reduce_sum(image, geom, scale):
     except Exception:
         return None
 
+@profile
 def fraction_of_mask(mask_img, geom, scale):
     """mask_img: 1 where class present, else 0. Returns fraction 0..1."""
     try:
@@ -339,6 +360,7 @@ def fraction_of_mask(mask_img, geom, scale):
         return None
 
 # ------------------ OSM ------------------
+@profile
 def osm_geoms_from_polygon(aoi_poly_wgs84, tags_dict):
     ox.settings.use_cache = True
     ox.settings.timeout = 180
@@ -364,6 +386,7 @@ def osm_geoms_from_polygon(aoi_poly_wgs84, tags_dict):
     all_feats = all_feats[all_feats.geometry.notna()].copy()
     return all_feats.to_crs(epsg=4326)
 
+@profile
 def count_sensitive_inside(sens_gdf, polygon):
     if sens_gdf is None or sens_gdf.empty:
         return dict(schools=0, clinics=0, hospitals=0, elder_homes=0)
@@ -385,6 +408,7 @@ def count_sensitive_inside(sens_gdf, polygon):
     return res
 
 # ------------------ HEAT INDEX ------------------
+@profile
 def heat_index_c_from_t_rh(t_air_c, rh_pct):
     """NOAA HI formula (approx). Inputs: air T in °C, RH in %."""
     if (t_air_c is None) or (rh_pct is None): return None
@@ -399,6 +423,7 @@ def heat_index_c_from_t_rh(t_air_c, rh_pct):
     return hi_c
 
 # ------------------ MAP ------------------
+@profile
 def build_map(aoi_bbox, hotspots, selected_cluster_polys, parameters):
     lat_c = (aoi_bbox[1] + aoi_bbox[3]) / 2.0
     lon_c = (aoi_bbox[0] + aoi_bbox[2]) / 2.0
@@ -524,6 +549,7 @@ def build_map(aoi_bbox, hotspots, selected_cluster_polys, parameters):
 
 # ------------------ MAIN ------------------
 # def run(session_id = None, ee_geometry = None, ee_bbox = None):
+@profile
 def run(session_id, ee_geometry, ee_bbox):
     print("Initializing Earth Engine…")
     ee_init_headless()
