@@ -11,7 +11,7 @@
 
 import markdown
 from models.llms import groq_api
-from memory_profiler import profile
+# from memory_profiler import profile
 
 import os, tempfile, base64
 import math
@@ -596,7 +596,7 @@ def build_map(aoi_bbox, hotspots, selected_cluster_polys, parameters):
     return m
 
 # ------------------ MAIN ------------------
-@profile
+# @profile
 def run(session_id=None, ee_geometry=None, aoi_bbox=None):
     print("Initializing Earth Engine…")
     ee_init_headless()

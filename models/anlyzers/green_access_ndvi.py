@@ -2,7 +2,7 @@ import os, tempfile, base64
 import math
 import warnings
 from datetime import date
-from memory_profiler import profile
+# from memory_profiler import profile
 
 try:
     import ee
@@ -559,7 +559,7 @@ def edges_within_time(Gp, edges_gdf, source_node, cutoff_s):
 # ----------------------------
 # session_id = "aaa"
 # gdf = location_gdf
-@profile
+# @profile
 def run(session_id = None, gdf = None):
     ee_init_headless()
 
