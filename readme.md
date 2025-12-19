@@ -14,7 +14,7 @@
 
 ## 🛰️ Overview
 
-This project was developed by **Team Codenebula** as part of the [NASA Space Apps Challenge 2025](https://www.spaceappschallenge.org/2025/challenges/data-pathways-to-healthy-cities-and-human-settlements/).
+This project was developed by **Team Codenebula** as part of the [BatchHacks](https://batchhacks.devpost.com/?_gl=1*1iaaduo*_gcl_au*MzgxODgwMDYwLjE3NjYxMDg0NDE.*_ga*NDc1MDAzMzE2LjE3NjYxMDg0NDE.*_ga_0YHJK3Y10M*czE3NjYxMzA1MjQkbzIkZzEkdDE3NjYxMzA3NzAkajYwJGwwJGgw).
 
 It is an intelligent **Smart Urban Planning Web Application** that helps planners and policymakers analyze and mitigate three major urban environmental challenges:
 
